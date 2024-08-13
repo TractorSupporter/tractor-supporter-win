@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 
 namespace TractorSupporter
@@ -41,19 +42,27 @@ namespace TractorSupporter
             {
                 IPEndPoint RemoteIpEndpoint = new IPEndPoint(IPAddress.Any, 8080);
                 Byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndpoint);
-                string returnData = Encoding.ASCII.GetString(receivedBytes);
+                string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
-                Dispatcher.Invoke(() =>
+                using (JsonDocument data = JsonDocument.Parse(serializedData))
                 {
-                    date = DateTime.Now.ToString("hh:mm:ss");
-                    data = "time: " + date + " | " + returnData;
+                    JsonElement dataRoot = data.RootElement;
+                    string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
+                    double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
 
-                    tb_IPSender.Text = RemoteIpEndpoint.Address.ToString();
-                    tb_IPDestination.Text = tb_IPSender.Text;
+                    Dispatcher.Invoke(() =>
+                    {
+                        tb_IPSender.Text = RemoteIpEndpoint.Address.ToString();
+                        tb_IPDestination.Text = tb_IPSender.Text;
 
-                    tb_ReceivedMessages.AppendText(data + "\n");
-                    tb_ReceivedMessages.ScrollToEnd();
-                });
+                        date = DateTime.Now.ToString("hh:mm:ss");
+                        extraMessage = "time: " + date + " | " + extraMessage;
+                        tb_ReceivedMessages.AppendText(extraMessage + "\n");
+                        tb_ReceivedMessages.ScrollToEnd();
+
+                        tb_DistanceMeasured.Text = distanceMeasured.ToString();
+                    });
+                }
             }
         }
 
