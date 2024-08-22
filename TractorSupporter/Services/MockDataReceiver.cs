@@ -12,7 +12,7 @@ namespace TractorSupporter.Services
     public class MockDataReceiver : IDataReceiver
     {
         public static string ExtraMessage { get; set; } = "extra message";
-        public static double DistanceMeasured { get; set; } = 10;
+        public static double DistanceMeasured { get; set; } = 1000;
 
 
         public Byte[] ReceiveData()

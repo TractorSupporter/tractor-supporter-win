@@ -6,14 +6,14 @@
         <StackPanel>
             <TextBlock Text="Extra Message:" Margin="10"/>
             <TextBox x:Name="tbExtraMessage" Margin="10" Text="extra message" TextChanged="tbExtraMessage_TextChanged"/>
-            <TextBlock Text="Distance Measured:" Margin="10"/>
-            <TextBox x:Name="tbDistanceMeasured" Margin="10" Text="10" TextChanged="tbDistanceMeasured_TextChanged"/>
+            <TextBlock Text="Distance Measured (cm):" Margin="10"/>
+            <TextBox x:Name="tbDistanceMeasured" Margin="10" Text="1000" TextChanged="tbDistanceMeasured_TextChanged"/>
 
             <TextBlock Text="Tractor State:" Margin="10"/>
             <RadioButton x:Name="rbStationary" Content="Stationary Tractor" Margin="10" GroupName="TractorState" Checked="RadioButton_Checked"/>
             <RadioButton x:Name="rbMoving" Content="Moving Tractor" Margin="10" GroupName="TractorState" Checked="RadioButton_Checked"/>
 
-            <TextBlock Text="Speed of Tractor:" Margin="10" Visibility="Collapsed" x:Name="tbSpeedLabel"/>
+            <TextBlock Text="Speed of Tractor (km/h):" Margin="10" Visibility="Collapsed" x:Name="tbSpeedLabel"/>
             <TextBox x:Name="tbSpeed" Margin="10" Text="0" Visibility="Collapsed" TextChanged="tbSpeed_TextChanged"/>
         </StackPanel>
     </Grid>

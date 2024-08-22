@@ -41,10 +41,10 @@ namespace TractorSupporter
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (Speed > 0)
+            if (MockDataReceiver.DistanceMeasured > 0 && Speed > 0)
             {
                 double speedInMetersPerSecond = Speed * 1000 / 3600;
-                double distanceChange = speedInMetersPerSecond * (timerInterval / 1000.0);
+                double distanceChange = speedInMetersPerSecond * (timerInterval / 10.0);
                 MockDataReceiver.DistanceMeasured -= distanceChange;
                 tbDistanceMeasured.Text = MockDataReceiver.DistanceMeasured.ToString("F2");
             }
