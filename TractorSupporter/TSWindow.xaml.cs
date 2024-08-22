@@ -1,8 +1,11 @@
-﻿using System.Net;
+﻿using System.Configuration;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
+using TractorSupporter.Interfaces;
+using TractorSupporter.Services;
 
 namespace TractorSupporter
 {
@@ -11,16 +14,25 @@ namespace TractorSupporter
     /// </summary>
     public partial class TSWindow : Window
     {
+        private bool useMockData = false;
+
         public TSWindow()
         {
             InitializeComponent();
-
             setMyIP();
 
             Thread thdUdpServer = new Thread(new ThreadStart(serverThread));
 
             thdUdpServer.IsBackground = true;
             thdUdpServer.Start();
+
+            // Working with mocks
+            useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
+            if (useMockData)
+            {
+                var configWindow = new MockDataConfigWindow();
+                configWindow.Show();
+            }
         }
 
         private void setMyIP()
@@ -34,14 +46,13 @@ namespace TractorSupporter
         string data = "";
         string date = "";
 
-
         public void serverThread()
         {
-            UdpClient udpClient = new UdpClient(8080);
+            IDataReceiver dataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
+
             while (true)
             {
-                IPEndPoint RemoteIpEndpoint = new IPEndPoint(IPAddress.Any, 8080);
-                Byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndpoint);
+                Byte[] receivedBytes = dataReceiver.ReceiveData();
                 string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
                 using (JsonDocument data = JsonDocument.Parse(serializedData))
@@ -52,7 +63,7 @@ namespace TractorSupporter
 
                     Dispatcher.Invoke(() =>
                     {
-                        tb_IPSender.Text = RemoteIpEndpoint.Address.ToString();
+                        tb_IPSender.Text = dataReceiver.GetRemoteIpAddress();
                         tb_IPDestination.Text = tb_IPSender.Text;
 
                         date = DateTime.Now.ToString("hh:mm:ss");
@@ -62,6 +73,12 @@ namespace TractorSupporter
 
                         tb_DistanceMeasured.Text = distanceMeasured.ToString();
                     });
+                }
+
+                // Working with mocks
+                if (useMockData)
+                {
+                    Thread.Sleep(1000);
                 }
             }
         }
