@@ -15,6 +15,7 @@ namespace TractorSupporter
     public partial class TSWindow : Window
     {
         private bool useMockData = false;
+        private readonly DistanceDataSender _dataSender;
 
         public TSWindow()
         {
@@ -27,6 +28,13 @@ namespace TractorSupporter
             thdUdpServer.Start();
 
             // Working with mocks
+            initMockConfigWindow();
+
+            _dataSender = new DistanceDataSender("DistancePipe");
+        }
+
+        private void initMockConfigWindow()
+        {
             useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
             if (useMockData)
             {
@@ -72,6 +80,7 @@ namespace TractorSupporter
                         tb_ReceivedMessages.ScrollToEnd();
 
                         tb_DistanceMeasured.Text = distanceMeasured.ToString();
+                        _dataSender.SendDistanceData(distanceMeasured);
                     });
                 }
 
@@ -89,6 +98,12 @@ namespace TractorSupporter
             udpClient.Connect(tb_IPDestination.Text, Convert.ToInt16(tb_Port.Text));
             Byte[] dataToSend = Encoding.ASCII.GetBytes(tb_SendMessage.Text);
             udpClient.Send(dataToSend, dataToSend.Length);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _dataSender.Dispose();
+            base.OnClosed(e);
         }
     }
 }
