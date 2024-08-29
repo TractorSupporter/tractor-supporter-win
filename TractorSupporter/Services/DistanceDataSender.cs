@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace TractorSupporter.Services
 {
-    using RabbitMQ.Client;
     using System.IO.Pipes;
     using System.IO;
     using System.Text;
