@@ -5,9 +5,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using TractorSupporter.Interfaces;
 
-namespace TractorSupporter.Services
+namespace TractorSupporter.Model
 {
     public class UdpDataReceiver : IDataReceiver
     {
@@ -20,12 +19,12 @@ namespace TractorSupporter.Services
             _remoteIpEndpoint = new IPEndPoint(IPAddress.Any, port);
         }
 
-        public Byte[] ReceiveData()
+        public byte[] ReceiveData()
         {
             return _udpClient.Receive(ref _remoteIpEndpoint);
         }
 
-        public String GetRemoteIpAddress()
+        public string GetRemoteIpAddress()
         {
             return _remoteIpEndpoint.Address.ToString();
         }

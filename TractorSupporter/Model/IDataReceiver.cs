@@ -5,11 +5,11 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TractorSupporter.Interfaces
+namespace TractorSupporter.Model
 {
     public interface IDataReceiver
     {
-        Byte[] ReceiveData();
-        String GetRemoteIpAddress();
+        byte[] ReceiveData();
+        string GetRemoteIpAddress();
     }
 }
