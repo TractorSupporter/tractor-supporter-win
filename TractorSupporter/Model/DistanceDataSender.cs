@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TractorSupporter.Services
+namespace TractorSupporter.Model
 {
     using System.IO.Pipes;
     using System.IO;

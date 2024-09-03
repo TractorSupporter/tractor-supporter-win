@@ -5,9 +5,8 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TractorSupporter.Interfaces;
 
-namespace TractorSupporter.Services
+namespace TractorSupporter.Model
 {
     public class MockDataReceiver : IDataReceiver
     {
@@ -15,7 +14,7 @@ namespace TractorSupporter.Services
         public static double DistanceMeasured { get; set; } = 1000;
 
 
-        public Byte[] ReceiveData()
+        public byte[] ReceiveData()
         {
             var mockData = new
             {
@@ -27,7 +26,7 @@ namespace TractorSupporter.Services
             return Encoding.ASCII.GetBytes(jsonString);
         }
 
-        public String GetRemoteIpAddress()
+        public string GetRemoteIpAddress()
         {
             return "0.0.0.0";
         }
