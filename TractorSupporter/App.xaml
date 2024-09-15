@@ -2,8 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TractorSupporter"
-             StartupUri="View/TSWindow.xaml">
+             StartupUri="View/StarterConfigWindow.xaml">
     <Application.Resources>
-         
+        <Color x:Key="DarkBlueColor">#0D2738</Color>
+        <Color x:Key="LightBlueColor">#1F90FE</Color>
+        <Color x:Key="GrayColor">#EAEBEC</Color>
+
+        <SolidColorBrush x:Key="DarkBlueBrush" Color="{StaticResource DarkBlueColor}"/>
+        <SolidColorBrush x:Key="LightBlueBrush" Color="{StaticResource LightBlueColor}"/>
+        <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource GrayColor}"/>
     </Application.Resources>
 </Application>

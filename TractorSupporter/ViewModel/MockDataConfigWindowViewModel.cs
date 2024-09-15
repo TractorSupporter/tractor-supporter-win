@@ -2,8 +2,8 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using TractorSupporter.Model;
 using TractorSupporter.Model.Enums;
+using TractorSupporter.Services;
 using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.ViewModel

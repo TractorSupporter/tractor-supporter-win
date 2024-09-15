@@ -5,8 +5,9 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TractorSupporter.Services.Interfaces;
 
-namespace TractorSupporter.Model
+namespace TractorSupporter.Services
 {
     public class MockDataReceiver : IDataReceiver
     {

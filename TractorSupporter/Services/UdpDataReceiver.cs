@@ -5,8 +5,9 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using TractorSupporter.Services.Interfaces;
 
-namespace TractorSupporter.Model
+namespace TractorSupporter.Services
 {
     public class UdpDataReceiver : IDataReceiver
     {
