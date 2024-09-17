@@ -15,20 +15,15 @@ using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View
 {
-    public partial class MainWindow : Window
+    /// <summary>
+    /// Interaction logic for SettingsWindow.xaml
+    /// </summary>
+    public partial class SettingsWindow : Window
     {
-        public MainWindow()
+        public SettingsWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
-
-            var viewModel = DataContext as MainWindowViewModel;
-            if (viewModel != null)
-            {
-                viewModel.RequestClose += (s, e) => this.Close();
-            }
-
-            Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
+            DataContext = new SettingsWindowViewModel();
         }
     }
 }

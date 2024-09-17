@@ -26,11 +26,13 @@ namespace TractorSupporter.ViewModel
         private ICommand _startConnectionCommand;
         private FlowDocument _receivedMessages;
         private readonly DistanceDataSender _dataSender;
+        private IWindowService _windowService;
 
         public MainWindowViewModel()
         {
             _receivedMessages = new FlowDocument();
             StartConnectionCommand = new RelayCommand(StartConnection);
+            _windowService = new WindowService();
             InitMockConfigWindow();
             //_dataSender = new DistanceDataSender("DistancePipe");
         }
@@ -155,6 +157,12 @@ namespace TractorSupporter.ViewModel
             {
                 StartServerThread();
             }
+        }
+
+        public void CloseMainWindow()
+        {
+            _windowService.OpenSettingsWindow();
+            Close(new object());
         }
     }
 }

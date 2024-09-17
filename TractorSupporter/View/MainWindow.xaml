@@ -7,13 +7,13 @@
         mc:Ignorable="d"
         xmlns:controls="clr-namespace:TractorSupporter.View.Controls"
         xmlns:helpers="clr-namespace:TractorSupporter.Helpers"
-        xmlns:vm="clr-namespace:TractorSupporter.Services.Converters"
-        Title="MainWindow" Height="696" Width="469">
+        xmlns:converters="clr-namespace:TractorSupporter.Services.Converters"
+        Title="MainWindow" Height="696" Width="469" Background="Transparent">
     <Window.Resources>
-        <vm:ConnectionStatusToBackgroundConverter x:Key="ConnectionStatusToBackgroundConverter"/>
-        <vm:ConnectionStatusToContentConverter x:Key="ConnectionStatusToContentConverter"/>
-        <vm:ConnectionStatusToTextConverter x:Key="ConnectionStatusToTextConverter"/>
-        <vm:ConnectionStatusToForegroundConverter x:Key="ConnectionStatusToForegroundConverter"/>
+        <converters:ConnectionStatusToBackgroundConverter x:Key="ConnectionStatusToBackgroundConverter"/>
+        <converters:ConnectionStatusToContentConverter x:Key="ConnectionStatusToContentConverter"/>
+        <converters:ConnectionStatusToTextConverter x:Key="ConnectionStatusToTextConverter"/>
+        <converters:ConnectionStatusToForegroundConverter x:Key="ConnectionStatusToForegroundConverter"/>
     </Window.Resources>
     <Grid Background="{StaticResource GrayBrush}">
         <Grid.RowDefinitions>
@@ -21,7 +21,7 @@
             <RowDefinition Height="200"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0"/>
+        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0" IsSettingsVisible = "True"/>
 
         <Grid Grid.Row="1" Margin="20,70,20,0">
             <StackPanel Orientation="Horizontal">

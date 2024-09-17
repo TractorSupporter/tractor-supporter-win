@@ -9,7 +9,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Icons\confirm-icon.png" />
+    <None Remove="Resources\Icons\return-icon.png" />
+    <None Remove="Resources\Icons\settings-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="SharpVectors.Wpf" Version="1.8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Icons\confirm-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\return-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\settings-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

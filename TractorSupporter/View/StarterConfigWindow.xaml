@@ -12,26 +12,23 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0"/>
+        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0" IsSettingsVisible="False"/>
         <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="300" Margin="0,135,0,0">
             <TextBlock Text="Welcome to TractorSupporter" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap" FontWeight="Bold"/>
             <TextBlock Text="This app provides measurement of the distance between your vehicle and potential obstacles. Fill config data to continue." FontSize="14" Margin="0,0,0,30" TextWrapping="Wrap" HorizontalAlignment="Center"/>
-            <TextBlock Text="Port" HorizontalAlignment="Left" Margin="0,20,0,5"/>
+            <TextBlock Text="Port" HorizontalAlignment="Center" FontSize="16" Margin="0,20,0,5"/>
             <TextBox Name="PortTextBox" Background="White" Width="300" Height="25" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Text="{Binding PortValidationMessage}" Foreground="Red" HorizontalAlignment="Left" Margin="0,5,0,0"/>
-            <TextBlock Text="Your IP" HorizontalAlignment="Left" Margin="0,20,0,5"/>
+            <TextBlock Text="Your IP" HorizontalAlignment="Center" FontSize="16" Margin="0,20,0,5"/>
             <TextBox Name="IpTextBox" Background="White" Width="300" Height="25" Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Text="{Binding IpValidationMessage}" Foreground="Red" HorizontalAlignment="Left" Margin="0,5,0,0"/>
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Button Background="DarkRed" Grid.Column="0" HorizontalAlignment="Center" Width="50" Height="50" Command="{Binding CloseCommand}"/>
-            <Button Background="Green" Grid.Column="1" HorizontalAlignment="Center" Width="50" Height="50" Command="{Binding ValidateCommand}"/>
+            <controls:NavigationButtons 
+                BackCommand="{Binding BackCommand}" 
+                ForwardCommand="{Binding ForwardCommand}"
+                />
         </Grid>
     </Grid>
 </Window>

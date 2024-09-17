@@ -15,23 +15,22 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.ViewModel
 {
-    public class StarterConfigViewModel : BaseViewModel
+    public class StarterConfigWindowViewModel : BaseViewModel
     {
         private string _port;
         private string _ipAddress;
         private string _portValidationMessage;
         private string _ipValidationMessage;
-        private ICommand _validateCommand;
-        private ICommand _closeCommand;
+        private ICommand _forwardCommand;
+        private ICommand _backCommand;
         private IWindowService _windowService;
         private IConfigAppJson _configAppJson;
-        public event EventHandler RequestClose;
 
-        public StarterConfigViewModel()
+        public StarterConfigWindowViewModel()
         {
             _windowService = new WindowService();
-            ValidateCommand = new RelayCommand(Validate);
-            CloseCommand = new RelayCommand(Close);
+            ForwardCommand = new RelayCommand(Validate);
+            BackCommand = new RelayCommand(Close);
             _configAppJson = ConfigAppJson.Instance;
         }
 
@@ -75,23 +74,23 @@ namespace TractorSupporter.ViewModel
             }
         }
 
-        public ICommand ValidateCommand
+        public ICommand ForwardCommand
         {
-            get => _validateCommand;
+            get => _forwardCommand;
             set
             {
-                _validateCommand = value;
-                OnPropertyChanged(nameof(ValidateCommand));
+                _forwardCommand = value;
+                OnPropertyChanged(nameof(ForwardCommand));
             }
         }
 
-        public ICommand CloseCommand
+        public ICommand BackCommand
         {
-            get => _closeCommand;
+            get => _backCommand;
             set
             {
-                _closeCommand = value;
-                OnPropertyChanged(nameof(CloseCommand));
+                _backCommand = value;
+                OnPropertyChanged(nameof(BackCommand));
             }
         }
 
@@ -125,11 +124,6 @@ namespace TractorSupporter.ViewModel
                 _windowService.OpenMainWindow();
                 Close(new object());
             }
-        }
-
-        private void Close(object parameter)
-        {
-            RequestClose?.Invoke(this, EventArgs.Empty);
         }
     }
 }

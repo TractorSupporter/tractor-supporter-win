@@ -9,5 +9,6 @@ namespace TractorSupporter.Services.Interfaces
     public interface IWindowService
     {
         void OpenMainWindow();
+        void OpenSettingsWindow();
     }
 }

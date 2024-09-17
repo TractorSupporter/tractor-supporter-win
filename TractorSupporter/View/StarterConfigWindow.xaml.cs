@@ -20,9 +20,9 @@ namespace TractorSupporter.View
         public StarterConfigWindow()
         {
             InitializeComponent();
-            DataContext = new StarterConfigViewModel();
+            DataContext = new StarterConfigWindowViewModel();
 
-            var viewModel = DataContext as StarterConfigViewModel;
+            var viewModel = DataContext as StarterConfigWindowViewModel;
             if (viewModel != null)
             {
                 viewModel.RequestClose += (s, e) => this.Close();

@@ -3,11 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TractorSupporter.View.Controls" 
+             xmlns:vm="clr-namespace:TractorSupporter.Services.Converters"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              mc:Ignorable="d" 
-             d:DesignHeight="120" d:DesignWidth="800">
-    <Grid Background="{StaticResource DarkBlueBrush}">
+             d:DesignHeight="120" d:DesignWidth="800" Background="Transparent">
+    <UserControl.Resources>
+        <vm:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource DarkBlueBrush}" Height="80">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
@@ -31,8 +34,10 @@
                 Margin="10"
                 Background="Transparent"
                 BorderThickness="0"
-                ToolTip="Settings">
-            <svg:SvgViewbox Source="/settins-icon.svg" Height="60" AutoSize="True" OptimizePath="False" TextAsGeometry="True"/>
+                Visibility="{Binding IsSettingsVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                ToolTip="Settings"
+                Click="SettingsButton_Click">
+            <Image Source="pack://application:,,,/TractorSupporter;component/Resources/Icons/settings-icon.png"/>
         </Button>
 
     </Grid>

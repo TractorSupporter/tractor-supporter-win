@@ -11,5 +11,11 @@ namespace TractorSupporter.Services
             MainWindow window = new MainWindow();
             window.Show();
         }
+
+        public void OpenSettingsWindow()
+        {
+            SettingsWindow window = new SettingsWindow();
+            window.Show();
+        }
     }
 }
