@@ -9,6 +9,8 @@ using TractorSupporter.Model;
 using TractorSupporter.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 using System.Windows;
+using TractorSupporter.Services;
+using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.ViewModel
 {
@@ -29,7 +31,7 @@ namespace TractorSupporter.ViewModel
             InitMockConfigWindow();
             SetMyIP();
             StartServerThread();
-            _dataSender = new DistanceDataSender("DistancePipe");
+            //_dataSender = new DistanceDataSender("DistancePipe");
         }
 
         public string MyIP
@@ -129,7 +131,7 @@ namespace TractorSupporter.ViewModel
                         }
 
                         DistanceMeasured = distanceMeasured.ToString();
-                        _dataSender.SendDistanceData(distanceMeasured);
+                        //_dataSender.SendDistanceData(distanceMeasured);
                     });
                 }
 

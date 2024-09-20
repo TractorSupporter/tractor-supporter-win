@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using TractorSupporter.Model.Enums;
 
-namespace TractorSupporter.ViewModel
+namespace TractorSupporter.Services.Converters
 {
     public class TractorStateToBooleanConverter : IValueConverter
     {
