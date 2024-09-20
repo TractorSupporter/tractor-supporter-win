@@ -6,148 +6,174 @@ using System.Text;
 using System.Windows.Documents;
 using System.Windows.Input;
 using TractorSupporter.Model;
-using TractorSupporter.ViewModel;
-using static System.Net.Mime.MediaTypeNames;
-using System.Windows;
 
-namespace TractorSupporter.ViewModel
+namespace TractorSupporter.ViewModel;
+
+public class TSWindowViewModel : BaseViewModel
 {
-    public class TSWindowViewModel : BaseViewModel
+    private bool useMockData;
+    private readonly DistanceDataSender _dataSender;
+    private readonly AvoidingCommandDataSender _avoidingCommandDataSender;
+    private string _myIP;
+    private string _ipSender;
+    private string _ipDestination;
+    private string _sendMessage;
+    private string _distanceMeasured;
+    
+    private FlowDocument _receivedMessages;
+
+    public TSWindowViewModel()
     {
-        private bool useMockData;
-        private readonly DistanceDataSender _dataSender;
-        private string _myIP;
-        private string _ipSender;
-        private string _ipDestination;
-        private string _sendMessage;
-        private string _distanceMeasured;
-        private FlowDocument _receivedMessages;
+        _receivedMessages = new FlowDocument();
+        StartCommandsUnblockDataReceiverAsync();
+        _dataSender = new DistanceDataSender("DistancePipe");
+        _avoidingCommandDataSender = new AvoidingCommandDataSender("CommandsPipe");
+        InitMockConfigWindow();
+        SetMyIP();
+        StartServerThread();
+        
+    }
 
-        public TSWindowViewModel()
+    private static async void StartCommandsUnblockDataReceiverAsync()
+    {
+        using (var receiver = new UnlockCommandsDataReceiver("UnblockCommandsPipe"))
         {
-            _receivedMessages = new FlowDocument();
-            InitMockConfigWindow();
-            SetMyIP();
-            StartServerThread();
-            _dataSender = new DistanceDataSender("DistancePipe");
+            receiver.AvoidCommandUnblockReceived += OnAvoidCommandUnblockedReceived;
+            await receiver.StartReceivingAsync();
         }
+    }
 
-        public string MyIP
+    private static void OnAvoidCommandUnblockedReceived(string message)
+    {
+        if (message == "start_avoid")
+            AvoidingLogic.isSendingAvoidCommandTurnedOn = true;
+    
+        else if (message == "unblock_avoid")
+            AvoidingLogic.isAvoidingCommandLocked = false;
+    }
+
+    public string MyIP
+    {
+        get => _myIP;
+        set { _myIP = value; OnPropertyChanged(nameof(MyIP)); }
+    }
+
+    public string IPSender
+    {
+        get => _ipSender;
+        set { _ipSender = value; OnPropertyChanged(nameof(IPSender)); }
+    }
+
+    public string IPDestination
+    {
+        get => _ipDestination;
+        set { _ipDestination = value; OnPropertyChanged(nameof(IPDestination)); }
+    }
+
+    public string SendMessage
+    {
+        get => _sendMessage;
+        set { _sendMessage = value; OnPropertyChanged(nameof(SendMessage)); }
+    }
+
+    public string DistanceMeasured
+    {
+        get => _distanceMeasured;
+        set { _distanceMeasured = value; OnPropertyChanged(nameof(DistanceMeasured)); }
+    }
+
+    public FlowDocument ReceivedMessages
+    {
+        get => _receivedMessages;
+        set { _receivedMessages = value; OnPropertyChanged(nameof(ReceivedMessages)); }
+    }
+
+
+    private void SetMyIP()
+    {
+        string hostName = Dns.GetHostName();
+        string myIP = Dns.GetHostEntry(hostName)
+            .AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
+        MyIP = myIP;
+    }
+
+    private void InitMockConfigWindow()
+    {
+        useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
+        if (useMockData)
         {
-            get => _myIP;
-            set { _myIP = value; OnPropertyChanged(nameof(MyIP)); }
+            var configWindow = new MockDataConfigWindow();
+            configWindow.Show();
         }
+    }
 
-        public string IPSender
+    private void StartServerThread()
+    {
+        Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
+        thdUdpServer.IsBackground = true;
+        thdUdpServer.Start();
+    }
+
+    private void ServerThread()
+    {
+        IDataReceiver dataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
+
+        while (true)
         {
-            get => _ipSender;
-            set { _ipSender = value; OnPropertyChanged(nameof(IPSender)); }
-        }
+            Byte[] receivedBytes = dataReceiver.ReceiveData();
+            string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
-        public string IPDestination
-        {
-            get => _ipDestination;
-            set { _ipDestination = value; OnPropertyChanged(nameof(IPDestination)); }
-        }
+            using (JsonDocument data = JsonDocument.Parse(serializedData))
+            {
+                JsonElement dataRoot = data.RootElement;
+                string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
+                double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
+                bool alarmSignal = dataRoot.GetProperty("alarmSignal").GetBoolean();
+                bool avoidSignal = dataRoot.GetProperty("avoidSignal").GetBoolean();
 
-        public string SendMessage
-        {
-            get => _sendMessage;
-            set { _sendMessage = value; OnPropertyChanged(nameof(SendMessage)); }
-        }
+                bool shouldAvoidDecision = _avoidingLogic
+                    .makeAvoidingDecision(avoidSignal, ref isAvoidingCommandLocked);
 
-        public string DistanceMeasured
-        {
-            get => _distanceMeasured;
-            set { _distanceMeasured = value; OnPropertyChanged(nameof(DistanceMeasured)); }
-        }
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    IPSender = dataReceiver.GetRemoteIpAddress();
+                    IPDestination = IPSender;
 
-        public FlowDocument ReceivedMessages
-        {
-            get => _receivedMessages;
-            set { _receivedMessages = value; OnPropertyChanged(nameof(ReceivedMessages)); }
-        }
+                    string date = DateTime.Now.ToString("hh:mm:ss");
+                    string datetime = DateTime.Now.ToString("hh:mm:ss");
+                    extraMessage = "time: " + datetime + " | " + extraMessage;
+                    Paragraph newParagraph = new Paragraph(new Run(extraMessage));
 
+                    if (ReceivedMessages.Blocks.FirstBlock != null)
+                    {
+                        ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
+                    }
+                    else
+                    {
+                        ReceivedMessages.Blocks.Add(newParagraph);
+                    }
 
-        private void SetMyIP()
-        {
-            string hostName = Dns.GetHostName();
-            string myIP = Dns.GetHostEntry(hostName)
-                .AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
-            MyIP = myIP;
-        }
+                    DistanceMeasured = distanceMeasured.ToString();
 
-        private void InitMockConfigWindow()
-        {
-            useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
+                    _dataSender.SendDistanceData(distanceMeasured);
+                    if (shouldAvoidDecision) _avoidingCommandDataSender.SendAvoidingCommand();
+                });
+            }
+
             if (useMockData)
             {
-                var configWindow = new MockDataConfigWindow();
-                configWindow.Show();
+                Thread.Sleep(1000);
             }
         }
+    }
 
-        private void StartServerThread()
-        {
-            Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
-            thdUdpServer.IsBackground = true;
-            thdUdpServer.Start();
-        }
+    public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
 
-        private void ServerThread()
-        {
-            IDataReceiver dataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
-
-            while (true)
-            {
-                Byte[] receivedBytes = dataReceiver.ReceiveData();
-                string serializedData = Encoding.ASCII.GetString(receivedBytes);
-
-                using (JsonDocument data = JsonDocument.Parse(serializedData))
-                {
-                    JsonElement dataRoot = data.RootElement;
-                    string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
-                    double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
-
-                    App.Current.Dispatcher.Invoke(() =>
-                    {
-                        IPSender = dataReceiver.GetRemoteIpAddress();
-                        IPDestination = IPSender;
-
-                        string date = DateTime.Now.ToString("hh:mm:ss");
-                        string datetime = DateTime.Now.ToString("hh:mm:ss");
-                        extraMessage = "time: " + datetime + " | " + extraMessage;
-                        Paragraph newParagraph = new Paragraph(new Run(extraMessage));
-
-                        if (ReceivedMessages.Blocks.FirstBlock != null)
-                        {
-                            ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
-                        }
-                        else
-                        {
-                            ReceivedMessages.Blocks.Add(newParagraph);
-                        }
-
-                        DistanceMeasured = distanceMeasured.ToString();
-                        _dataSender.SendDistanceData(distanceMeasured);
-                    });
-                }
-
-                if (useMockData)
-                {
-                    Thread.Sleep(1000);
-                }
-            }
-        }
-
-        public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
-
-        private void SendMessageExecute(object parameter)
-        {
-            UdpClient udpClient = new UdpClient();
-            udpClient.Connect(IPDestination, Convert.ToInt16(parameter));
-            Byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
-            udpClient.Send(dataToSend, dataToSend.Length);
-        }
+    private void SendMessageExecute(object parameter)
+    {
+        UdpClient udpClient = new UdpClient();
+        udpClient.Connect(IPDestination, Convert.ToInt16(parameter));
+        Byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
+        udpClient.Send(dataToSend, dataToSend.Length);
     }
 }
