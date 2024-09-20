@@ -15,7 +15,7 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.ViewModel
 {
-    public class StarterConfigWindowViewModel : BaseViewModel
+    public class StarterWindowViewModel : BaseViewModel
     {
         private string _port;
         private string _ipAddress;
@@ -23,15 +23,16 @@ namespace TractorSupporter.ViewModel
         private string _ipValidationMessage;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
-        private IWindowService _windowService;
+        private INavigationService _navigationService;
         private IConfigAppJson _configAppJson;
 
-        public StarterConfigWindowViewModel()
+        public StarterWindowViewModel()
         {
-            _windowService = new WindowService();
+            //_windowService = new WindowService();
             ForwardCommand = new RelayCommand(Validate);
             BackCommand = new RelayCommand(Close);
             _configAppJson = ConfigAppJson.Instance;
+            _navigationService = NavigationService.Instance;
         }
 
         public string Port
@@ -121,9 +122,14 @@ namespace TractorSupporter.ViewModel
             if (isValid)
             {
                 _configAppJson.createJson(Port, IpAddress);
-                _windowService.OpenMainWindow();
-                Close(new object());
+                _navigationService.NavigateToMain();
+                //_windowService.OpenMainWindow();
+                //Close(new object());
             }
+        }
+        public void CloseMainWindow()
+        {
+            _navigationService.NavigateToSettings();
         }
     }
 }

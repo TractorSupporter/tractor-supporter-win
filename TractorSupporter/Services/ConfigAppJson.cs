@@ -40,7 +40,7 @@ namespace TractorSupporter.Services
         {
             var config = new AppConfig
             {
-                Port = port,
+                Port = int.Parse(port),
                 IpAddress = ipAddress
             };
 
@@ -60,7 +60,7 @@ namespace TractorSupporter.Services
             }
 
             string jsonString = File.ReadAllText(filePath);
-_appConfig = JsonSerializer.Deserialize<AppConfig>(jsonString);
+            _appConfig = JsonSerializer.Deserialize<AppConfig>(jsonString);
 
             return _appConfig;
         }

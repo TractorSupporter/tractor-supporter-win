@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TractorSupporter.Services.Interfaces
 {
-    public interface IWindowService
+    public interface INavigationService
     {
-        void OpenMainWindow();
-        void OpenSettingsWindow();
+        void NavigateToSettings();
+        void NavigateToMain();
     }
 }

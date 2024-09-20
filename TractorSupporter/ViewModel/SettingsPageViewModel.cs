@@ -5,18 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using TractorSupporter.Services;
 
 namespace TractorSupporter.ViewModel
 {
-    class SettingsWindowViewModel : BaseViewModel
+    class SettingsPageViewModel : BaseViewModel
     {
         private ICommand _forwardCommand;
         private ICommand _backCommand;
+        private NavigationService _navigationService;
 
-        public SettingsWindowViewModel()
+        public SettingsPageViewModel()
         {
-            ForwardCommand = new RelayCommand(Save);
-            BackCommand = new RelayCommand(Close);
+            _navigationService = NavigationService.Instance;
+            ForwardCommand = new RelayCommand(SaveSettings);
+            BackCommand = new RelayCommand(CloseSettings);
         }
 
         public ICommand ForwardCommand
@@ -39,9 +42,16 @@ namespace TractorSupporter.ViewModel
             }
         }
 
-        private void Save(object parameter)
+        private void SaveSettings(object parameter)
         {
             Console.WriteLine("Save");
+            _navigationService.NavigateToMain();
+        }
+
+        private void CloseSettings(object parameter)
+        {
+            Console.WriteLine("Close");
+            _navigationService.NavigateToMain();
         }
     }
 }

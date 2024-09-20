@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0" IsSettingsVisible="False"/>
+        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0" IsSettingsVisible="True"/>
         <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="300" Margin="0,135,0,0">
             <TextBlock Text="Welcome to TractorSupporter" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap" FontWeight="Bold"/>
             <TextBlock Text="This app provides measurement of the distance between your vehicle and potential obstacles. Fill config data to continue." FontSize="14" Margin="0,0,0,30" TextWrapping="Wrap" HorizontalAlignment="Center"/>
@@ -30,5 +30,6 @@
                 ForwardCommand="{Binding ForwardCommand}"
                 />
         </Grid>
+        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

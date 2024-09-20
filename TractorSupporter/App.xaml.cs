@@ -18,14 +18,14 @@ namespace TractorSupporter
             var configAppJson = ConfigAppJson.Instance;
             AppConfig appConfig = configAppJson.readJson();
 
-            if (appConfig != null)
-            {
-                StartupUri = new Uri("View/MainWindow.xaml", UriKind.Relative);
-            }
-            else
-            {
-                StartupUri = new Uri("View/StarterConfigWindow.xaml", UriKind.Relative);
-            }
+            //if (appConfig != null)
+            //{
+            //    StartupUri = new Uri("View/MainWindow.xaml", UriKind.Relative);
+            //}
+            //else
+            //{
+            //    StartupUri = new Uri("View/StarterConfigWindow.xaml", UriKind.Relative);
+            //}
         }
     }
 

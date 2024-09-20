@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Linq;
 using System.Net.Sockets;
+using System.Printing;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.ViewModel
 {
-    public class MainWindowViewModel : BaseViewModel
+    public class MainPageViewModel : BaseViewModel
     {
         private bool _useMockData;
         private string _distanceToObstacle;
@@ -26,13 +27,18 @@ namespace TractorSupporter.ViewModel
         private ICommand _startConnectionCommand;
         private FlowDocument _receivedMessages;
         private readonly DistanceDataSender _dataSender;
-        private IWindowService _windowService;
+        private INavigationService _navigationService;
+        private AppConfig _appConfig;
+        private int _port;
+        private string _ipAddress;
 
-        public MainWindowViewModel()
+        public MainPageViewModel()
         {
+            _navigationService = NavigationService.Instance;
             _receivedMessages = new FlowDocument();
             StartConnectionCommand = new RelayCommand(StartConnection);
-            _windowService = new WindowService();
+            _appConfig = ConfigAppJson.Instance.readJson();
+            _port = _appConfig.Port;
             InitMockConfigWindow();
             //_dataSender = new DistanceDataSender("DistancePipe");
         }
@@ -96,7 +102,7 @@ namespace TractorSupporter.ViewModel
 
         private void ServerThread()
         {
-            IDataReceiver dataReceiver = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
+            IDataReceiver dataReceiver = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
 
             while (IsConnected)
             {
@@ -114,19 +120,7 @@ namespace TractorSupporter.ViewModel
                         IPSender = dataReceiver.GetRemoteIpAddress();
                         _ipDestination = IPSender;
 
-                        string date = DateTime.Now.ToString("hh:mm:ss");
-                        string datetime = DateTime.Now.ToString("hh:mm:ss");
-                        extraMessage = "time: " + datetime + " | " + extraMessage;
-                        Paragraph newParagraph = new Paragraph(new Run(extraMessage));
-
-                        if (ReceivedMessages.Blocks.FirstBlock != null)
-                        {
-                            ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
-                        }
-                        else
-                        {
-                            ReceivedMessages.Blocks.Add(newParagraph);
-                        }
+                        AddParagraphToReceivedMessages(extraMessage);
 
                         DistanceToObstacle = distanceMeasured.ToString();
                         //_dataSender.SendDistanceData(distanceMeasured);
@@ -142,6 +136,21 @@ namespace TractorSupporter.ViewModel
 
         public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
 
+        private void AddParagraphToReceivedMessages(string extraMessage)
+        { 
+            string datetime = DateTime.Now.ToString("hh:mm:ss");
+            extraMessage = "time: " + datetime + " | " + extraMessage;
+            Paragraph newParagraph = new Paragraph(new Run(extraMessage));
+
+            if (ReceivedMessages.Blocks.FirstBlock != null)
+            {
+                ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
+            }
+            else
+            {
+                ReceivedMessages.Blocks.Add(newParagraph);
+            }
+        }
         private void SendMessageExecute(object parameter)
         {
             UdpClient udpClient = new UdpClient();
@@ -161,8 +170,7 @@ namespace TractorSupporter.ViewModel
 
         public void CloseMainWindow()
         {
-            _windowService.OpenSettingsWindow();
-            Close(new object());
+            _navigationService.NavigateToSettings();
         }
     }
 }

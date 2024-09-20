@@ -11,19 +11,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TractorSupporter.Services;
 using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View
 {
-    /// <summary>
-    /// Interaction logic for SettingsWindow.xaml
-    /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class StarterConfigWindow : Window
     {
-        public SettingsWindow()
+        public StarterConfigWindow()
         {
             InitializeComponent();
-            DataContext = new SettingsWindowViewModel();
+            NavigationService.Initialize(MainFrame);
+            DataContext = new StarterWindowViewModel();
+
+            var viewModel = DataContext as StarterWindowViewModel;
+            Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
         }
     }
 }

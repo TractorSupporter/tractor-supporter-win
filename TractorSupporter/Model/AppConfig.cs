@@ -8,7 +8,7 @@ namespace TractorSupporter.Model
 {
     public class AppConfig
     {
-        public string Port { get; set; }
+        public int Port { get; set; }
         public string IpAddress { get; set; }
     }
 }

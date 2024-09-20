@@ -15,18 +15,15 @@ using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View
 {
-    public partial class StarterConfigWindow : Window
+    /// <summary>
+    /// Interaction logic for SettingsWindow.xaml
+    /// </summary>
+    public partial class SettingsPage : Page
     {
-        public StarterConfigWindow()
+        public SettingsPage()
         {
             InitializeComponent();
-            DataContext = new StarterConfigWindowViewModel();
-
-            var viewModel = DataContext as StarterConfigWindowViewModel;
-            if (viewModel != null)
-            {
-                viewModel.RequestClose += (s, e) => this.Close();
-            }
+            DataContext = new SettingsPageViewModel();
         }
     }
 }
