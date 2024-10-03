@@ -36,7 +36,7 @@ namespace TractorSupporter.Services
             }
         }
 
-        public void createJson(string port, string ipAddress)
+        public void CreateJson(string port, string ipAddress)
         {
             var config = new AppConfig
             {
@@ -50,7 +50,7 @@ namespace TractorSupporter.Services
             File.WriteAllText(filePath, jsonString);
         }
 
-        public AppConfig readJson()
+        public AppConfig ReadJson()
         {
             string filePath = Path.Combine(baseDirectory, fileName);
 

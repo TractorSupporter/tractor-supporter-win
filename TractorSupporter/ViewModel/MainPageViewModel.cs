@@ -37,7 +37,7 @@ namespace TractorSupporter.ViewModel
             _navigationService = NavigationService.Instance;
             _receivedMessages = new FlowDocument();
             StartConnectionCommand = new RelayCommand(StartConnection);
-            _appConfig = ConfigAppJson.Instance.readJson();
+            _appConfig = ConfigAppJson.Instance.ReadJson();
             _port = _appConfig.Port;
             InitMockConfigWindow();
             //_dataSender = new DistanceDataSender("DistancePipe");

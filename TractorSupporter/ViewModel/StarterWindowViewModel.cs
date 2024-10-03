@@ -33,6 +33,7 @@ namespace TractorSupporter.ViewModel
             BackCommand = new RelayCommand(Close);
             _configAppJson = ConfigAppJson.Instance;
             _navigationService = NavigationService.Instance;
+            NavigateToMainPageIfConfigExists();
         }
 
         public string Port
@@ -95,6 +96,17 @@ namespace TractorSupporter.ViewModel
             }
         }
 
+        private void NavigateToMainPageIfConfigExists()
+        {
+            var configAppJson = ConfigAppJson.Instance;
+            AppConfig appConfig = configAppJson.ReadJson();
+
+            if (appConfig != null)
+            {
+                _navigationService.NavigateToMain();
+            }
+        }
+
         private void Validate(object parameter)
         {
             bool isValid = true;
@@ -121,7 +133,7 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.createJson(Port, IpAddress);
+                _configAppJson.CreateJson(Port, IpAddress);
                 _navigationService.NavigateToMain();
                 //_windowService.OpenMainWindow();
                 //Close(new object());

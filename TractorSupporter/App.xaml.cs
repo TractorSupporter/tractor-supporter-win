@@ -15,17 +15,6 @@ namespace TractorSupporter
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            var configAppJson = ConfigAppJson.Instance;
-            AppConfig appConfig = configAppJson.readJson();
-
-            //if (appConfig != null)
-            //{
-            //    StartupUri = new Uri("View/MainWindow.xaml", UriKind.Relative);
-            //}
-            //else
-            //{
-            //    StartupUri = new Uri("View/StarterConfigWindow.xaml", UriKind.Relative);
-            //}
         }
     }
 

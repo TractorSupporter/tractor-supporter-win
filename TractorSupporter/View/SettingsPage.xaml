@@ -36,6 +36,11 @@
                     <TextBlock Text="Description 1" Grid.Row="1" FontSize="16"/>
                 </Grid>
             </Grid>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    
+                </Grid.ColumnDefinitions>
+            </Grid>
             
         </Grid>
         <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="0,0,0,60">
