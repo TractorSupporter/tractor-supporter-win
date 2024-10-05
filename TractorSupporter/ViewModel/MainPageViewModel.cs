@@ -19,6 +19,7 @@ namespace TractorSupporter.ViewModel
     public class MainPageViewModel : BaseViewModel
     {
         private bool _useMockData;
+        private static MockDataConfigWindow _mockDataConfigWindow;
         private string _distanceToObstacle;
         private string _sendMessage;
         private string _ipSender;
@@ -37,7 +38,7 @@ namespace TractorSupporter.ViewModel
             _navigationService = NavigationService.Instance;
             _receivedMessages = new FlowDocument();
             StartConnectionCommand = new RelayCommand(StartConnection);
-            _appConfig = ConfigAppJson.Instance.ReadJson();
+            _appConfig = ConfigAppJson.Instance.GetConfig();
             _port = _appConfig.Port;
             InitMockConfigWindow();
             //_dataSender = new DistanceDataSender("DistancePipe");
@@ -86,10 +87,10 @@ namespace TractorSupporter.ViewModel
         private void InitMockConfigWindow()
         {
             _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
-            if (_useMockData)
+            if (_useMockData && (_mockDataConfigWindow == null || !_mockDataConfigWindow.IsVisible))
             {
-                var configWindow = new MockDataConfigWindow();
-                configWindow.Show();
+                _mockDataConfigWindow = new MockDataConfigWindow();
+                _mockDataConfigWindow.Show();
             }
         }
 
@@ -122,7 +123,7 @@ namespace TractorSupporter.ViewModel
 
                         AddParagraphToReceivedMessages(extraMessage);
 
-                        DistanceToObstacle = distanceMeasured.ToString();
+                        DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
                         //_dataSender.SendDistanceData(distanceMeasured);
                     });
                 }
@@ -166,11 +167,6 @@ namespace TractorSupporter.ViewModel
             {
                 StartServerThread();
             }
-        }
-
-        public void CloseMainWindow()
-        {
-            _navigationService.NavigateToSettings();
         }
     }
 }
