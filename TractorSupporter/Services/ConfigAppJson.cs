@@ -36,12 +36,14 @@ namespace TractorSupporter.Services
             }
         }
 
-        public void CreateJson(string port, string ipAddress)
+        public void CreateJson(string port, string ipAddress, bool option1 = false, bool option2 = false)
         {
             var config = new AppConfig
             {
                 Port = int.Parse(port),
-                IpAddress = ipAddress
+                IpAddress = ipAddress,
+                Option1 = option1,
+                Option2 = option2
             };
 
             string jsonString = JsonSerializer.Serialize(config);
@@ -67,6 +69,11 @@ namespace TractorSupporter.Services
 
         public AppConfig GetConfig()
         {
+            if (_appConfig == null)
+            {
+                return ReadJson();
+            }
+               
             return _appConfig;
         }
     }

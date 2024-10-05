@@ -9,7 +9,8 @@ namespace TractorSupporter.Services.Interfaces
 {
     public interface IConfigAppJson
     {
-        public void CreateJson(string port, string ipAddress);
+        public void CreateJson(string port, string ipAddress, bool option1 = false, bool option2 = false);
         public AppConfig ReadJson();
+        public AppConfig GetConfig();
     }
 }

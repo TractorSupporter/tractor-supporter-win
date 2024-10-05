@@ -10,5 +10,7 @@ namespace TractorSupporter.Model
     {
         public int Port { get; set; }
         public string IpAddress { get; set; }
+        public bool Option1 { get; set; }
+        public bool Option2 { get; set; }
     }
 }
