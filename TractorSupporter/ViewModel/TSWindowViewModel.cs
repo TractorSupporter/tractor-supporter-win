@@ -17,7 +17,7 @@ namespace TractorSupporter.ViewModel
     public class TSWindowViewModel : BaseViewModel
     {
         private bool useMockData;
-        private readonly DistanceDataSender _dataSender;
+        private readonly TSDataSender _dataSender;
         private string _myIP;
         private string _ipSender;
         private string _ipDestination;
@@ -27,6 +27,7 @@ namespace TractorSupporter.ViewModel
 
         public TSWindowViewModel()
         {
+
             _receivedMessages = new FlowDocument();
             InitMockConfigWindow();
             SetMyIP();
@@ -98,11 +99,11 @@ namespace TractorSupporter.ViewModel
 
         private void ServerThread()
         {
-            IDataReceiver dataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
+            IDataReceiver espDataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
 
             while (true)
             {
-                Byte[] receivedBytes = dataReceiver.ReceiveData();
+                Byte[] receivedBytes = espDataReceiver.ReceiveData();
                 string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
                 using (JsonDocument data = JsonDocument.Parse(serializedData))
@@ -113,7 +114,7 @@ namespace TractorSupporter.ViewModel
 
                     App.Current.Dispatcher.Invoke(() =>
                     {
-                        IPSender = dataReceiver.GetRemoteIpAddress();
+                        IPSender = espDataReceiver.GetRemoteIpAddress();
                         IPDestination = IPSender;
 
                         string date = DateTime.Now.ToString("hh:mm:ss");

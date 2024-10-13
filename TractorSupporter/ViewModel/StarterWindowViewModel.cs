@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -34,6 +35,16 @@ namespace TractorSupporter.ViewModel
             _configAppJson = ConfigAppJson.Instance;
             _navigationService = NavigationService.Instance;
             NavigateToMainPageIfConfigExists();
+            SetMyIP();
+            Port = "8080";
+        }
+
+        private void SetMyIP()
+        {
+            string hostName = Dns.GetHostName();
+            string myIP = Dns.GetHostEntry(hostName)
+                .AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
+            IpAddress = myIP;
         }
 
         public string Port

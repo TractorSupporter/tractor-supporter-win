@@ -14,159 +14,172 @@ using TractorSupporter.Model;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
 
-namespace TractorSupporter.ViewModel
+namespace TractorSupporter.ViewModel;
+
+public class MainPageViewModel : BaseViewModel
 {
-    public class MainPageViewModel : BaseViewModel
+    private bool _useMockData;
+    private static MockDataConfigWindow _mockDataConfigWindow;
+    private string _distanceToObstacle;
+    private string _sendMessage;
+    private string _ipSender;
+    private string _ipDestination;
+    private bool _isConnected;
+    private ICommand _startConnectionCommand;
+    private FlowDocument _receivedMessages;
+    
+    private INavigationService _navigationService;
+    private AppConfig _appConfig;
+    private int _port;
+    private string _ipAddress;
+
+    public MainPageViewModel()
     {
-        private bool _useMockData;
-        private static MockDataConfigWindow _mockDataConfigWindow;
-        private string _distanceToObstacle;
-        private string _sendMessage;
-        private string _ipSender;
-        private string _ipDestination;
-        private bool _isConnected;
-        private ICommand _startConnectionCommand;
-        private FlowDocument _receivedMessages;
-        private readonly DistanceDataSender _dataSender;
-        private INavigationService _navigationService;
-        private AppConfig _appConfig;
-        private int _port;
-        private string _ipAddress;
+        _navigationService = NavigationService.Instance;
+        _receivedMessages = new FlowDocument();
+        StartConnectionCommand = new RelayCommand(StartConnection);
+        _appConfig = ConfigAppJson.Instance.GetConfig();
+        _port = _appConfig.Port;
+        InitMockConfigWindow();
+        
 
-        public MainPageViewModel()
+    }
+
+    public string DistanceToObstacle
+    {
+        get => _distanceToObstacle;
+        set { _distanceToObstacle = value; OnPropertyChanged(nameof(DistanceToObstacle)); }
+    }
+
+    public FlowDocument ReceivedMessages
+    {
+        get => _receivedMessages;
+        set { _receivedMessages = value; OnPropertyChanged(nameof(ReceivedMessages)); }
+    }
+
+    public string SendMessage
+    {
+        get => _sendMessage;
+        set { _sendMessage = value; OnPropertyChanged(nameof(SendMessage)); }
+    }
+
+    public string IPSender
+    {
+        get => _ipSender;
+        set { _ipSender = value; OnPropertyChanged(nameof(IPSender)); }
+    }
+
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set { _isConnected = value; OnPropertyChanged(nameof(IsConnected)); }
+    }
+
+    public ICommand StartConnectionCommand
+    {
+        get => _startConnectionCommand;
+        set
         {
-            _navigationService = NavigationService.Instance;
-            _receivedMessages = new FlowDocument();
-            StartConnectionCommand = new RelayCommand(StartConnection);
-            _appConfig = ConfigAppJson.Instance.GetConfig();
-            _port = _appConfig.Port;
-            InitMockConfigWindow();
-            //_dataSender = new DistanceDataSender("DistancePipe");
+            _startConnectionCommand = value;
+            OnPropertyChanged(nameof(StartConnectionCommand));
         }
+    }
 
-        public string DistanceToObstacle
+    private void InitMockConfigWindow()
+    {
+        _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
+        if (_useMockData && (_mockDataConfigWindow == null || !_mockDataConfigWindow.IsVisible))
         {
-            get => _distanceToObstacle;
-            set { _distanceToObstacle = value; OnPropertyChanged(nameof(DistanceToObstacle)); }
+            _mockDataConfigWindow = new MockDataConfigWindow();
+            _mockDataConfigWindow.Show();
         }
+    }
 
-        public FlowDocument ReceivedMessages
-        {
-            get => _receivedMessages;
-            set { _receivedMessages = value; OnPropertyChanged(nameof(ReceivedMessages)); }
-        }
+    private void StartServerThread()
+    {
+        Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
+        thdUdpServer.IsBackground = true;
+        thdUdpServer.Start();
+    }
 
-        public string SendMessage
-        {
-            get => _sendMessage;
-            set { _sendMessage = value; OnPropertyChanged(nameof(SendMessage)); }
-        }
+    private async void ServerThread()
+    {
+        IDataReceiver dataReceiverESP = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
+        AvoidingService avoidingService = AvoidingService.Instance;
+        TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
+        TSDataSender dataSender = TSDataSender.Instance;
 
-        public string IPSender
-        {
-            get => _ipSender;
-            set { _ipSender = value; OnPropertyChanged(nameof(IPSender)); }
-        }
+        await dataReceiverTS.StartReceivingAsync();
 
-        public bool IsConnected
+        while (IsConnected)
         {
-            get => _isConnected;
-            set { _isConnected = value; OnPropertyChanged(nameof(IsConnected)); }
-        }
+            Byte[] receivedBytes = dataReceiverESP.ReceiveData();
+            string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
-        public ICommand StartConnectionCommand
-        {
-            get => _startConnectionCommand;
-            set
+            using (JsonDocument data = JsonDocument.Parse(serializedData))
             {
-                _startConnectionCommand = value;
-                OnPropertyChanged(nameof(StartConnectionCommand));
-            }
-        }
+                JsonElement dataRoot = data.RootElement;
+                string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
+                double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
 
-        private void InitMockConfigWindow()
-        {
-            _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
-            if (_useMockData && (_mockDataConfigWindow == null || !_mockDataConfigWindow.IsVisible))
-            {
-                _mockDataConfigWindow = new MockDataConfigWindow();
-                _mockDataConfigWindow.Show();
-            }
-        }
-
-        private void StartServerThread()
-        {
-            Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
-            thdUdpServer.IsBackground = true;
-            thdUdpServer.Start();
-        }
-
-        private void ServerThread()
-        {
-            IDataReceiver dataReceiver = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
-
-            while (IsConnected)
-            {
-                Byte[] receivedBytes = dataReceiver.ReceiveData();
-                string serializedData = Encoding.ASCII.GetString(receivedBytes);
-
-                using (JsonDocument data = JsonDocument.Parse(serializedData))
+                App.Current.Dispatcher.Invoke(() =>
                 {
-                    JsonElement dataRoot = data.RootElement;
-                    string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
-                    double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
+                    IPSender = dataReceiverESP.GetRemoteIpAddress();
+                    _ipDestination = IPSender;
 
-                    App.Current.Dispatcher.Invoke(() =>
+                    AddParagraphToReceivedMessages(extraMessage);
+
+                    DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
+
+                    bool shouldAvoid = avoidingService.MakeAvoidingDecision(distanceMeasured);
+                    bool shouldAlarm = false; // alarmService.MakeAlarmDecision();
+                    dataSender.SendData(new 
                     {
-                        IPSender = dataReceiver.GetRemoteIpAddress();
-                        _ipDestination = IPSender;
+                        shouldAvoid,
+                        shouldAlarm,
+                        distanceMeasured
+                    }); // adjust agopengps to receive this kind of data
+                });
+            }
 
-                        AddParagraphToReceivedMessages(extraMessage);
-
-                        DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
-                        //_dataSender.SendDistanceData(distanceMeasured);
-                    });
-                }
-
-                if (_useMockData)
-                {
-                    Thread.Sleep(1000);
-                }
+            if (_useMockData)
+            {
+                Thread.Sleep(300);
             }
         }
+    }
 
-        public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
+    public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
 
-        private void AddParagraphToReceivedMessages(string extraMessage)
-        { 
-            string datetime = DateTime.Now.ToString("hh:mm:ss");
-            extraMessage = "time: " + datetime + " | " + extraMessage;
-            Paragraph newParagraph = new Paragraph(new Run(extraMessage));
+    private void AddParagraphToReceivedMessages(string extraMessage)
+    { 
+        string datetime = DateTime.Now.ToString("hh:mm:ss");
+        extraMessage = "time: " + datetime + " | " + extraMessage;
+        Paragraph newParagraph = new Paragraph(new Run(extraMessage));
 
-            if (ReceivedMessages.Blocks.FirstBlock != null)
-            {
-                ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
-            }
-            else
-            {
-                ReceivedMessages.Blocks.Add(newParagraph);
-            }
-        }
-        private void SendMessageExecute(object parameter)
+        if (ReceivedMessages.Blocks.FirstBlock != null)
         {
-            UdpClient udpClient = new UdpClient();
-            udpClient.Connect(_ipDestination, Convert.ToInt16(parameter));
-            Byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
-            udpClient.Send(dataToSend, dataToSend.Length);
+            ReceivedMessages.Blocks.InsertBefore(ReceivedMessages.Blocks.FirstBlock, newParagraph);
         }
-
-        private void StartConnection(object parameter)
+        else
         {
-            IsConnected = !IsConnected;
-            if (IsConnected)
-            {
-                StartServerThread();
-            }
+            ReceivedMessages.Blocks.Add(newParagraph);
+        }
+    }
+    private void SendMessageExecute(object parameter)
+    {
+        UdpClient udpClient = new UdpClient();
+        udpClient.Connect(_ipDestination, Convert.ToInt16(parameter));
+        Byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
+        udpClient.Send(dataToSend, dataToSend.Length);
+    }
+
+    private void StartConnection(object parameter)
+    {
+        IsConnected = !IsConnected;
+        if (IsConnected)
+        {
+            StartServerThread();
         }
     }
 }
