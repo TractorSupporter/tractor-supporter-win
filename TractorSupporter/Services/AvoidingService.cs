@@ -10,15 +10,17 @@ public partial class AvoidingService
     private double _avoidingDistance;
     private double _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
-    private event Action UnblockMakingDecisionEvent;
+    private bool _avoidingDecisionAllowed;
 
-    public void UnblockMakingDecision()
+    public void AllowMakingDecision(bool shouldAllowMakingDecision)
     {
-        UnblockMakingDecisionEvent?.Invoke();
+        _avoidingDecisionAllowed = shouldAllowMakingDecision;
     }
 
     public bool MakeAvoidingDecision(double distanceMeasured)
     {
+        
+
         var currentTime = DateTime.Now;
 
         _avoidingDistanceTimes.RemoveAll(time => (currentTime - time).TotalMilliseconds > _avoidingDistanceSignalValidLifetimeMs);
@@ -26,7 +28,15 @@ public partial class AvoidingService
         if (distanceMeasured <= _avoidingDistance)
             _avoidingDistanceTimes.Add(currentTime);
 
-        return _avoidingDistanceTimes.Count >= _minAvoidingSignalsCount;
+        var decision = _avoidingDistanceTimes.Count >= _minAvoidingSignalsCount;
+
+        if (!_avoidingDecisionAllowed)
+            return false;
+
+        if (decision)
+            _avoidingDecisionAllowed = false;
+
+        return decision;
     }
 }
 
@@ -41,6 +51,7 @@ public partial class AvoidingService
         _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinAvoidingSignalsCount"]!);
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["AvoidingDistanceSignalValidLifetimeMs"]!);
+        _avoidingDecisionAllowed = false;
     }
 }
 #endregion

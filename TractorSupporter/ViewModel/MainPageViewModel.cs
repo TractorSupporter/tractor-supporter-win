@@ -87,7 +87,7 @@ public class MainPageViewModel : BaseViewModel
 
     private void InitMockConfigWindow()
     {
-        _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]);
+        _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]!);
         if (_useMockData && (_mockDataConfigWindow == null || !_mockDataConfigWindow.IsVisible))
         {
             _mockDataConfigWindow = new MockDataConfigWindow();
@@ -102,14 +102,14 @@ public class MainPageViewModel : BaseViewModel
         thdUdpServer.Start();
     }
 
-    private async void ServerThread()
+    private void ServerThread()
     {
         IDataReceiver dataReceiverESP = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
         AvoidingService avoidingService = AvoidingService.Instance;
         TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
         TSDataSender dataSender = TSDataSender.Instance;
 
-        await dataReceiverTS.StartReceivingAsync();
+        dataReceiverTS.StartReceivingAsync();
 
         while (IsConnected)
         {
@@ -138,7 +138,7 @@ public class MainPageViewModel : BaseViewModel
                         shouldAvoid,
                         shouldAlarm,
                         distanceMeasured
-                    }); // adjust agopengps to receive this kind of data
+                    });
                 });
             }
 

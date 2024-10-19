@@ -1,11 +1,11 @@
 ﻿using System.IO.Pipes;
 using System.IO;
+using System.Text.Json;
 
 namespace TractorSupporter.Services;
     
 public partial class TSDataReceiver 
 {
-    
     private readonly AvoidingService _avoidingService;
 
     public async Task StartReceivingAsync()
@@ -13,12 +13,14 @@ public partial class TSDataReceiver
         _pipeServer.WaitForConnection();
         while (_pipeServer.IsConnected)
         {
-            string message = await _reader.ReadLineAsync() ?? "";
-
-            if (message == "unblock_avoid") 
-                _avoidingService.UnblockMakingDecision();
-            else                            
-                Console.WriteLine("Failed to recogize the input string.");
+            using (JsonDocument data = JsonDocument.Parse(await _reader.ReadLineAsync() ?? ""))
+            {
+                JsonElement dataRoot = data.RootElement;
+                if (dataRoot.TryGetProperty("allowAvoidingDecision", out JsonElement blockAvoidingDecisionElement))
+                    _avoidingService.AllowMakingDecision(blockAvoidingDecisionElement.GetBoolean());
+                else
+                    Console.WriteLine("Failed to recogize the input elements.");
+            }
         }
     }
 }
