@@ -106,6 +106,7 @@ public class MainPageViewModel : BaseViewModel
     {
         IDataReceiver dataReceiverESP = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
         AvoidingService avoidingService = AvoidingService.Instance;
+        AlarmService alarmService = AlarmService.Instance;
         TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
         TSDataSender dataSender = TSDataSender.Instance;
 
@@ -132,7 +133,7 @@ public class MainPageViewModel : BaseViewModel
                     DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
 
                     bool shouldAvoid = avoidingService.MakeAvoidingDecision(distanceMeasured);
-                    bool shouldAlarm = false; // alarmService.MakeAlarmDecision();
+                    bool shouldAlarm = alarmService.MakeAlarmDecision(distanceMeasured);
                     dataSender.SendData(new 
                     {
                         shouldAvoid,
