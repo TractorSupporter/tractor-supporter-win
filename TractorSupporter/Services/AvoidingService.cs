@@ -12,6 +12,15 @@ public partial class AvoidingService
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
 
+    private AvoidingService()
+    {
+        _avoidingDistanceTimes = new List<DateTime>();
+        _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
+        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinAvoidingSignalsCount"]!);
+        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["AvoidingDistanceSignalValidLifetimeMs"]!);
+        _avoidingDecisionAllowed = false;
+    }
+
     public void AllowMakingDecision(bool shouldAllowMakingDecision)
     {
         _avoidingDecisionAllowed = shouldAllowMakingDecision;
@@ -45,13 +54,5 @@ public partial class AvoidingService
 {
     private static readonly Lazy<AvoidingService> _lazyInstance = new(() => new AvoidingService());
     public static AvoidingService Instance => _lazyInstance.Value;
-    private AvoidingService() 
-    {
-        _avoidingDistanceTimes = new List<DateTime>();
-        _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
-        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinAvoidingSignalsCount"]!);
-        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["AvoidingDistanceSignalValidLifetimeMs"]!);
-        _avoidingDecisionAllowed = false;
-    }
 }
 #endregion
