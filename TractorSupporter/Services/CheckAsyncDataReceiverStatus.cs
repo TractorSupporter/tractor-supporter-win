@@ -33,7 +33,7 @@ public partial class CheckAsyncDataReceiverStatus<T>
         {
             _succeeded = false;
             data = _data;
-            return false;
+            return true;
         }
 
         _data = default(T);
