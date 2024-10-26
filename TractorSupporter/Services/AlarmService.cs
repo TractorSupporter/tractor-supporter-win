@@ -15,6 +15,15 @@ public partial class AlarmService: CommandService
     private int _alarmDistanceSignalValidLifetimeMs;
     private bool _alarmDecisionAllowed;
 
+    private AlarmService()
+    {
+        _alarmDistanceTimes = new List<DateTime>();
+        _alarmDistance = double.Parse(ConfigurationManager.AppSettings["AlarmDistance"]!);
+        _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
+        _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+        _alarmDecisionAllowed = true;
+    }
+
     public void AllowMakingDecision(bool shouldAllowMakingDecision)
     {
         _alarmDecisionAllowed = shouldAllowMakingDecision;
@@ -38,13 +47,5 @@ public partial class AlarmService
 {
     private static readonly Lazy<AlarmService> _lazyInstance = new(() => new AlarmService());
     public static AlarmService Instance => _lazyInstance.Value;
-    private AlarmService()
-    {
-        _alarmDistanceTimes = new List<DateTime>();
-        _alarmDistance = double.Parse(ConfigurationManager.AppSettings["AlarmDistance"]!);
-        _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
-        _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
-        _alarmDecisionAllowed = true;
-    }
 }
 #endregion

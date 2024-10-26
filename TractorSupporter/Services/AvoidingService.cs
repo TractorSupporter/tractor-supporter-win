@@ -2,8 +2,6 @@
 
 namespace TractorSupporter.Services;
 
-
-
 public partial class AvoidingService: CommandService
 {
     private readonly List<DateTime> _avoidingDistanceTimes;
@@ -11,6 +9,15 @@ public partial class AvoidingService: CommandService
     private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
+
+    private AvoidingService()
+    {
+        _avoidingDistanceTimes = new List<DateTime>();
+        _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
+        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
+        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+        _avoidingDecisionAllowed = false;
+    }
 
     public void AllowMakingDecision(bool shouldAllowMakingDecision)
     {
@@ -36,13 +43,5 @@ public partial class AvoidingService
 {
     private static readonly Lazy<AvoidingService> _lazyInstance = new(() => new AvoidingService());
     public static AvoidingService Instance => _lazyInstance.Value;
-    private AvoidingService() 
-    {
-        _avoidingDistanceTimes = new List<DateTime>();
-        _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
-        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
-        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
-        _avoidingDecisionAllowed = false;
-    }
 }
 #endregion

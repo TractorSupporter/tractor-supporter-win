@@ -9,22 +9,24 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.Services
 {
-    public class MockDataReceiver : IDataReceiver
+    public class MockDataReceiver : IDataReceiverAsync
     {
         public static string ExtraMessage { get; set; } = "extra message";
         public static double DistanceMeasured { get; set; } = 1000;
 
 
-        public byte[] ReceiveData()
+        public Task<byte[]> ReceiveDataAsync()
         {
-            var mockData = new
+            var mockData = new 
             {
                 extraMessage = ExtraMessage,
                 distanceMeasured = DistanceMeasured
             };
 
             string jsonString = JsonSerializer.Serialize(mockData);
-            return Encoding.ASCII.GetBytes(jsonString);
+            byte[] data = Encoding.ASCII.GetBytes(jsonString);
+
+            return Task.FromResult(data);
         }
 
         public string GetRemoteIpAddress()

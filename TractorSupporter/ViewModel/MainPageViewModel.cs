@@ -104,17 +104,25 @@ public class MainPageViewModel : BaseViewModel
 
     private void ServerThread()
     {
-        IDataReceiver dataReceiverESP = _useMockData ? new MockDataReceiver() : new UdpDataReceiver(_port);
+        IDataReceiverAsync dataReceiverESP = _useMockData ? new MockDataReceiver() : UdpDataReceiver.Instance(_port);
         AvoidingService avoidingService = AvoidingService.Instance;
         AlarmService alarmService = AlarmService.Instance;
         TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
         TSDataSender dataSender = TSDataSender.Instance;
+        CheckAsyncDataReceiverStatus<byte[]> checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
 
-        dataReceiverTS.StartReceivingAsync();
+        _ = dataReceiverTS.StartReceivingAsync();
 
         while (IsConnected)
         {
-            Byte[] receivedBytes = dataReceiverESP.ReceiveData();
+            if (!checkDataReceiverStatus.CheckStatus(dataReceiverESP.ReceiveDataAsync()).TryGetResult(out byte[]? result))
+            {
+                Console.WriteLine("Failed to get data for 5 seconds.");
+                IsConnected = false;
+                return;
+            }
+            byte[] receivedBytes = result!;
+
             string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
             using (JsonDocument data = JsonDocument.Parse(serializedData))
