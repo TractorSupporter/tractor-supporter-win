@@ -99,11 +99,11 @@ namespace TractorSupporter.ViewModel
 
         private void ServerThread()
         {
-            IDataReceiver espDataReceiver = useMockData ? new MockDataReceiver() : new UdpDataReceiver(8080);
+            IDataReceiverAsync espDataReceiver = useMockData ? new MockDataReceiver() : UdpDataReceiver.Instance(8080);
 
             while (true)
             {
-                Byte[] receivedBytes = espDataReceiver.ReceiveData();
+                Byte[] receivedBytes = espDataReceiver.ReceiveDataAsync().Result;
                 string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
                 using (JsonDocument data = JsonDocument.Parse(serializedData))

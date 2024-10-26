@@ -4,20 +4,23 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.Services;
 
-public class UdpDataReceiver : IDataReceiver
+public partial class UdpDataReceiver : IDataReceiverAsync
 {
     private readonly UdpClient _udpClient;
     private IPEndPoint _remoteIpEndpoint;
 
-    public UdpDataReceiver(int port)
+    private UdpDataReceiver(int port)
     {
         _udpClient = new UdpClient(port);
         _remoteIpEndpoint = new IPEndPoint(IPAddress.Any, port);
     }
 
-    public byte[] ReceiveData()
+    public async Task<byte[]> ReceiveDataAsync()
     {
-        return _udpClient.Receive(ref _remoteIpEndpoint);
+        var result = await _udpClient.ReceiveAsync();
+
+        _remoteIpEndpoint = result.RemoteEndPoint;
+        return result.Buffer;
     }
 
     public string GetRemoteIpAddress()
@@ -25,3 +28,20 @@ public class UdpDataReceiver : IDataReceiver
         return _remoteIpEndpoint.Address.ToString();
     }
 }
+
+#region Class structure
+public partial class UdpDataReceiver
+{
+    private static Lazy<UdpDataReceiver>? _lazyInstance = null;
+
+    public static UdpDataReceiver Instance(int port)
+    {
+        if (_lazyInstance is null)
+        {
+            _lazyInstance = new(() => new UdpDataReceiver(port));
+        }
+
+        return _lazyInstance.Value;
+    }
+}
+#endregion
