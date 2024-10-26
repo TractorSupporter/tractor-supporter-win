@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
+using System.Diagnostics;
 using System.Net.Sockets;
-using System.Printing;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Input;
 using TractorSupporter.Model;
@@ -41,9 +36,11 @@ public class MainPageViewModel : BaseViewModel
         _appConfig = ConfigAppJson.Instance.GetConfig();
         _port = _appConfig.Port;
         InitMockConfigWindow();
-        
 
+        ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
     }
+
+
 
     public string DistanceToObstacle
     {
@@ -95,67 +92,67 @@ public class MainPageViewModel : BaseViewModel
         }
     }
 
-    private void StartServerThread()
-    {
-        Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
-        thdUdpServer.IsBackground = true;
-        thdUdpServer.Start();
-    }
+    //private void StartServerThread()
+    //{
+    //    Thread thdUdpServer = new Thread(new ThreadStart(ServerThread));
+    //    thdUdpServer.IsBackground = true;
+    //    thdUdpServer.Start();
+    //}
 
-    private void ServerThread()
-    {
-        IDataReceiverAsync dataReceiverESP = _useMockData ? new MockDataReceiver() : UdpDataReceiver.Instance(_port);
-        AvoidingService avoidingService = AvoidingService.Instance;
-        TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
-        TSDataSender dataSender = TSDataSender.Instance;
-        CheckAsyncDataReceiverStatus<byte[]> checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
+    //private void ServerThread()
+    //{
+    //    IDataReceiverAsync dataReceiverESP = _useMockData ? new MockDataReceiver() : UdpDataReceiver.Initialize(_port);
+    //    AvoidingService avoidingService = AvoidingService.Instance;
+    //    TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
+    //    TSDataSender dataSender = TSDataSender.Instance;
+    //    CheckAsyncDataReceiverStatus<byte[]> checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
 
-        _ = dataReceiverTS.StartReceivingAsync();
+    //    _ = dataReceiverTS.StartReceivingAsync();
 
-        while (IsConnected)
-        {
-            if (!checkDataReceiverStatus.CheckStatus(dataReceiverESP.ReceiveDataAsync()).TryGetResult(out byte[]? result))
-            {
-                Console.WriteLine("Failed to get data for 5 seconds.");
-                IsConnected = false;
-                return;
-            }
-            byte[] receivedBytes = result!;
+    //    while (IsConnected)
+    //    {
+    //        if (!checkDataReceiverStatus.CheckStatus(dataReceiverESP.ReceiveDataAsync()).TryGetResult(out byte[]? result))
+    //        {
+    //            Console.WriteLine("Failed to get data for 5 seconds.");
+    //            IsConnected = false;
+    //            return;
+    //        }
+    //        byte[] receivedBytes = result!;
 
-            string serializedData = Encoding.ASCII.GetString(receivedBytes);
+    //        string serializedData = Encoding.ASCII.GetString(receivedBytes);
 
-            using (JsonDocument data = JsonDocument.Parse(serializedData))
-            {
-                JsonElement dataRoot = data.RootElement;
-                string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
-                double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
+    //        using (JsonDocument data = JsonDocument.Parse(serializedData))
+    //        {
+    //            JsonElement dataRoot = data.RootElement;
+    //            string extraMessage = dataRoot.GetProperty("extraMessage").GetString()!;
+    //            double distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
 
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    IPSender = dataReceiverESP.GetRemoteIpAddress();
-                    _ipDestination = IPSender;
+    //            App.Current.Dispatcher.Invoke(() =>
+    //            {
+    //                IPSender = dataReceiverESP.GetRemoteIpAddress();
+    //                _ipDestination = IPSender;
 
-                    AddParagraphToReceivedMessages(extraMessage);
+    //                AddParagraphToReceivedMessages(extraMessage);
 
-                    DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
+    //                DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
 
-                    bool shouldAvoid = avoidingService.MakeAvoidingDecision(distanceMeasured);
-                    bool shouldAlarm = false; // alarmService.MakeAlarmDecision();
-                    dataSender.SendData(new 
-                    {
-                        shouldAvoid,
-                        shouldAlarm,
-                        distanceMeasured
-                    });
-                });
-            }
+    //                bool shouldAvoid = avoidingService.MakeAvoidingDecision(distanceMeasured);
+    //                bool shouldAlarm = false; // alarmService.MakeAlarmDecision();
+    //                dataSender.SendData(new 
+    //                {
+    //                    shouldAvoid,
+    //                    shouldAlarm,
+    //                    distanceMeasured
+    //                });
+    //            });
+    //        }
 
-            if (_useMockData)
-            {
-                Thread.Sleep(300);
-            }
-        }
-    }
+    //        if (_useMockData)
+    //        {
+    //            Thread.Sleep(300);
+    //        }
+    //    }
+    //}
 
     public ICommand SendMessageCommand => new RelayCommand(SendMessageExecute);
 
@@ -187,7 +184,18 @@ public class MainPageViewModel : BaseViewModel
         IsConnected = !IsConnected;
         if (IsConnected)
         {
-            StartServerThread();
+            ServerThreadService.Instance.StartServer(_port, _useMockData);
         }
+        else
+        {
+            ServerThreadService.Instance.StopServer();
+        }
+    }
+
+    private void OnUdpDataReceived(object sender, UdpDataReceivedEventArgs e)
+    {
+        IPSender = e.IpSender;
+        DistanceToObstacle = e.DistanceMeasured.ToString();
+        AddParagraphToReceivedMessages(e.ExtraMessage);
     }
 }

@@ -15,8 +15,10 @@ namespace TractorSupporter.Services
         public static double DistanceMeasured { get; set; } = 1000;
 
 
-        public Task<byte[]> ReceiveDataAsync()
+        public async Task<byte[]> ReceiveDataAsync(CancellationToken token = default)
         {
+            await Task.Delay(300, token);
+
             var mockData = new 
             {
                 extraMessage = ExtraMessage,
@@ -26,7 +28,7 @@ namespace TractorSupporter.Services
             string jsonString = JsonSerializer.Serialize(mockData);
             byte[] data = Encoding.ASCII.GetBytes(jsonString);
 
-            return Task.FromResult(data);
+            return await Task.FromResult(data);
         }
 
         public string GetRemoteIpAddress()
