@@ -144,7 +144,7 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress);
+                _configAppJson.CreateJson(Port, IpAddress, false, false, TypeSensor.Laser);
                 _navigationService.NavigateToMain();
                 //_windowService.OpenMainWindow();
                 //Close(new object());
