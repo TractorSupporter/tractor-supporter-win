@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TractorSupporter.Model;
+using TractorSupporter.Model.Enums;
 using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.Services
@@ -36,14 +37,15 @@ namespace TractorSupporter.Services
             }
         }
 
-        public void CreateJson(string port, string ipAddress, bool option1 = false, bool option2 = false)
+        public void CreateJson(string port, string ipAddress, bool option1, bool option2, TypeSensor selectedTypeSensor)
         {
             var config = new AppConfig
             {
                 Port = int.Parse(port),
                 IpAddress = ipAddress,
                 Option1 = option1,
-                Option2 = option2
+                Option2 = option2,
+                SelectedSensorType = selectedTypeSensor
             };
 
             string jsonString = JsonSerializer.Serialize(config);

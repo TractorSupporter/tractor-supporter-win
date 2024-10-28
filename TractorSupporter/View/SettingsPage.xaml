@@ -5,46 +5,70 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TractorSupporter.View"
         xmlns:controls="clr-namespace:TractorSupporter.View.Controls"
+        xmlns:enums="clr-namespace:TractorSupporter.Model.Enums"
+        xmlns:converters="clr-namespace:TractorSupporter.Services.Converters"
         mc:Ignorable="d"
         Title="SettingsPage" Height="616" Width="469">
+    <Page.Resources>
+        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+    </Page.Resources>
     <Grid Background="{StaticResource GrayBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="230"/>
-            <RowDefinition Height="280"/>
-            <RowDefinition Height="130"/>
-        </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="1" Margin="20,50,20,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Behaviour Settings" Grid.Row="0"  FontSize="20" FontWeight="Bold"/>
-            <Grid Grid.Row="1">
-                <controls:SettingsOption Label="Option 1" Description="Description 1" IsChecked="{Binding Option1IsChecked, Mode=TwoWay}"/>
-            </Grid>
-            <Grid Grid.Row="2">
-                <controls:SettingsOption Label="Option 2" Description="Description 2" IsChecked="{Binding Option2IsChecked, Mode=TwoWay}"/>
-            </Grid>
-        </Grid>
+        <TabControl Margin="0,40,10,120" Background="{StaticResource GrayBrush}" MinWidth="410" HorizontalAlignment="Center">
+            <TabItem Header="Behaviour">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80"/>
+                        <RowDefinition Height="80"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <controls:SettingsOption Label="Option 1" Description="Description 1" IsChecked="{Binding Option1IsChecked, Mode=TwoWay}"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <controls:SettingsOption Label="Option 2" Description="Description 2" IsChecked="{Binding Option2IsChecked, Mode=TwoWay}"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
 
-        <Grid Grid.Row="2" Margin="20,50,20,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Connection Settings" Grid.Row="0"  FontSize="20" FontWeight="Bold"/>
-            <Grid Grid.Row="1">
-                <controls:ConfigData DataContext="{Binding}"/>
-            </Grid>
-        </Grid>
-        <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="0,0,0,80">
+            <TabItem Header="Connection">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="300">
+                            <TextBlock Text="Select Sensor Type" FontSize="20" Margin="0,0,0,10" />
+
+                            <RadioButton Content="Ultrasonic" 
+                             GroupName="SensorType"
+                             Margin="0,0,0,10"
+                             FontSize="16"
+                             VerticalContentAlignment="Center"
+                             IsChecked="{Binding SelectedSensorType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:TypeSensor.Ultrasonic}}" />
+                            <RadioButton Content="Laser" 
+                             GroupName="SensorType"
+                             FontSize="16"
+                             VerticalContentAlignment="Center"
+                             IsChecked="{Binding SelectedSensorType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:TypeSensor.Laser}}" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <TextBlock Text="Connection Properties" FontSize="20" Margin="50,0,0,0" />
+                        <controls:ConfigData DataContext="{Binding}" Margin="0,30,0,0"/>
+                       
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Other">
+            </TabItem>
+
+        </TabControl>
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="20,0,40,50">
             <controls:NavigationButtons 
                 BackCommand="{Binding BackCommand}" 
-                ForwardCommand="{Binding ForwardCommand}"
-                />
+                ForwardCommand="{Binding ForwardCommand}"/>
         </Grid>
     </Grid>
 </Page>
