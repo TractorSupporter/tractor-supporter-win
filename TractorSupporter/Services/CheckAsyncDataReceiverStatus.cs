@@ -11,17 +11,34 @@ public partial class CheckAsyncDataReceiverStatus<T>
 
     public CheckAsyncDataReceiverStatus<T> CheckStatus(Task<T> dataReceiverTask)
     {
-        Task finishedTask = Task.WhenAny(Task.Delay(_receiveDataTimeoutMs), dataReceiverTask).Result;
+        try
+        {
+            Task finishedTask = Task.WhenAny(Task.Delay(_receiveDataTimeoutMs), dataReceiverTask).Result;
 
-        if (finishedTask == dataReceiverTask)
-        {
-            _succeeded = true;
-            _data = dataReceiverTask.Result;
+            if (finishedTask == dataReceiverTask)
+            {
+                _succeeded = true;
+                _data = dataReceiverTask.Result;
+            }
+            else
+            {
+                _succeeded = false;
+                _data = default(T);
+            }
+
+            return this;
         }
-        else
+        catch (AggregateException e) 
         {
-            _succeeded = false;
-            _data = default(T);
+            Exception inner = e.InnerException!;
+            if (inner is TaskCanceledException)
+            {
+
+                _succeeded = false;
+                _data = default(T);
+            }
+            else
+                throw inner;
         }
 
         return this;

@@ -2,6 +2,6 @@
 
 public interface IDataReceiverAsync
 {
-    Task<byte[]> ReceiveDataAsync();
+    Task<byte[]> ReceiveDataAsync(CancellationToken token = default);
     string GetRemoteIpAddress();
 }
