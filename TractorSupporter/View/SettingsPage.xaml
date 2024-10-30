@@ -19,13 +19,31 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80"/>
                         <RowDefinition Height="80"/>
+                        <RowDefinition Height="120"/>
+                        <RowDefinition Height="80"/>
                     </Grid.RowDefinitions>
+
                     <Grid Grid.Row="0">
                         <controls:SettingsOption Label="Option 1" Description="Description 1" IsChecked="{Binding Option1IsChecked, Mode=TwoWay}"/>
                     </Grid>
+
                     <Grid Grid.Row="1">
                         <controls:SettingsOption Label="Option 2" Description="Description 2" IsChecked="{Binding Option2IsChecked, Mode=TwoWay}"/>
                     </Grid>
+
+                    <controls:DistanceControl Grid.Row="2" Margin="0,40,0,0" 
+                               Title="Avoiding Distance" 
+                               Description="Distance to obstacle when avoiding mechanism will start working"
+                               Minimum="50" 
+                               Maximum="500" 
+                               Value="{Binding AvoidingDistance, Mode=TwoWay}" />
+
+                    <controls:DistanceControl Grid.Row="3" 
+                               Title="Alarm Distance" 
+                               Description="Distance to obstacle when alarm mechanism will start working"
+                               Minimum="100" 
+                               Maximum="800" 
+                               Value="{Binding AlarmDistance, Mode=TwoWay}" />
                 </Grid>
             </TabItem>
 

@@ -29,6 +29,8 @@ public class MainPageViewModel : BaseViewModel
     private FlowDocument _receivedMessages;
     
     private INavigationService _navigationService;
+    private AlarmService _alarmService;
+    private AvoidingService _avoidingService;
     private AppConfig _appConfig;
     private int _port;
     private string _ipAddress;
@@ -36,13 +38,15 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel()
     {
         _navigationService = NavigationService.Instance;
+        _alarmService = AlarmService.Instance;
+        _avoidingService = AvoidingService.Instance;
         _receivedMessages = new FlowDocument();
         StartConnectionCommand = new RelayCommand(StartConnection);
         _appConfig = ConfigAppJson.Instance.GetConfig();
         _port = _appConfig.Port;
+        _alarmService.AlarmDistance = _appConfig.AlarmDistance;
+        _avoidingService.AvoidingDistance = _appConfig.AvoidingDistance;
         InitMockConfigWindow();
-        
-
     }
 
     public string DistanceToObstacle
@@ -105,14 +109,11 @@ public class MainPageViewModel : BaseViewModel
     private void ServerThread()
     {
         IDataReceiverAsync dataReceiverESP = _useMockData ? new MockDataReceiver() : UdpDataReceiver.Instance(_port);
-        AvoidingService avoidingService = AvoidingService.Instance;
-        AlarmService alarmService = AlarmService.Instance;
         TSDataReceiver dataReceiverTS = TSDataReceiver.Instance;     
         TSDataSender dataSender = TSDataSender.Instance;
         CheckAsyncDataReceiverStatus<byte[]> checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
 
         _ = dataReceiverTS.StartReceivingAsync();
-
         while (IsConnected)
         {
             if (!checkDataReceiverStatus.CheckStatus(dataReceiverESP.ReceiveDataAsync()).TryGetResult(out byte[]? result))
@@ -140,8 +141,8 @@ public class MainPageViewModel : BaseViewModel
 
                     DistanceToObstacle = Convert.ToInt32(distanceMeasured).ToString();
 
-                    bool shouldAvoid = avoidingService.MakeAvoidingDecision(distanceMeasured);
-                    bool shouldAlarm = alarmService.MakeAlarmDecision(distanceMeasured);
+                    bool shouldAvoid = _avoidingService.MakeAvoidingDecision(distanceMeasured);
+                    bool shouldAlarm = _alarmService.MakeAlarmDecision(distanceMeasured);
                     dataSender.SendData(new 
                     {
                         shouldAvoid,

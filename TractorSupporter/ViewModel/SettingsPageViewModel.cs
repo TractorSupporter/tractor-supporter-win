@@ -24,6 +24,8 @@ namespace TractorSupporter.ViewModel
         private bool _option1IsChecked;
         private bool _option2IsChecked;
         private TypeSensor _selectedSensorType;
+        private int _alarmDistance;
+        private int _avoidingDistance;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
         private NavigationService _navigationService;
@@ -36,6 +38,32 @@ namespace TractorSupporter.ViewModel
             ForwardCommand = new RelayCommand(SaveSettings);
             BackCommand = new RelayCommand(CloseSettings);
             setConfigData();
+        }
+
+        public int AlarmDistance
+        {
+            get => _alarmDistance;
+            set
+            {
+                if (_alarmDistance != value)
+                {
+                    _alarmDistance = value;
+                    OnPropertyChanged(nameof(AlarmDistance));
+                }
+            }
+        }
+
+        public int AvoidingDistance
+        {
+            get => _avoidingDistance;
+            set
+            {
+                if (_avoidingDistance != value)
+                {
+                    _avoidingDistance = value;
+                    OnPropertyChanged(nameof(AvoidingDistance));
+                }
+            }
         }
 
         public TypeSensor SelectedSensorType
@@ -145,6 +173,8 @@ namespace TractorSupporter.ViewModel
             Option1IsChecked = appConfig.Option1;
             Option2IsChecked = appConfig.Option2;
             SelectedSensorType = appConfig.SelectedSensorType;
+            AlarmDistance = appConfig.AlarmDistance;
+            AvoidingDistance = appConfig.AvoidingDistance;
         }
 
         private void SaveSettings(object parameter)
@@ -173,7 +203,8 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress, Option1IsChecked, Option2IsChecked, SelectedSensorType);
+                _configAppJson.CreateJson(Port, IpAddress, Option1IsChecked, Option2IsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance);
+                _configAppJson.ReadJson();
                 _navigationService.NavigateToMain();
             }
         }

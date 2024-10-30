@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -144,7 +145,13 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress, false, false, TypeSensor.Laser);
+                _configAppJson.CreateJson(Port, 
+                    IpAddress, 
+                    false, 
+                    false, 
+                    TypeSensor.Ultrasonic, 
+                    int.Parse(ConfigurationManager.AppSettings["Alarm"]),
+                    int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]));
                 _navigationService.NavigateToMain();
                 //_windowService.OpenMainWindow();
                 //Close(new object());
