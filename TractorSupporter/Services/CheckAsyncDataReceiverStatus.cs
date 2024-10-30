@@ -28,9 +28,17 @@ public partial class CheckAsyncDataReceiverStatus<T>
 
             return this;
         }
-        catch (Exception e) 
+        catch (AggregateException e) 
         {
-            var xd = 3;
+            Exception inner = e.InnerException!;
+            if (inner is TaskCanceledException)
+            {
+
+                _succeeded = false;
+                _data = default(T);
+            }
+            else
+                throw inner;
         }
 
         return this;
