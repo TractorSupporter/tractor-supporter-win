@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TractorSupporter.Services;
 
-public class CommandService
+public class CommandFieldDecisionService
 {
-    public bool MakeDecision(double distanceMeasured, List<DateTime> distanceTimes, double distance, int validLifetimeMs, int minSignalsCount, ref bool decisionAllowed, bool isAvoidingCommand = false)
+    public bool MakeDecision(double distanceMeasured, List<DateTime> distanceTimes, double distance, int validLifetimeMs, int minSignalsCount)
     {
         var currentTime = DateTime.Now;
 
@@ -18,12 +18,6 @@ public class CommandService
             distanceTimes.Add(currentTime);
 
         var decision = distanceTimes.Count >= minSignalsCount;
-
-        if (!decisionAllowed)
-            return false;
-
-        if (isAvoidingCommand && decision)
-            decisionAllowed = false;
 
         return decision;
     }

@@ -14,5 +14,7 @@ namespace TractorSupporter.Model
         public bool Option1 { get; set; }
         public bool Option2 { get; set; }
         public TypeSensor SelectedSensorType { get; set; }
+        public int AvoidingDistance { get; set; }
+        public int AlarmDistance { get; set; }
     }
 }
