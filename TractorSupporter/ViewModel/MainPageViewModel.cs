@@ -36,11 +36,8 @@ public class MainPageViewModel : BaseViewModel
         _appConfig = ConfigAppJson.Instance.GetConfig();
         _port = _appConfig.Port;
         InitMockConfigWindow();
-
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
     }
-
-
 
     public string DistanceToObstacle
     {

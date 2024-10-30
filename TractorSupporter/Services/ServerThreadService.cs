@@ -13,6 +13,7 @@ public partial class ServerThreadService
     private bool _isConnected;
     private IDataReceiverAsync _dataReceiverESP;
     private AvoidingService _avoidingService;
+    private AlarmService _alarmService;
     private TSDataReceiver _dataReceiverTS;
     private TSDataSender _dataSender;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
@@ -45,6 +46,7 @@ public partial class ServerThreadService
 
     private void ServerThread(CancellationToken token)
     {
+        _alarmService = AlarmService.Instance;
         _avoidingService = AvoidingService.Instance;
         _dataReceiverTS = TSDataReceiver.Instance;
         _dataSender = TSDataSender.Instance;
@@ -77,7 +79,7 @@ public partial class ServerThreadService
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
             bool shouldAvoid = _avoidingService.MakeAvoidingDecision(distanceMeasured);
-            bool shouldAlarm = false; // Implement if needed
+            bool shouldAlarm = _alarmService.MakeAlarmDecision(distanceMeasured);
 
             _dataSender.SendData(new
             {

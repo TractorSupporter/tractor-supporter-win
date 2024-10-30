@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TractorSupporter.Model;
+using TractorSupporter.Model.Enums;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
 
@@ -22,6 +23,7 @@ namespace TractorSupporter.ViewModel
         private string _ipValidationMessage;
         private bool _option1IsChecked;
         private bool _option2IsChecked;
+        private TypeSensor _selectedSensorType;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
         private NavigationService _navigationService;
@@ -34,6 +36,19 @@ namespace TractorSupporter.ViewModel
             ForwardCommand = new RelayCommand(SaveSettings);
             BackCommand = new RelayCommand(CloseSettings);
             setConfigData();
+        }
+
+        public TypeSensor SelectedSensorType
+        {
+            get => _selectedSensorType;
+            set
+            {
+                if (_selectedSensorType != value)
+                {
+                    _selectedSensorType = value;
+                    OnPropertyChanged(nameof(SelectedSensorType));
+                }
+            }
         }
 
         public bool Option1IsChecked
@@ -129,6 +144,7 @@ namespace TractorSupporter.ViewModel
             IpAddress = appConfig.IpAddress;
             Option1IsChecked = appConfig.Option1;
             Option2IsChecked = appConfig.Option2;
+            SelectedSensorType = appConfig.SelectedSensorType;
         }
 
         private void SaveSettings(object parameter)
@@ -157,7 +173,7 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress, Option1IsChecked, Option2IsChecked);
+                _configAppJson.CreateJson(Port, IpAddress, Option1IsChecked, Option2IsChecked, SelectedSensorType);
                 _navigationService.NavigateToMain();
             }
         }

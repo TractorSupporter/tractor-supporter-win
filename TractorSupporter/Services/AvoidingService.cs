@@ -2,13 +2,11 @@
 
 namespace TractorSupporter.Services;
 
-
-
-public partial class AvoidingService
+public partial class AvoidingService: CommandService
 {
     private readonly List<DateTime> _avoidingDistanceTimes;
     private double _avoidingDistance;
-    private double _minAvoidingSignalsCount;
+    private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
 
@@ -16,8 +14,8 @@ public partial class AvoidingService
     {
         _avoidingDistanceTimes = new List<DateTime>();
         _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
-        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinAvoidingSignalsCount"]!);
-        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["AvoidingDistanceSignalValidLifetimeMs"]!);
+        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
+        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
         _avoidingDecisionAllowed = false;
     }
 
@@ -28,24 +26,15 @@ public partial class AvoidingService
 
     public bool MakeAvoidingDecision(double distanceMeasured)
     {
-        
-
-        var currentTime = DateTime.Now;
-
-        _avoidingDistanceTimes.RemoveAll(time => (currentTime - time).TotalMilliseconds > _avoidingDistanceSignalValidLifetimeMs);
-
-        if (distanceMeasured <= _avoidingDistance)
-            _avoidingDistanceTimes.Add(currentTime);
-
-        var decision = _avoidingDistanceTimes.Count >= _minAvoidingSignalsCount;
-
-        if (!_avoidingDecisionAllowed)
-            return false;
-
-        if (decision)
-            _avoidingDecisionAllowed = false;
-
-        return decision;
+        return MakeDecision(
+            distanceMeasured,
+            _avoidingDistanceTimes,
+            _avoidingDistance,
+            _avoidingDistanceSignalValidLifetimeMs,
+            _minAvoidingSignalsCount,
+            ref _avoidingDecisionAllowed,
+            true
+        );
     }
 }
 
