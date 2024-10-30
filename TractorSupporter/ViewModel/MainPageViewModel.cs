@@ -24,6 +24,8 @@ public class MainPageViewModel : BaseViewModel
     private FlowDocument _receivedMessages;
     
     private INavigationService _navigationService;
+    private AlarmService _alarmService;
+    private AvoidingService _avoidingService;
     private AppConfig _appConfig;
     private int _port;
     private string _ipAddress;
@@ -31,10 +33,14 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel()
     {
         _navigationService = NavigationService.Instance;
+        _alarmService = AlarmService.Instance;
+        _avoidingService = AvoidingService.Instance;
         _receivedMessages = new FlowDocument();
         StartConnectionCommand = new RelayCommand(StartConnection);
         _appConfig = ConfigAppJson.Instance.GetConfig();
         _port = _appConfig.Port;
+        _alarmService.AlarmDistance = _appConfig.AlarmDistance;
+        _avoidingService.AvoidingDistance = _appConfig.AvoidingDistance;
         InitMockConfigWindow();
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
     }

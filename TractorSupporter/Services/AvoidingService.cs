@@ -1,11 +1,12 @@
 ﻿using System.Configuration;
+using TractorSupporter.Model;
 
 namespace TractorSupporter.Services;
 
-public partial class AvoidingService: CommandService
+public partial class AvoidingService: CommandFieldDecisionService
 {
     private readonly List<DateTime> _avoidingDistanceTimes;
-    private double _avoidingDistance;
+    public double AvoidingDistance { get; set; }
     private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
@@ -13,7 +14,6 @@ public partial class AvoidingService: CommandService
     private AvoidingService()
     {
         _avoidingDistanceTimes = new List<DateTime>();
-        _avoidingDistance = double.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]!);
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
         _avoidingDecisionAllowed = false;
@@ -26,15 +26,21 @@ public partial class AvoidingService: CommandService
 
     public bool MakeAvoidingDecision(double distanceMeasured)
     {
-        return MakeDecision(
+        bool decision = MakeDecision(
             distanceMeasured,
             _avoidingDistanceTimes,
-            _avoidingDistance,
+            AvoidingDistance,
             _avoidingDistanceSignalValidLifetimeMs,
-            _minAvoidingSignalsCount,
-            ref _avoidingDecisionAllowed,
-            true
+            _minAvoidingSignalsCount
         );
+
+        if (!_avoidingDecisionAllowed)
+            return false;
+
+        if (decision)
+            _avoidingDecisionAllowed = false;
+
+        return decision;
     }
 }
 
