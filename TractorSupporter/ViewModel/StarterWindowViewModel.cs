@@ -150,8 +150,8 @@ namespace TractorSupporter.ViewModel
                     false, 
                     false, 
                     TypeSensor.Ultrasonic, 
-                    int.Parse(ConfigurationManager.AppSettings["Alarm"]),
-                    int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]));
+                    int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]),
+                    int.Parse(ConfigurationManager.AppSettings["AlarmDistance"]));
                 _navigationService.NavigateToMain();
                 //_windowService.OpenMainWindow();
                 //Close(new object());
