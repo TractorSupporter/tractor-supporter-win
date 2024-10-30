@@ -5,6 +5,7 @@ namespace TractorSupporter.Services;
 
 public partial class CheckAsyncDataReceiverStatus<T>
 {
+    public event EventHandler<UpdateUdpConnectionStatusEventArgs> UpdateUdpConnectionStatus;
     private readonly int _receiveDataTimeoutMs;
     private bool _succeeded;
     private T? _data;
@@ -26,6 +27,7 @@ public partial class CheckAsyncDataReceiverStatus<T>
                 _data = default(T);
             }
 
+            UpdateUdpConnectionStatus.Invoke(this, new UpdateUdpConnectionStatusEventArgs(_succeeded));
             return this;
         }
         catch (AggregateException e) 
@@ -70,9 +72,16 @@ public partial class CheckAsyncDataReceiverStatus<T> where T : notnull
         _data = default(T);
         _succeeded = false;
         _receiveDataTimeoutMs = int.Parse(ConfigurationManager.AppSettings["MaxLifeCheckESPResposeTime"]!);
-        //_udpClient = new UdpClient();
     }
-
-    //private T DefaultData => default(T);
 }
 #endregion
+
+public class UpdateUdpConnectionStatusEventArgs : EventArgs
+{
+    public bool ConnectionStatus { get; }
+
+    public UpdateUdpConnectionStatusEventArgs(bool connectionStatus)
+    {
+        ConnectionStatus = connectionStatus;
+    }
+}

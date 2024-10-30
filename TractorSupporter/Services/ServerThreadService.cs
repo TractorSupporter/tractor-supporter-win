@@ -7,8 +7,7 @@ namespace TractorSupporter.Services;
 
 public partial class ServerThreadService
 {
-    public event EventHandler<UdpDataReceivedEventArgs> UdpDataReceived;
-
+    public EventHandler<UdpDataReceivedEventArgs> UdpDataReceived;
     private Thread _serverThread;
     private bool _isConnected;
     private IDataReceiverAsync _dataReceiverESP;
@@ -19,29 +18,25 @@ public partial class ServerThreadService
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
 
+    private ServerThreadService() 
+    {
+        _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
+        _cancellationTokenSource = new CancellationTokenSource(); 
+    }
+
     public void StopServer()
     {
         _isConnected = false;
         _cancellationTokenSource?.Cancel();
-        
     }
 
     public void StartServer(int port, bool useMockData)
     {
-        _cancellationTokenSource = new CancellationTokenSource();
         _serverThread = new Thread(() => ServerThread(_cancellationTokenSource.Token));
-
-        _dataReceiverESP = useMockData ? new MockDataReceiver() : UdpDataReceiver.Initialize(port);
+        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : UdpDataReceiver.Initialize(port);
         _isConnected = true;
-
-
         _serverThread.IsBackground = true;
         _serverThread.Start();
-    }
-
-    private ServerThreadService()
-    {
-        
     }
 
     private void ServerThread(CancellationToken token)
@@ -50,7 +45,7 @@ public partial class ServerThreadService
         _avoidingService = AvoidingService.Instance;
         _dataReceiverTS = TSDataReceiver.Instance;
         _dataSender = TSDataSender.Instance;
-        _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
+        
 
         _ = _dataReceiverTS.StartReceivingAsync();
 
@@ -65,6 +60,8 @@ public partial class ServerThreadService
 
             ProcessReceivedData(result!);
         }
+
+        // TODO add checking signal even if app is disconnected from AgOpenGPS
     }
     
     private void ProcessReceivedData(byte[] receivedBytes)
@@ -102,6 +99,7 @@ public partial class ServerThreadService
 {
     private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService());
     public static ServerThreadService Instance => _lazyInstance.Value;
+    
 }
 #endregion
 

@@ -20,6 +20,7 @@ public class MainPageViewModel : BaseViewModel
     private string _ipSender;
     private string _ipDestination;
     private bool _isConnected;
+    private bool _isUdpConnected;
     private ICommand _startConnectionCommand;
     private FlowDocument _receivedMessages;
     
@@ -36,7 +37,9 @@ public class MainPageViewModel : BaseViewModel
         _appConfig = ConfigAppJson.Instance.GetConfig();
         _port = _appConfig.Port;
         InitMockConfigWindow();
+        StandbyThreadService.Instance.StartStandby(_port, _useMockData);
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
+        CheckAsyncDataReceiverStatus<byte[]>.Instance.UpdateUdpConnectionStatus += OnUpdateUdpConnectionStatus;
     }
 
     public string DistanceToObstacle
@@ -61,6 +64,12 @@ public class MainPageViewModel : BaseViewModel
     {
         get => _ipSender;
         set { _ipSender = value; OnPropertyChanged(nameof(IPSender)); }
+    }
+
+    public bool IsUdpConnected
+    {
+        get => _isUdpConnected;
+        set { _isUdpConnected = value; OnPropertyChanged(nameof(IsUdpConnected)); }
     }
 
     public bool IsConnected
@@ -110,7 +119,7 @@ public class MainPageViewModel : BaseViewModel
     {
         UdpClient udpClient = new UdpClient();
         udpClient.Connect(_ipDestination, Convert.ToInt16(parameter));
-        Byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
+        byte[] dataToSend = Encoding.ASCII.GetBytes(SendMessage);
         udpClient.Send(dataToSend, dataToSend.Length);
     }
 
@@ -119,18 +128,25 @@ public class MainPageViewModel : BaseViewModel
         IsConnected = !IsConnected;
         if (IsConnected)
         {
+            StandbyThreadService.Instance.StopStandby();
             ServerThreadService.Instance.StartServer(_port, _useMockData);
         }
         else
         {
             ServerThreadService.Instance.StopServer();
+            StandbyThreadService.Instance.StartStandby(_port, _useMockData);
         }
     }
 
-    private void OnUdpDataReceived(object sender, UdpDataReceivedEventArgs e)
+    private void OnUdpDataReceived(object? sender, UdpDataReceivedEventArgs e)
     {
         IPSender = e.IpSender;
         DistanceToObstacle = e.DistanceMeasured.ToString();
         AddParagraphToReceivedMessages(e.ExtraMessage);
+    }
+
+    private void OnUpdateUdpConnectionStatus(object? sender, UpdateUdpConnectionStatusEventArgs e)
+    {
+        IsUdpConnected = e.ConnectionStatus;
     }
 }
