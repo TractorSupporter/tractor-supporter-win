@@ -99,7 +99,7 @@ namespace TractorSupporter.ViewModel
 
         private void ServerThread()
         {
-            IDataReceiverAsync espDataReceiver = useMockData ? new MockDataReceiver() : UdpDataReceiver.Instance(8080);
+            IDataReceiverAsync espDataReceiver = useMockData ? new MockDataReceiver() : UdpDataReceiver.Initialize(8080);
 
             while (true)
             {
