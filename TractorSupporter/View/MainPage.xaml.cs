@@ -21,6 +21,24 @@ namespace TractorSupporter.View
         {
             InitializeComponent();
             DataContext = new MainPageViewModel();
+            this.Loaded += MainPage_Loaded;
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Hello", $"{App.IsInitialized}, {App.CommandLineArgs != null}");
+
+            if (App.IsInitialized && App.CommandLineArgs != null && App.CommandLineArgs.Length > 0 && App.CommandLineArgs[0] == "click_connect_button")
+            {
+                if (DataContext is MainPageViewModel viewModel)
+                {
+                    if (viewModel.StartConnectionCommand.CanExecute(null))
+                    {
+                        viewModel.StartConnectionCommand.Execute(null);
+                    }
+                }
+            }
+            App.IsInitialized = false;
         }
     }
 }

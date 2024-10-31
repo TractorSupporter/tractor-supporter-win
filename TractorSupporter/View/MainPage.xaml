@@ -39,6 +39,7 @@
                 HorizontalAlignment="Center" 
                 Width="250" 
                 Height="50" 
+                x:Name="ConnectButton"
                 Command="{Binding StartConnectionCommand}"
                 />
         </Grid>

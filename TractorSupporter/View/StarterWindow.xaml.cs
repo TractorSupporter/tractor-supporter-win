@@ -16,9 +16,9 @@ using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View
 {
-    public partial class StarterConfigWindow : Window
+    public partial class StarterWindow : Window
     {
-        public StarterConfigWindow()
+        public StarterWindow()
         {
             InitializeComponent();
             NavigationService.Initialize(MainFrame);
