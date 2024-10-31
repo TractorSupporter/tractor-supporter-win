@@ -18,15 +18,26 @@
     <Grid Background="{StaticResource GrayBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="150"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <Grid Grid.Row="1" Margin="20,50,20,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Connection status:" FontSize="20"/>
+                <TextBlock Text="Connection status [ESP32]:" FontSize="18"/>
+                <TextBlock Text="{Binding IsUdpConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
+                   FontSize="18" Margin="20,0,0,0" 
+                   Foreground="{Binding IsUdpConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
+                   FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="20,50,20,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Connection status [AgOpenGPSGPS]:" FontSize="18"/>
                 <TextBlock Text="{Binding IsConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
-                           FontSize="20" Margin="20,0,0,0" 
+                           FontSize="18" Margin="20,0,0,0" 
                            Foreground="{Binding IsConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
                            FontWeight="Bold"/>
             </StackPanel>
@@ -44,7 +55,7 @@
                 />
         </Grid>
 
-        <Grid Grid.Row="2" Margin="40,40,40,80">
+        <Grid Grid.Row="3" Margin="40,40,40,80">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="30"/>
