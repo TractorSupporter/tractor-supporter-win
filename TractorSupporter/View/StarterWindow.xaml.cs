@@ -26,6 +26,11 @@ namespace TractorSupporter.View
 
             var viewModel = DataContext as StarterWindowViewModel;
             Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
+
+            if (App.CommandLineArgs != null && ConfigAppJson.Instance.ReadJson() == null)
+            {
+                App.IsInitialized = false;
+            }
         }
     }
 }
