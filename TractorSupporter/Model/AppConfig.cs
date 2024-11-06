@@ -11,8 +11,8 @@ namespace TractorSupporter.Model
     {
         public int Port { get; set; }
         public string IpAddress { get; set; }
-        public bool Option1 { get; set; }
-        public bool Option2 { get; set; }
+        public bool IsAvoidingMechanismTurnedOn { get; set; }
+        public bool IsAlarmMechanismTurnedOn { get; set; }
         public TypeSensor SelectedSensorType { get; set; }
         public int AvoidingDistance { get; set; }
         public int AlarmDistance { get; set; }

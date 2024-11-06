@@ -11,6 +11,7 @@
         Title="SettingsPage" Height="616" Width="469">
     <Page.Resources>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Page.Resources>
     <Grid Background="{StaticResource GrayBrush}">
         <TabControl Margin="0,40,10,120" Background="{StaticResource GrayBrush}" MinWidth="410" HorizontalAlignment="Center">
@@ -24,11 +25,11 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
-                        <controls:SettingsOption Label="Option 1" Description="Description 1" IsChecked="{Binding Option1IsChecked, Mode=TwoWay}"/>
+                        <controls:SettingsOption Label="Avoiding Mechanism" Description="If this is checked on avoiding mechanism will work" IsChecked="{Binding AvoidingMechanismIsChecked, Mode=TwoWay}"/>
                     </Grid>
 
                     <Grid Grid.Row="1">
-                        <controls:SettingsOption Label="Option 2" Description="Description 2" IsChecked="{Binding Option2IsChecked, Mode=TwoWay}"/>
+                        <controls:SettingsOption Label="Alarming Mechanism" Description="If this is checked on alarm mechanism will work" IsChecked="{Binding AlarmMechanismIsChecked, Mode=TwoWay}" Loaded="SettingsOption_Loaded"/>
                     </Grid>
 
                     <controls:DistanceControl Grid.Row="2" Margin="0,40,0,0" 
@@ -36,6 +37,7 @@
                                Description="Distance to obstacle when avoiding mechanism will start working"
                                Minimum="50" 
                                Maximum="500" 
+                               Visibility="{Binding AvoidingMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Value="{Binding AvoidingDistance, Mode=TwoWay}" />
 
                     <controls:DistanceControl Grid.Row="3" 
@@ -43,6 +45,7 @@
                                Description="Distance to obstacle when alarm mechanism will start working"
                                Minimum="100" 
                                Maximum="800" 
+                               Visibility="{Binding AlarmMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Value="{Binding AlarmDistance, Mode=TwoWay}" />
                 </Grid>
             </TabItem>

@@ -25,5 +25,10 @@ namespace TractorSupporter.View
             InitializeComponent();
             DataContext = new SettingsPageViewModel();
         }
+
+        private void SettingsOption_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
