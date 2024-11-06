@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Xml.Serialization;
 using TractorSupporter.Model;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
@@ -30,6 +31,8 @@ public class MainPageViewModel : BaseViewModel
     private AppConfig _appConfig;
     private int _port;
     private string _ipAddress;
+    private bool _isAvoidingMechanismTurnedOn;
+    private bool _isAlarmMechanismTurnedOn;
 
     public MainPageViewModel()
     {
@@ -38,10 +41,7 @@ public class MainPageViewModel : BaseViewModel
         _avoidingService = AvoidingService.Instance;
         _receivedMessages = new FlowDocument();
         StartConnectionCommand = new RelayCommand(StartConnection);
-        _appConfig = ConfigAppJson.Instance.GetConfig();
-        _port = _appConfig.Port;
-        _alarmService.AlarmDistance = _appConfig.AlarmDistance;
-        _avoidingService.AvoidingDistance = _appConfig.AvoidingDistance;
+        InitConfig();
         InitMockConfigWindow();
         StandbyThreadService.Instance.StartStandby(_port, _useMockData);
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
@@ -92,6 +92,18 @@ public class MainPageViewModel : BaseViewModel
             _startConnectionCommand = value;
             OnPropertyChanged(nameof(StartConnectionCommand));
         }
+    }
+
+    private void InitConfig()
+    {
+        _appConfig = ConfigAppJson.Instance.GetConfig();
+        _port = _appConfig.Port;
+        _alarmService.AlarmDistance = _appConfig.AlarmDistance;
+        _avoidingService.AvoidingDistance = _appConfig.AvoidingDistance;
+        _isAvoidingMechanismTurnedOn = _appConfig.IsAvoidingMechanismTurnedOn;
+        _isAlarmMechanismTurnedOn = _appConfig.IsAlarmMechanismTurnedOn;
+        ServerThreadService.Instance.IsAvoidingMechanismTurnedOn = _isAvoidingMechanismTurnedOn;
+        ServerThreadService.Instance.IsAlarmMechanismTurnedOn = _isAlarmMechanismTurnedOn;
     }
 
     private void InitMockConfigWindow()

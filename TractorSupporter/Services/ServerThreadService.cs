@@ -17,6 +17,8 @@ public partial class ServerThreadService
     private TSDataSender _dataSender;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
+    public bool IsAvoidingMechanismTurnedOn { get; set; }
+    public bool IsAlarmMechanismTurnedOn { get; set; }
 
     private ServerThreadService() 
     {
@@ -75,8 +77,8 @@ public partial class ServerThreadService
 
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
-            bool shouldAvoid = _avoidingService.MakeAvoidingDecision(distanceMeasured);
-            bool shouldAlarm = _alarmService.MakeAlarmDecision(distanceMeasured);
+            bool shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
+            bool shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
 
             _dataSender.SendData(new
             {

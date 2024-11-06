@@ -10,7 +10,7 @@ namespace TractorSupporter.Services.Interfaces
 {
     public interface IConfigAppJson
     {
-        public void CreateJson(string port, string ipAddress, bool option1, bool option2, TypeSensor selectedSensorType, int AvoidingDistance, int AlarmDistance);
+        public void CreateJson(string port, string ipAddress, bool isAvoidingMechanismTurnedOn, bool isAlarmMechanismTurnedOn, TypeSensor selectedSensorType, int AvoidingDistance, int AlarmDistance);
         public AppConfig ReadJson();
         public AppConfig GetConfig();
     }

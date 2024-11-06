@@ -147,8 +147,8 @@ namespace TractorSupporter.ViewModel
             {
                 _configAppJson.CreateJson(Port, 
                     IpAddress, 
-                    false, 
-                    false, 
+                    true, 
+                    true, 
                     TypeSensor.Ultrasonic, 
                     int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]),
                     int.Parse(ConfigurationManager.AppSettings["AlarmDistance"]));
