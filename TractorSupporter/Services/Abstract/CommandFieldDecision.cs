@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace TractorSupporter.Services.Abstract;
 
-namespace TractorSupporter.Services;
-
-public class CommandFieldDecisionService
+public abstract class CommandFieldDecision
 {
     public bool MakeDecision(double distanceMeasured, List<DateTime> distanceTimes, double distance, int validLifetimeMs, int minSignalsCount)
     {

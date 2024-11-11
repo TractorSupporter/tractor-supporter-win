@@ -35,10 +35,10 @@
 
         <Grid Grid.Row="2" Margin="20,50,20,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Connection status [AgOpenGPSGPS]:" FontSize="18"/>
-                <TextBlock Text="{Binding IsConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
+                <TextBlock Text="Connection status [AgOpenGPS]:" FontSize="18"/>
+                <TextBlock Text="{Binding IsGPSConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
                            FontSize="18" Margin="20,0,0,0" 
-                           Foreground="{Binding IsConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
+                           Foreground="{Binding IsGPSConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
                            FontWeight="Bold"/>
             </StackPanel>
             <Button 

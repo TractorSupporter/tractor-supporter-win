@@ -10,13 +10,16 @@ public partial class ServerThreadService
     public EventHandler<UdpDataReceivedEventArgs> UdpDataReceived;
     private Thread _serverThread;
     private bool _isConnected;
+    private GPSConnectionService _gpsConnectionService;
     private IDataReceiverAsync _dataReceiverESP;
     private AvoidingService _avoidingService;
     private AlarmService _alarmService;
-    private TSDataReceiver _dataReceiverTS;
-    private TSDataSender _dataSender;
+    private DataReceiverGPS _dataReceiverGPS;
+    private DataSenderGPS _dataSenderGPS;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
+
+    public bool IsConnected => _isConnected;
 
     private ServerThreadService() 
     {
@@ -26,12 +29,14 @@ public partial class ServerThreadService
 
     public void StopServer()
     {
+        _gpsConnectionService.Disconnect();
         _isConnected = false;
-        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource.Cancel();
     }
 
     public void StartServer(int port, bool useMockData)
     {
+        _cancellationTokenSource = new CancellationTokenSource();
         _serverThread = new Thread(() => ServerThread(_cancellationTokenSource.Token));
         _dataReceiverESP = useMockData ? MockDataReceiver.Instance : UdpDataReceiver.Initialize(port);
         _isConnected = true;
@@ -41,20 +46,19 @@ public partial class ServerThreadService
 
     private void ServerThread(CancellationToken token)
     {
+        _gpsConnectionService = GPSConnectionService.Instance;
         _alarmService = AlarmService.Instance;
         _avoidingService = AvoidingService.Instance;
-        _dataReceiverTS = TSDataReceiver.Instance;
-        _dataSender = TSDataSender.Instance;
-        
+        _dataReceiverGPS = DataReceiverGPS.Instance;
+        _dataSenderGPS = DataSenderGPS.Instance;
 
-        _ = _dataReceiverTS.StartReceivingAsync();
+        _ = _gpsConnectionService.Connect();
+        _ = _dataReceiverGPS.StartReceivingAsync(token);
 
         while (_isConnected && !token.IsCancellationRequested)
-        {
+        {   
             if (!_checkDataReceiverStatus.CheckStatus(_dataReceiverESP.ReceiveDataAsync(token)).TryGetResult(out byte[]? result))
             {
-                Console.WriteLine("Failed to get data for 5 seconds.");
-
                 continue;
             }
 
@@ -72,18 +76,17 @@ public partial class ServerThreadService
             var dataRoot = data.RootElement;
             var extraMessage = dataRoot.GetProperty("extraMessage").GetString() ?? "";
             var distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
-
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
-
             bool shouldAvoid = _avoidingService.MakeAvoidingDecision(distanceMeasured);
             bool shouldAlarm = _alarmService.MakeAlarmDecision(distanceMeasured);
 
-            _dataSender.SendData(new
-            {
-                shouldAvoid,
-                shouldAlarm,
-                distanceMeasured
-            });
+            if (!_cancellationTokenSource.IsCancellationRequested)
+                _ = _dataSenderGPS.SendData(new
+                {
+                    shouldAvoid,
+                    shouldAlarm,
+                    distanceMeasured
+                });
 
             App.Current.Dispatcher.Invoke(() =>
             {
