@@ -21,8 +21,8 @@ namespace TractorSupporter.ViewModel
         private string _ipAddress;
         private string _portValidationMessage;
         private string _ipValidationMessage;
-        private bool _option1IsChecked;
-        private bool _option2IsChecked;
+        private bool _avoidingMechanismIsChecked;
+        private bool _alarmMechanismIsChecked;
         private TypeSensor _selectedSensorType;
         private int _alarmDistance;
         private int _avoidingDistance;
@@ -79,28 +79,28 @@ namespace TractorSupporter.ViewModel
             }
         }
 
-        public bool Option1IsChecked
+        public bool AvoidingMechanismIsChecked
         {
-            get => _option1IsChecked;
+            get => _avoidingMechanismIsChecked;
             set
             {
-                if (_option1IsChecked != value)
+                if (_avoidingMechanismIsChecked != value)
                 {
-                    _option1IsChecked = value;
-                    OnPropertyChanged(nameof(_option1IsChecked));
+                    _avoidingMechanismIsChecked = value;
+                    OnPropertyChanged(nameof(AvoidingMechanismIsChecked));
                 }
             }
         }
 
-        public bool Option2IsChecked
+        public bool AlarmMechanismIsChecked
         {
-            get => _option2IsChecked;
+            get => _alarmMechanismIsChecked;
             set
             {
-                if (_option2IsChecked != value)
+                if (_alarmMechanismIsChecked != value)
                 {
-                    _option2IsChecked = value;
-                    OnPropertyChanged(nameof(_option2IsChecked));
+                    _alarmMechanismIsChecked = value;
+                    OnPropertyChanged(nameof(AlarmMechanismIsChecked));
                 }
             }
         }
@@ -170,8 +170,8 @@ namespace TractorSupporter.ViewModel
             AppConfig appConfig = _configAppJson.ReadJson();
             Port = appConfig.Port.ToString();
             IpAddress = appConfig.IpAddress;
-            Option1IsChecked = appConfig.Option1;
-            Option2IsChecked = appConfig.Option2;
+            AvoidingMechanismIsChecked = appConfig.IsAvoidingMechanismTurnedOn;
+            AlarmMechanismIsChecked = appConfig.IsAlarmMechanismTurnedOn;
             SelectedSensorType = appConfig.SelectedSensorType;
             AlarmDistance = appConfig.AlarmDistance;
             AvoidingDistance = appConfig.AvoidingDistance;
@@ -203,7 +203,7 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress, Option1IsChecked, Option2IsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance);
+                _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance);
                 _configAppJson.ReadJson();
                 _navigationService.NavigateToMain();
             }

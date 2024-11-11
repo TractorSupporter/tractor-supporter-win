@@ -12,14 +12,14 @@ public partial class ConfigAppJson
     readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
     readonly string fileName = "config.json";
 
-    public void CreateJson(string port, string ipAddress, bool option1, bool option2, TypeSensor selectedTypeSensor, int avoidingDistance, int alarmDistance)
+    public void CreateJson(string port, string ipAddress, bool isAvoidingMechanismTurnedOn, bool isAlarmMechanismTurnedOn, TypeSensor selectedTypeSensor, int avoidingDistance, int alarmDistance)
     {
         var config = new AppConfig
         {
             Port = int.Parse(port),
             IpAddress = ipAddress,
-            Option1 = option1,
-            Option2 = option2,
+            IsAvoidingMechanismTurnedOn = isAvoidingMechanismTurnedOn,
+            IsAlarmMechanismTurnedOn = isAlarmMechanismTurnedOn,
             SelectedSensorType = selectedTypeSensor,
             AlarmDistance = alarmDistance,
             AvoidingDistance = avoidingDistance

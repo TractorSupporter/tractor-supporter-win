@@ -18,6 +18,8 @@ public partial class ServerThreadService
     private DataSenderGPS _dataSenderGPS;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
+    public bool IsAvoidingMechanismTurnedOn { get; set; }
+    public bool IsAlarmMechanismTurnedOn { get; set; }
 
     public bool IsConnected => _isConnected;
 
@@ -77,8 +79,9 @@ public partial class ServerThreadService
             var extraMessage = dataRoot.GetProperty("extraMessage").GetString() ?? "";
             var distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
-            bool shouldAvoid = _avoidingService.MakeAvoidingDecision(distanceMeasured);
-            bool shouldAlarm = _alarmService.MakeAlarmDecision(distanceMeasured);
+
+            bool shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
+            bool shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
 
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new
