@@ -7,6 +7,8 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TractorSupporter.Model;
 using TractorSupporter.Model.Enums;
@@ -26,18 +28,35 @@ namespace TractorSupporter.ViewModel
         private TypeSensor _selectedSensorType;
         private int _alarmDistance;
         private int _avoidingDistance;
+        private Language _selectedLanguage;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
         private NavigationService _navigationService;
+        private LanguageService _languageService;
         private IConfigAppJson _configAppJson;
 
         public SettingsPageViewModel()
         {
             _navigationService = NavigationService.Instance;
             _configAppJson = ConfigAppJson.Instance;
+            _languageService = LanguageService.Instance;
             ForwardCommand = new RelayCommand(SaveSettings);
             BackCommand = new RelayCommand(CloseSettings);
             setConfigData();
+        }
+
+        public Language SelectedLanguage
+        {
+            get => _selectedLanguage;
+            set
+            {
+                if (_selectedLanguage != value)
+                {
+                    _selectedLanguage = value;
+                    OnPropertyChanged(nameof(SelectedLanguage));
+                    string languageCode = _selectedLanguage.GetDescription();
+                }
+            }
         }
 
         public int AlarmDistance
@@ -175,6 +194,7 @@ namespace TractorSupporter.ViewModel
             SelectedSensorType = appConfig.SelectedSensorType;
             AlarmDistance = appConfig.AlarmDistance;
             AvoidingDistance = appConfig.AvoidingDistance;
+            SelectedLanguage = appConfig.Language;
         }
 
         private void SaveSettings(object parameter)
@@ -203,8 +223,9 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance);
+                _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage);
                 _configAppJson.ReadJson();
+                _languageService.ChangeLanguage(SelectedLanguage);
                 _navigationService.NavigateToMain();
             }
         }

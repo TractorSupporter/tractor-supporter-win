@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    >
+    
+    <sys:String x:Key="MainPageConnectionStatusESP">Status Połączenia [ESP32]:</sys:String>
+    <sys:String x:Key="MainPageConnectionStatusAgOpenGPS">Status Połączenia [AgOpenGPS]:</sys:String>
+    <sys:String x:Key="MainPageDistanceToObstacle">Odległość do przeszkody</sys:String>
+    <sys:String x:Key="MainPageMessages">Wiadomości</sys:String>
+    <sys:String x:Key="MainPageConnected">Połączony</sys:String>
+    <sys:String x:Key="MainPageDisconnected">Rozłączony</sys:String>
+    <sys:String x:Key="MainPageStopConnection">Zastopuj połączenie</sys:String>
+    <sys:String x:Key="MainPageStartConnection">Rozpocznij połączenie</sys:String>
+
+
+</ResourceDictionary>

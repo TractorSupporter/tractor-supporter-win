@@ -38,6 +38,6 @@
                 ForwardCommand="{Binding ForwardCommand}"
                 />
         </Grid>
-        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
     </Grid>
 </Window>

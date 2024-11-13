@@ -15,10 +15,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="Dictionary-en-US.xaml" />
+    <Page Remove="Dictionary-pl-PL.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="SharpVectors.Wpf" Version="1.8.4.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Dictionary-en-US.xaml" />
+    <Resource Include="Dictionary-pl-PL.xaml" />
     <Resource Include="Resources\Icons\confirm-icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

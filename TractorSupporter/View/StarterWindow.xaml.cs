@@ -27,5 +27,10 @@ namespace TractorSupporter.View
             var viewModel = DataContext as StarterWindowViewModel;
             Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
         }
+
+        private void MainFrame_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
+        {
+
+        }
     }
 }

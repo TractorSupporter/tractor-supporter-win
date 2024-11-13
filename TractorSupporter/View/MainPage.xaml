@@ -8,13 +8,15 @@
         xmlns:controls="clr-namespace:TractorSupporter.View.Controls"
         xmlns:helpers="clr-namespace:TractorSupporter.Helpers"
         xmlns:converters="clr-namespace:TractorSupporter.Services.Converters"
-        Title="MainWindow" Height="616" Width="469" Background="Transparent">
+        Title="MainWindow" Height="616" Width="469" Background="Transparent"
+    xmlns:System="clr-namespace:System;assembly=System.Runtime">
     <Page.Resources>
         <converters:ConnectionStatusToBackgroundConverter x:Key="ConnectionStatusToBackgroundConverter"/>
         <converters:ConnectionStatusToContentConverter x:Key="ConnectionStatusToContentConverter"/>
         <converters:ConnectionStatusToTextConverter x:Key="ConnectionStatusToTextConverter"/>
         <converters:ConnectionStatusToForegroundConverter x:Key="ConnectionStatusToForegroundConverter"/>
     </Page.Resources>
+    
     <Grid Background="{StaticResource GrayBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,7 +27,7 @@
         
         <Grid Grid.Row="1" Margin="20,50,20,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Connection status [ESP32]:" FontSize="18"/>
+                <TextBlock Text="{DynamicResource MainPageConnectionStatusESP}" FontSize="18"/>
                 <TextBlock Text="{Binding IsUdpConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
                    FontSize="18" Margin="20,0,0,0" 
                    Foreground="{Binding IsUdpConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
@@ -35,7 +37,7 @@
 
         <Grid Grid.Row="2" Margin="20,50,20,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Connection status [AgOpenGPSGPS]:" FontSize="18"/>
+                <TextBlock Text="{DynamicResource MainPageConnectionStatusAgOpenGPS}" FontSize="18"/>
                 <TextBlock Text="{Binding IsConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
                            FontSize="18" Margin="20,0,0,0" 
                            Foreground="{Binding IsConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
@@ -61,9 +63,9 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Distance to obstacle" HorizontalAlignment="Center" Margin="0,20,0,5" FontSize="16"/>
+            <TextBlock Grid.Row="0" Text="{DynamicResource MainPageDistanceToObstacle}" HorizontalAlignment="Center" Margin="0,20,0,5" FontSize="16"/>
             <TextBox Grid.Row="1" Name="PortTextBox" Background="White" Text="{Binding DistanceToObstacle, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
-            <TextBlock Grid.Row="2" Text="Messages" HorizontalAlignment="Center" Margin="0,20,0,5" FontSize="16"/>
+            <TextBlock Grid.Row="2" Text="{DynamicResource MainPageMessages}" HorizontalAlignment="Center" Margin="0,20,0,5" FontSize="16"/>
             <RichTextBox Grid.Row="3" helpers:RichTextBoxHelper.Document="{Binding ReceivedMessages, Mode=TwoWay}" IsReadOnly="True"/>
         </Grid>
     </Grid>

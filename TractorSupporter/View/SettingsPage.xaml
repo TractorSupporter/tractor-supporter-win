@@ -7,6 +7,7 @@
         xmlns:controls="clr-namespace:TractorSupporter.View.Controls"
         xmlns:enums="clr-namespace:TractorSupporter.Model.Enums"
         xmlns:converters="clr-namespace:TractorSupporter.Services.Converters"
+        xmlns:viewModel="clr-namespace:TractorSupporter.ViewModel"
         mc:Ignorable="d"
         Title="SettingsPage" Height="616" Width="469">
     <Page.Resources>
@@ -15,6 +16,23 @@
     </Page.Resources>
     <Grid Background="{StaticResource GrayBrush}">
         <TabControl Margin="0,40,10,120" Background="{StaticResource GrayBrush}" MinWidth="410" HorizontalAlignment="Center">
+            <TabItem Header="{DynamicResource SettingsGeneralTabSetting}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource SettingsSelectLanguage}" Margin="0,0,0,5"/>
+                            <ComboBox Width="150" SelectedValue="{Binding SelectedLanguage, Mode=TwoWay}" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="{DynamicResource SettingsEnglish}" Tag="{x:Static enums:Language.English}"/>
+                                <ComboBoxItem Content="{DynamicResource SettingsPolish}" Tag="{x:Static enums:Language.Polish}"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
             <TabItem Header="Behaviour">
                 <Grid>
                     <Grid.RowDefinitions>
