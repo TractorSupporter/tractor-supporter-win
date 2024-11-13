@@ -26,7 +26,6 @@ namespace TractorSupporter.View.Controls
         public Navbar()
         {
             InitializeComponent();
-            DataContext = this;
         }
 
         public ICommand SettingsCommand { get; }

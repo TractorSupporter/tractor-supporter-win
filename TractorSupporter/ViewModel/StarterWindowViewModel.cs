@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -23,11 +24,13 @@ namespace TractorSupporter.ViewModel
         private string _ipAddress;
         private string _portValidationMessage;
         private string _ipValidationMessage;
+        private bool _isSettingsVisible;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
         private INavigationService _navigationService;
         private IConfigAppJson _configAppJson;
         private LanguageService _languageService;
+        private SettingsVisibilityService _settingsVisibilityService;
 
         public StarterWindowViewModel()
         {
@@ -37,9 +40,12 @@ namespace TractorSupporter.ViewModel
             _configAppJson = ConfigAppJson.Instance;
             _navigationService = NavigationService.Instance;
             _languageService = LanguageService.Instance;
+            _settingsVisibilityService = SettingsVisibilityService.Instance;
+            _settingsVisibilityService.PropertyChanged += OnSettingsVisibilityServicePropertyChanged;
             NavigateToMainPageIfConfigExists();
             SetMyIP();
             Port = "8080";
+            IsSettingsVisible = false;
         }
 
         private void SetMyIP()
@@ -49,6 +55,13 @@ namespace TractorSupporter.ViewModel
                 .AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
             IpAddress = myIP;
         }
+
+        public bool IsSettingsVisible
+        {
+            get => _settingsVisibilityService.IsSettingsVisible;
+            set => _settingsVisibilityService.IsSettingsVisible = value;
+        }
+
 
         public string Port
         {
@@ -119,6 +132,14 @@ namespace TractorSupporter.ViewModel
             {
                 _languageService.ChangeLanguage(appConfig.Language);
                 _navigationService.NavigateToMain();
+            }
+        }
+
+        private void OnSettingsVisibilityServicePropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(_settingsVisibilityService.IsSettingsVisible))
+            {
+                OnPropertyChanged(nameof(IsSettingsVisible));
             }
         }
 

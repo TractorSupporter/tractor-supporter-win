@@ -29,6 +29,7 @@ public class MainPageViewModel : BaseViewModel
     private INavigationService _navigationService;
     private AlarmService _alarmService;
     private AvoidingService _avoidingService;
+    private SettingsVisibilityService _settingsVisibilityService;
     private AppConfig _appConfig;
     private int _port;
     private string _ipAddress;
@@ -40,6 +41,7 @@ public class MainPageViewModel : BaseViewModel
         _navigationService = NavigationService.Instance;
         _alarmService = AlarmService.Instance;
         _avoidingService = AvoidingService.Instance;
+        _settingsVisibilityService = SettingsVisibilityService.Instance;
         _receivedMessages = new FlowDocument();
         StartConnectionCommand = new RelayCommand(StartConnection);
         InitConfig();
@@ -153,6 +155,7 @@ public class MainPageViewModel : BaseViewModel
     private void StartConnection(object parameter)
     {
         IsConnected = !IsConnected;
+        _settingsVisibilityService.IsSettingsVisible = !IsConnected;
         if (IsConnected)
         {
             StandbyThreadService.Instance.StopStandby();

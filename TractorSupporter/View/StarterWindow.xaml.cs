@@ -35,7 +35,23 @@ namespace TractorSupporter.View
 
         private void MainFrame_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
         {
+            if (DataContext is StarterWindowViewModel viewModel)
+            {
+                switch (e.Content)
+                {
+                    case SettingsPage:
+                        viewModel.IsSettingsVisible = true;
+                        break;
 
+                    case MainPage:
+                        viewModel.IsSettingsVisible = true;
+                        break;
+
+                    default:
+                        viewModel.IsSettingsVisible = true;
+                        break;
+                }
+            }
         }
     }
 }
