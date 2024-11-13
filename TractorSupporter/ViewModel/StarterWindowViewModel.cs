@@ -27,6 +27,7 @@ namespace TractorSupporter.ViewModel
         private ICommand _backCommand;
         private INavigationService _navigationService;
         private IConfigAppJson _configAppJson;
+        private LanguageService _languageService;
 
         public StarterWindowViewModel()
         {
@@ -35,6 +36,7 @@ namespace TractorSupporter.ViewModel
             BackCommand = new RelayCommand(Close);
             _configAppJson = ConfigAppJson.Instance;
             _navigationService = NavigationService.Instance;
+            _languageService = LanguageService.Instance;
             NavigateToMainPageIfConfigExists();
             SetMyIP();
             Port = "8080";
@@ -115,6 +117,7 @@ namespace TractorSupporter.ViewModel
 
             if (appConfig != null)
             {
+                _languageService.ChangeLanguage(appConfig.Language);
                 _navigationService.NavigateToMain();
             }
         }
@@ -145,13 +148,14 @@ namespace TractorSupporter.ViewModel
 
             if (isValid)
             {
-                _configAppJson.CreateJson(Port, 
-                    IpAddress, 
-                    true, 
-                    true, 
-                    TypeSensor.Ultrasonic, 
+                _configAppJson.CreateJson(Port,
+                    IpAddress,
+                    true,
+                    true,
+                    TypeSensor.Ultrasonic,
                     int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]),
-                    int.Parse(ConfigurationManager.AppSettings["AlarmDistance"]));
+                    int.Parse(ConfigurationManager.AppSettings["AlarmDistance"]),
+                    Language.English);
                 _navigationService.NavigateToMain();
                 //_windowService.OpenMainWindow();
                 //Close(new object());

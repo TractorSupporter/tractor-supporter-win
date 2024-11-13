@@ -4,12 +4,18 @@
              xmlns:local="clr-namespace:TractorSupporter"
              StartupUri="View/StarterWindow.xaml">
     <Application.Resources>
-        <Color x:Key="DarkBlueColor">#0D2738</Color>
-        <Color x:Key="LightBlueColor">#1F90FE</Color>
-        <Color x:Key="GrayColor">#EAEBEC</Color>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Dictionary-en-US.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-        <SolidColorBrush x:Key="DarkBlueBrush" Color="{StaticResource DarkBlueColor}"/>
-        <SolidColorBrush x:Key="LightBlueBrush" Color="{StaticResource LightBlueColor}"/>
-        <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource GrayColor}"/>
+            <Color x:Key="DarkBlueColor">#0D2738</Color>
+            <Color x:Key="LightBlueColor">#1F90FE</Color>
+            <Color x:Key="GrayColor">#EAEBEC</Color>
+
+            <SolidColorBrush x:Key="DarkBlueBrush" Color="{StaticResource DarkBlueColor}"/>
+            <SolidColorBrush x:Key="LightBlueBrush" Color="{StaticResource LightBlueColor}"/>
+            <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource GrayColor}"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

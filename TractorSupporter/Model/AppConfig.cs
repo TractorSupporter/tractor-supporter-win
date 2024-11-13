@@ -16,5 +16,6 @@ namespace TractorSupporter.Model
         public TypeSensor SelectedSensorType { get; set; }
         public int AvoidingDistance { get; set; }
         public int AlarmDistance { get; set; }
+        public Language Language { get; set; }
     }
 }

@@ -22,8 +22,8 @@
 
                 <Grid Grid.Row="0">
                     <StackPanel>
-                        <TextBlock Text="Welcome to TractorSupporter" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap" FontWeight="Bold"/>
-                        <TextBlock Text="This app provides measurement of the distance between your vehicle and potential obstacles. By default your sensor is set as ultrasonic, change it if you want in settings. Fill config data to continue. " FontSize="14" Margin="0,0,0,30" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource StarterWelcomeTractoSupporter}" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,30" TextWrapping="Wrap" FontWeight="Bold"/>
+                        <TextBlock Text="{DynamicResource StarterProjectDescription}" FontSize="14" Margin="0,0,0,30" TextWrapping="Wrap" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1">
@@ -38,6 +38,6 @@
                 ForwardCommand="{Binding ForwardCommand}"
                 />
         </Grid>
-        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
     </Grid>
 </Window>

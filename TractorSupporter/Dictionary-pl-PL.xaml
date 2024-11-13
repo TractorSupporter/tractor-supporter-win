@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    >
+    
+    <sys:String x:Key="MainPageConnectionStatusESP">Status Połączenia [ESP32]:</sys:String>
+    <sys:String x:Key="MainPageConnectionStatusAgOpenGPS">Status Połączenia [AgOpenGPS]:</sys:String>
+    <sys:String x:Key="MainPageDistanceToObstacle">Odległość do przeszkody</sys:String>
+    <sys:String x:Key="MainPageMessages">Wiadomości</sys:String>
+    <sys:String x:Key="MainPageConnected">Połączony</sys:String>
+    <sys:String x:Key="MainPageDisconnected">Rozłączony</sys:String>
+    <sys:String x:Key="MainPageStopConnection">Zastopuj połączenie</sys:String>
+    <sys:String x:Key="MainPageStartConnection">Rozpocznij połączenie</sys:String>
+
+    <sys:String x:Key="Port">Port</sys:String>
+    <sys:String x:Key="YourIP">Twoje IP</sys:String>
+    <sys:String x:Key="SettingsSelectLanguage">Wybierz język:</sys:String>
+    <sys:String x:Key="SettingsEnglish">Angielski</sys:String>
+    <sys:String x:Key="SettingsPolish">Polski</sys:String>
+    <sys:String x:Key="SettingsGeneralTabSetting">Ogólne</sys:String>
+    <sys:String x:Key="SettingsAvoidingMechanismLabel">Mechanizm omijania</sys:String>
+    <sys:String x:Key="SettingsAvoidingMechanismDescription">Jeśli jest włączony to mechanizm omijania zadziała</sys:String>
+    <sys:String x:Key="SettingsAlarmingMechanismLabel">Mechanizm alarmowania</sys:String>
+    <sys:String x:Key="SettingsAlarmingMechanismDescription">Jeśli jest włączony to mechanizm alarmowania zadziała</sys:String>
+    <sys:String x:Key="SettingsAvoidingDistanceTitle">Odległość omijania</sys:String>
+    <sys:String x:Key="SettingsAvoidingDistanceDescription">Odległość od przeszkody, kiedy mechanizm omijania zacznie działać</sys:String>
+    <sys:String x:Key="SettingsAlarmDistanceTitle">Odległość alarmowania</sys:String>
+    <sys:String x:Key="SettingsAlarmDistanceDescription">Odległość od przeszkody, kiedy mechanizm alarmowania zacznie działać</sys:String>
+    <sys:String x:Key="SettingsBehaviourTabSetting">Zachowanie</sys:String>
+    <sys:String x:Key="SettingsConnectionTabSetting">Połączenie</sys:String>
+    <sys:String x:Key="SettingsConnectionProperties">Właściwości połączenia</sys:String>
+    <sys:String x:Key="SettingsSelectSensorType">Wybierz typ czujnika</sys:String>
+    <sys:String x:Key="SettingsUltrasonic">Ultradźwiękowy</sys:String>
+    <sys:String x:Key="SettingsLaser">Laserowy</sys:String>
+
+    <sys:String x:Key="StarterProjectDescription">Ta aplikacja zapewnia pomiar dystansu od twojego pojazdu do przeszkód. Domyślnie Twój czujnik jest ustawiony na typ ultradźwiękowy, możesz to zmienić w ustawieniach. Uzupełnij danę, by kontynuować.</sys:String>
+    <sys:String x:Key="StarterWelcomeTractoSupporter">Witamy w Tractor Supporter</sys:String>
+</ResourceDictionary>
