@@ -22,6 +22,7 @@ public class MainPageViewModel : BaseViewModel
     private string _ipDestination;
     private bool _isConnected;
     private bool _isUdpConnected;
+    private bool _isGPSConnected;
     private ICommand _startConnectionCommand;
     private FlowDocument _receivedMessages;
     
@@ -43,9 +44,11 @@ public class MainPageViewModel : BaseViewModel
         StartConnectionCommand = new RelayCommand(StartConnection);
         InitConfig();
         InitMockConfigWindow();
-        StandbyThreadService.Instance.StartStandby(_port, _useMockData);
+        GPSConnectionService.Instance.ConnectedToGPSUpdated += OnUpdateConnectionToGPS; 
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
         CheckAsyncDataReceiverStatus<byte[]>.Instance.UpdateUdpConnectionStatus += OnUpdateUdpConnectionStatus;
+
+        StandbyThreadService.Instance.StartStandby(_port, _useMockData);
     }
 
     public string DistanceToObstacle
@@ -84,6 +87,12 @@ public class MainPageViewModel : BaseViewModel
         set { _isConnected = value; OnPropertyChanged(nameof(IsConnected)); }
     }
 
+    public bool IsGPSConnected
+    {
+        get => _isGPSConnected;
+        set { _isGPSConnected = value; OnPropertyChanged(nameof(IsGPSConnected)); }
+    }
+    
     public ICommand StartConnectionCommand
     {
         get => _startConnectionCommand;
@@ -166,5 +175,10 @@ public class MainPageViewModel : BaseViewModel
     private void OnUpdateUdpConnectionStatus(object? sender, UpdateUdpConnectionStatusEventArgs e)
     {
         IsUdpConnected = e.ConnectionStatus;
+    }
+
+    private void OnUpdateConnectionToGPS(object? sender, bool isConnected)
+    {
+        IsGPSConnected = isConnected;
     }
 }

@@ -40,7 +40,7 @@
                 <TextBlock Text="{DynamicResource MainPageConnectionStatusAgOpenGPS}" FontSize="18"/>
                 <TextBlock Text="{Binding IsConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
                            FontSize="18" Margin="20,0,0,0" 
-                           Foreground="{Binding IsConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
+                           Foreground="{Binding IsGPSConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
                            FontWeight="Bold"/>
             </StackPanel>
             <Button 
@@ -52,6 +52,7 @@
                 HorizontalAlignment="Center" 
                 Width="250" 
                 Height="50" 
+                x:Name="ConnectButton"
                 Command="{Binding StartConnectionCommand}"
                 />
         </Grid>

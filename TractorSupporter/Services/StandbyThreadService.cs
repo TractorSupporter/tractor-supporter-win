@@ -4,11 +4,11 @@ namespace TractorSupporter.Services;
 
 public partial class StandbyThreadService
 {
-    private Thread _serverThread;
+    private Thread _standbyThread;
+    private bool _shouldRun;
     private IDataReceiverAsync _dataReceiverESP;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
-    private bool _shouldRun;
 
     private StandbyThreadService()
     {
@@ -24,11 +24,11 @@ public partial class StandbyThreadService
 
     public void StartStandby(int port, bool useMockData)
     {
-        _serverThread = new Thread(() => StandbyThread(_cancellationTokenSource.Token));
+        _standbyThread = new Thread(() => StandbyThread(_cancellationTokenSource.Token));
         _shouldRun = true;
-        _serverThread.IsBackground = true;
+        _standbyThread.IsBackground = true;
         _dataReceiverESP = useMockData ? MockDataReceiver.Instance : UdpDataReceiver.Initialize(port);
-        _serverThread.Start();
+        _standbyThread.Start();
     }
 
     private void StandbyThread(CancellationToken token)

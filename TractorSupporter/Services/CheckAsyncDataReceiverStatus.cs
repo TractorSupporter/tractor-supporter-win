@@ -24,10 +24,13 @@ public partial class CheckAsyncDataReceiverStatus<T>
             else
             {
                 _succeeded = false;
-                _data = default(T);
+                _data = default;
             }
-
-            UpdateUdpConnectionStatus.Invoke(this, new UpdateUdpConnectionStatusEventArgs(_succeeded));
+            App.Current.Dispatcher.Invoke(() => 
+            {
+                UpdateUdpConnectionStatus.Invoke(this, new UpdateUdpConnectionStatusEventArgs(_succeeded));
+            });
+            
             return this;
         }
         catch (AggregateException e) 
@@ -37,7 +40,7 @@ public partial class CheckAsyncDataReceiverStatus<T>
             {
 
                 _succeeded = false;
-                _data = default(T);
+                _data = default;
             }
             else
                 throw inner;
@@ -55,7 +58,7 @@ public partial class CheckAsyncDataReceiverStatus<T>
             return true;
         }
 
-        _data = default(T);
+        _data = default;
         data = _data;
         return false;
     }
