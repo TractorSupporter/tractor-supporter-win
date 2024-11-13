@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TractorSupporter.Model;
+using TractorSupporter.Services.Abstract;
 
 namespace TractorSupporter.Services;
 
-public partial class AlarmService: CommandFieldDecisionService
+public partial class AlarmService: CommandFieldDecision
 {
     private readonly List<DateTime> _alarmDistanceTimes;
     public double AlarmDistance { get; set; }

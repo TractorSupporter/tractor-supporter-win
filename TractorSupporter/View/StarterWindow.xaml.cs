@@ -16,9 +16,9 @@ using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View
 {
-    public partial class StarterConfigWindow : Window
+    public partial class StarterWindow : Window
     {
-        public StarterConfigWindow()
+        public StarterWindow()
         {
             InitializeComponent();
             NavigationService.Initialize(MainFrame);
@@ -26,6 +26,11 @@ namespace TractorSupporter.View
 
             var viewModel = DataContext as StarterWindowViewModel;
             Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
+
+            if (App.CommandLineArgs != null && ConfigAppJson.Instance.ReadJson() == null)
+            {
+                App.IsInitialized = false;
+            }
         }
     }
 }
