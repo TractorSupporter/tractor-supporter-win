@@ -9,7 +9,8 @@
         xmlns:converters="clr-namespace:TractorSupporter.Services.Converters"
         xmlns:viewModel="clr-namespace:TractorSupporter.ViewModel"
         mc:Ignorable="d"
-        Title="SettingsPage" Height="616" Width="469">
+        Title="SettingsPage" Height="616" Width="469"
+    xmlns:System="clr-namespace:System;assembly=System.Runtime">
     <Page.Resources>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -19,22 +20,28 @@
             <TabItem Header="{DynamicResource SettingsGeneralTabSetting}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="75"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0">
-                        <StackPanel>
-                            <TextBlock Text="{DynamicResource SettingsSelectLanguage}" Margin="0,0,0,5"/>
-                            <ComboBox Width="150" SelectedValue="{Binding SelectedLanguage, Mode=TwoWay}" SelectedValuePath="Tag">
-                                <ComboBoxItem Content="{DynamicResource SettingsEnglish}" Tag="{x:Static enums:Language.English}"/>
-                                <ComboBoxItem Content="{DynamicResource SettingsPolish}" Tag="{x:Static enums:Language.Polish}"/>
-                            </ComboBox>
-                        </StackPanel>
+                    <Grid Grid.Row="0" Margin="0,50,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource SettingsSelectLanguage}" Margin="0,0,0,5"/>
+                        <ComboBox  Grid.Column="1" Width="150" SelectedValue="{Binding SelectedLanguage, Mode=TwoWay}" SelectedValuePath="Tag">
+                            <ComboBoxItem Content="{DynamicResource SettingsEnglish}" Tag="{x:Static enums:Language.English}"/>
+                            <ComboBoxItem Content="{DynamicResource SettingsPolish}" Tag="{x:Static enums:Language.Polish}"/>
+                        </ComboBox>
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Behaviour">
+            <TabItem Header="{DynamicResource SettingsBehaviourTabSetting}">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="145*"/>
+                        <ColumnDefinition Width="259*"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80"/>
                         <RowDefinition Height="80"/>
@@ -42,33 +49,37 @@
                         <RowDefinition Height="80"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0">
-                        <controls:SettingsOption Label="Avoiding Mechanism" Description="If this is checked on avoiding mechanism will work" IsChecked="{Binding AvoidingMechanismIsChecked, Mode=TwoWay}"/>
+                    <Grid Grid.Row="0" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="153*"/>
+                            <ColumnDefinition Width="251*"/>
+                        </Grid.ColumnDefinitions>
+                        <controls:SettingsOption Label="{DynamicResource SettingsAvoidingMechanismLabel}" Description="{DynamicResource SettingsAvoidingMechanismDescription}" IsChecked="{Binding AvoidingMechanismIsChecked, Mode=TwoWay}" Grid.ColumnSpan="2"/>
                     </Grid>
 
-                    <Grid Grid.Row="1">
-                        <controls:SettingsOption Label="Alarming Mechanism" Description="If this is checked on alarm mechanism will work" IsChecked="{Binding AlarmMechanismIsChecked, Mode=TwoWay}" Loaded="SettingsOption_Loaded"/>
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                        <controls:SettingsOption Label="{DynamicResource SettingsAlarmingMechanismLabel}" Description="{DynamicResource SettingsAlarmingMechanismDescription}" IsChecked="{Binding AlarmMechanismIsChecked, Mode=TwoWay}" Loaded="SettingsOption_Loaded"/>
                     </Grid>
 
                     <controls:DistanceControl Grid.Row="2" Margin="0,40,0,0" 
-                               Title="Avoiding Distance" 
-                               Description="Distance to obstacle when avoiding mechanism will start working"
+                               Title="{DynamicResource SettingsAvoidingDistanceTitle}" 
+                               Description="{DynamicResource SettingsAvoidingDistanceDescription}"
                                Minimum="50" 
                                Maximum="500" 
                                Visibility="{Binding AvoidingMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                               Value="{Binding AvoidingDistance, Mode=TwoWay}" />
+                               Value="{Binding AvoidingDistance, Mode=TwoWay}" Grid.ColumnSpan="2" />
 
                     <controls:DistanceControl Grid.Row="3" 
-                               Title="Alarm Distance" 
-                               Description="Distance to obstacle when alarm mechanism will start working"
+                               Title="{DynamicResource SettingsAlarmDistanceTitle}" 
+                               Description="{DynamicResource SettingsAlarmDistanceDescription}"
                                Minimum="100" 
                                Maximum="800" 
                                Visibility="{Binding AlarmMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                               Value="{Binding AlarmDistance, Mode=TwoWay}" />
+                               Value="{Binding AlarmDistance, Mode=TwoWay}" Grid.ColumnSpan="2" />
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Connection">
+            <TabItem Header="{DynamicResource SettingsConnectionTabSetting}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -76,15 +87,15 @@
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="300">
-                            <TextBlock Text="Select Sensor Type" FontSize="20" Margin="0,0,0,10" />
+                            <TextBlock Text="{DynamicResource SettingsSelectSensorType}" FontSize="20" Margin="0,0,0,10" />
 
-                            <RadioButton Content="Ultrasonic" 
+                            <RadioButton Content="{DynamicResource SettingsUltrasonic}" 
                              GroupName="SensorType"
                              Margin="0,0,0,10"
                              FontSize="16"
                              VerticalContentAlignment="Center"
                              IsChecked="{Binding SelectedSensorType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:TypeSensor.Ultrasonic}}" />
-                            <RadioButton Content="Laser" 
+                            <RadioButton Content="{DynamicResource SettingsLaser}" 
                              GroupName="SensorType"
                              FontSize="16"
                              VerticalContentAlignment="Center"
@@ -92,14 +103,15 @@
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Row="1">
-                        <TextBlock Text="Connection Properties" FontSize="20" Margin="50,0,0,0" />
-                        <controls:ConfigData DataContext="{Binding}" Margin="0,30,0,0"/>
-                       
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="93*"/>
+                            <ColumnDefinition Width="311*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{DynamicResource SettingsConnectionProperties}" FontSize="20" Margin="50,0,0,0" Grid.ColumnSpan="2" />
+                        <controls:ConfigData DataContext="{Binding}" Margin="0,30,0,0" Grid.ColumnSpan="2"/>
+
                     </Grid>
                 </Grid>
-            </TabItem>
-
-            <TabItem Header="Other">
             </TabItem>
 
         </TabControl>

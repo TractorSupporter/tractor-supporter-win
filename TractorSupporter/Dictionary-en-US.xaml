@@ -10,10 +10,30 @@
     <sys:String x:Key="MainPageStopConnection">Stop Connection</sys:String>
     <sys:String x:Key="MainPageStartConnection">Start Connection</sys:String>
 
+    <sys:String x:Key="Port">Port</sys:String>
+    <sys:String x:Key="YourIP">Your IP</sys:String>
     <sys:String x:Key="SettingsSelectLanguage">Select Language:</sys:String>
     <sys:String x:Key="SettingsEnglish">English</sys:String>
     <sys:String x:Key="SettingsPolish">Polish</sys:String>
     <sys:String x:Key="SettingsGeneralTabSetting">General</sys:String>
+    <sys:String x:Key="SettingsAvoidingMechanismLabel">Avoiding Mechanism</sys:String>
+    <sys:String x:Key="SettingsAvoidingMechanismDescription">If this is checked on avoiding mechanism will work</sys:String>
+    <sys:String x:Key="SettingsAlarmingMechanismLabel">Alarming Mechanism</sys:String>
+    <sys:String x:Key="SettingsAlarmingMechanismDescription">If this is checked on alarm mechanism will work</sys:String>
+    <sys:String x:Key="SettingsAvoidingDistanceTitle">Avoiding Distance</sys:String>
+    <sys:String x:Key="SettingsAvoidingDistanceDescription">Distance to obstacle when avoiding mechanism will start working</sys:String>
+    <sys:String x:Key="SettingsAlarmDistanceTitle">Alarm Distance</sys:String>
+    <sys:String x:Key="SettingsAlarmDistanceDescription">Distance to obstacle when alarm mechanism will start working</sys:String>
+    <sys:String x:Key="SettingsBehaviourTabSetting">Behaviour</sys:String>
+    <sys:String x:Key="SettingsConnectionTabSetting">Connection</sys:String>
+    <sys:String x:Key="SettingsSelectSensorType">Select Sensor Type</sys:String>
+    <sys:String x:Key="SettingsUltrasonic">Ultrasonic</sys:String>
+    <sys:String x:Key="SettingsLaser">Laser</sys:String>
+    <sys:String x:Key="SettingsConnectionProperties">Connection Properties</sys:String>
+
+
+    <sys:String x:Key="StarterProjectDescription">This app provides measurement of the distance between your vehicle and potential obstacles. By default your sensor is set as ultrasonic, change it if you want in settings. Fill config data to continue. </sys:String>
+    <sys:String x:Key="StarterWelcomeTractoSupporter">Welcome to TractorSupporter</sys:String>
 
 
 </ResourceDictionary>
