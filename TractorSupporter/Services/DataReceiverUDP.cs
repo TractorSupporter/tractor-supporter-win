@@ -4,12 +4,12 @@ using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.Services;
 
-public partial class UdpDataReceiver : IDataReceiverAsync
+public partial class DataReceiverUDP : IDataReceiverAsync
 {
     private readonly UdpClient _udpClient;
     private IPEndPoint _remoteIpEndpoint;
 
-    private UdpDataReceiver(int port)
+    private DataReceiverUDP(int port)
     {
         _udpClient = new UdpClient(port);
         _remoteIpEndpoint = new IPEndPoint(IPAddress.Any, port);
@@ -30,11 +30,11 @@ public partial class UdpDataReceiver : IDataReceiverAsync
 }
 
 #region Class structure
-public partial class UdpDataReceiver
+public partial class DataReceiverUDP
 {
-    private static Lazy<UdpDataReceiver>? _lazyInstance = null;
+    private static Lazy<DataReceiverUDP>? _lazyInstance = null;
 
-    public static UdpDataReceiver Instance
+    public static DataReceiverUDP Instance
     {
         get 
         {
@@ -44,11 +44,11 @@ public partial class UdpDataReceiver
         }
     }
 
-    public static UdpDataReceiver Initialize(int port)
+    public static DataReceiverUDP Initialize(int port)
     {
         if (_lazyInstance is null)
         {
-            _lazyInstance = new(() => new UdpDataReceiver(port));
+            _lazyInstance = new(() => new DataReceiverUDP(port));
         }
 
         return _lazyInstance.Value;

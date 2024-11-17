@@ -9,11 +9,13 @@ public partial class StandbyThreadService
     private IDataReceiverAsync _dataReceiverESP;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
+    private int _currentPort;
 
     private StandbyThreadService()
     {
         _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
-        _cancellationTokenSource = new CancellationTokenSource(); 
+        _cancellationTokenSource = new CancellationTokenSource();
+
     }
 
     public void StopStandby()
@@ -24,10 +26,11 @@ public partial class StandbyThreadService
 
     public void StartStandby(int port, bool useMockData)
     {
+        _currentPort = port;
         _standbyThread = new Thread(() => StandbyThread(_cancellationTokenSource.Token));
         _shouldRun = true;
         _standbyThread.IsBackground = true;
-        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : UdpDataReceiver.Initialize(port);
+        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : DataReceiverUDP.Initialize(port);
         _standbyThread.Start();
     }
 
@@ -36,6 +39,9 @@ public partial class StandbyThreadService
         while (_shouldRun && !token.IsCancellationRequested)
         {
             _checkDataReceiverStatus.CheckStatus(_dataReceiverESP.ReceiveDataAsync(token));
+
+            if (!DataSenderUDP.IsInitialized && _checkDataReceiverStatus.TryGetResult(out byte[]? x))
+                DataSenderUDP.Initialize(_dataReceiverESP.GetRemoteIpAddress(), _currentPort);
         }
     }
 }

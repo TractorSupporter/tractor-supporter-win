@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text;
 using TractorSupporter.Services.Interfaces;
+using TractorSupporter.Model;
 
 namespace TractorSupporter.Services;
 
@@ -16,8 +17,11 @@ public partial class ServerThreadService
     private AlarmService _alarmService;
     private DataReceiverGPS _dataReceiverGPS;
     private DataSenderGPS _dataSenderGPS;
+    private DataSenderUDP _dataSenderUDP;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
+    private int _currentPort;
+
     public bool IsAvoidingMechanismTurnedOn { get; set; }
     public bool IsAlarmMechanismTurnedOn { get; set; }
 
@@ -31,6 +35,7 @@ public partial class ServerThreadService
 
     public void StopServer()
     {
+        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
         _gpsConnectionService.Disconnect();
         _isConnected = false;
         _cancellationTokenSource.Cancel();
@@ -38,9 +43,10 @@ public partial class ServerThreadService
 
     public void StartServer(int port, bool useMockData)
     {
+        _currentPort = port;
         _cancellationTokenSource = new CancellationTokenSource();
         _serverThread = new Thread(() => ServerThread(_cancellationTokenSource.Token));
-        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : UdpDataReceiver.Initialize(port);
+        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : DataReceiverUDP.Initialize(port);
         _isConnected = true;
         _serverThread.IsBackground = true;
         _serverThread.Start();
@@ -53,7 +59,9 @@ public partial class ServerThreadService
         _avoidingService = AvoidingService.Instance;
         _dataReceiverGPS = DataReceiverGPS.Instance;
         _dataSenderGPS = DataSenderGPS.Instance;
+        _dataSenderUDP = DataSenderUDP.Instance;
 
+        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
         _ = _dataReceiverGPS.StartReceivingAsync(token);
 
@@ -67,7 +75,7 @@ public partial class ServerThreadService
             ProcessReceivedData(result!);
         }
 
-        // TODO add checking signal even if app is disconnected from AgOpenGPS
+       
     }
     
     private void ProcessReceivedData(byte[] receivedBytes)
