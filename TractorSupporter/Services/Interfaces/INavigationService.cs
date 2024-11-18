@@ -8,6 +8,7 @@ namespace TractorSupporter.Services.Interfaces
 {
     public interface INavigationService
     {
+        void NavigateToHistory();
         void NavigateToSettings();
         void NavigateToMain();
     }

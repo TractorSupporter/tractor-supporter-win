@@ -16,7 +16,21 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-           
+
+        <Button Grid.Column="0"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"
+        Width="60"
+        Height="60"
+        Margin="10"
+        Background="Transparent"
+        BorderThickness="0"
+        Visibility="{Binding IsHistoryVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+        ToolTip="History"
+        Click="HistoryButton_Click">
+            <Image Source="pack://application:,,,/TractorSupporter;component/Resources/Icons/history-icon.png"/>
+        </Button>
+
         <TextBlock 
             Text="Tractor Supporter"
             Grid.Column="1"

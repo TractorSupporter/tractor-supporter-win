@@ -10,7 +10,7 @@
         xmlns:viewModel="clr-namespace:TractorSupporter.ViewModel"
         mc:Ignorable="d"
         Title="SettingsPage" Height="616" Width="469"
-    xmlns:System="clr-namespace:System;assembly=System.Runtime">
+        xmlns:System="clr-namespace:System;assembly=System.Runtime">
     <Page.Resources>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

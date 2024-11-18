@@ -25,7 +25,8 @@ namespace TractorSupporter.View
             DataContext = new StarterWindowViewModel();
 
             var viewModel = DataContext as StarterWindowViewModel;
-            Navbar.OnSettingsClicked = viewModel.CloseMainWindow;
+            Navbar.OnSettingsClicked = viewModel.SettingsCloseMainWindow;
+            Navbar.OnHistoryClicked = viewModel.HistoryCloseMainWindow;
 
             if (App.CommandLineArgs != null && ConfigAppJson.Instance.ReadJson() == null)
             {
@@ -39,15 +40,23 @@ namespace TractorSupporter.View
             {
                 switch (e.Content)
                 {
+                    case HistoryPage:
+                        viewModel.IsHistoryVisible = true;
+                        viewModel.IsSettingsVisible = true;
+                        break;
+
                     case SettingsPage:
+                        viewModel.IsHistoryVisible = true;
                         viewModel.IsSettingsVisible = true;
                         break;
 
                     case MainPage:
+                        viewModel.IsHistoryVisible = true;
                         viewModel.IsSettingsVisible = true;
                         break;
 
                     default:
+                        viewModel.IsHistoryVisible = true;
                         viewModel.IsSettingsVisible = true;
                         break;
                 }

@@ -15,224 +15,223 @@ using TractorSupporter.Model.Enums;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
 
-namespace TractorSupporter.ViewModel
+namespace TractorSupporter.ViewModel;
+
+class SettingsPageViewModel : BaseViewModel
 {
-    class SettingsPageViewModel : BaseViewModel
+    private string _port;
+    private string _ipAddress;
+    private string _portValidationMessage;
+    private string _ipValidationMessage;
+    private bool _avoidingMechanismIsChecked;
+    private bool _alarmMechanismIsChecked;
+    private TypeSensor _selectedSensorType;
+    private int _alarmDistance;
+    private int _avoidingDistance;
+    private Language _selectedLanguage;
+    private ICommand _forwardCommand;
+    private ICommand _backCommand;
+    private NavigationService _navigationService;
+    private LanguageService _languageService;
+    private IConfigAppJson _configAppJson;
+
+    public SettingsPageViewModel()
     {
-        private string _port;
-        private string _ipAddress;
-        private string _portValidationMessage;
-        private string _ipValidationMessage;
-        private bool _avoidingMechanismIsChecked;
-        private bool _alarmMechanismIsChecked;
-        private TypeSensor _selectedSensorType;
-        private int _alarmDistance;
-        private int _avoidingDistance;
-        private Language _selectedLanguage;
-        private ICommand _forwardCommand;
-        private ICommand _backCommand;
-        private NavigationService _navigationService;
-        private LanguageService _languageService;
-        private IConfigAppJson _configAppJson;
+        _navigationService = NavigationService.Instance;
+        _configAppJson = ConfigAppJson.Instance;
+        _languageService = LanguageService.Instance;
+        ForwardCommand = new RelayCommand(SaveSettings);
+        BackCommand = new RelayCommand(CloseSettings);
+        setConfigData();
+    }
 
-        public SettingsPageViewModel()
+    public Language SelectedLanguage
+    {
+        get => _selectedLanguage;
+        set
         {
-            _navigationService = NavigationService.Instance;
-            _configAppJson = ConfigAppJson.Instance;
-            _languageService = LanguageService.Instance;
-            ForwardCommand = new RelayCommand(SaveSettings);
-            BackCommand = new RelayCommand(CloseSettings);
-            setConfigData();
-        }
-
-        public Language SelectedLanguage
-        {
-            get => _selectedLanguage;
-            set
+            if (_selectedLanguage != value)
             {
-                if (_selectedLanguage != value)
-                {
-                    _selectedLanguage = value;
-                    OnPropertyChanged(nameof(SelectedLanguage));
-                    string languageCode = _selectedLanguage.GetDescription();
-                }
+                _selectedLanguage = value;
+                OnPropertyChanged(nameof(SelectedLanguage));
+                string languageCode = _selectedLanguage.GetDescription();
             }
         }
+    }
 
-        public int AlarmDistance
+    public int AlarmDistance
+    {
+        get => _alarmDistance;
+        set
         {
-            get => _alarmDistance;
-            set
+            if (_alarmDistance != value)
             {
-                if (_alarmDistance != value)
-                {
-                    _alarmDistance = value;
-                    OnPropertyChanged(nameof(AlarmDistance));
-                }
+                _alarmDistance = value;
+                OnPropertyChanged(nameof(AlarmDistance));
             }
         }
+    }
 
-        public int AvoidingDistance
+    public int AvoidingDistance
+    {
+        get => _avoidingDistance;
+        set
         {
-            get => _avoidingDistance;
-            set
+            if (_avoidingDistance != value)
             {
-                if (_avoidingDistance != value)
-                {
-                    _avoidingDistance = value;
-                    OnPropertyChanged(nameof(AvoidingDistance));
-                }
+                _avoidingDistance = value;
+                OnPropertyChanged(nameof(AvoidingDistance));
             }
         }
+    }
 
-        public TypeSensor SelectedSensorType
+    public TypeSensor SelectedSensorType
+    {
+        get => _selectedSensorType;
+        set
         {
-            get => _selectedSensorType;
-            set
+            if (_selectedSensorType != value)
             {
-                if (_selectedSensorType != value)
-                {
-                    _selectedSensorType = value;
-                    OnPropertyChanged(nameof(SelectedSensorType));
-                }
+                _selectedSensorType = value;
+                OnPropertyChanged(nameof(SelectedSensorType));
             }
         }
+    }
 
-        public bool AvoidingMechanismIsChecked
+    public bool AvoidingMechanismIsChecked
+    {
+        get => _avoidingMechanismIsChecked;
+        set
         {
-            get => _avoidingMechanismIsChecked;
-            set
+            if (_avoidingMechanismIsChecked != value)
             {
-                if (_avoidingMechanismIsChecked != value)
-                {
-                    _avoidingMechanismIsChecked = value;
-                    OnPropertyChanged(nameof(AvoidingMechanismIsChecked));
-                }
+                _avoidingMechanismIsChecked = value;
+                OnPropertyChanged(nameof(AvoidingMechanismIsChecked));
             }
         }
+    }
 
-        public bool AlarmMechanismIsChecked
+    public bool AlarmMechanismIsChecked
+    {
+        get => _alarmMechanismIsChecked;
+        set
         {
-            get => _alarmMechanismIsChecked;
-            set
+            if (_alarmMechanismIsChecked != value)
             {
-                if (_alarmMechanismIsChecked != value)
-                {
-                    _alarmMechanismIsChecked = value;
-                    OnPropertyChanged(nameof(AlarmMechanismIsChecked));
-                }
+                _alarmMechanismIsChecked = value;
+                OnPropertyChanged(nameof(AlarmMechanismIsChecked));
             }
         }
+    }
 
-        public string Port
+    public string Port
+    {
+        get => _port;
+        set
         {
-            get => _port;
-            set
-            {
-                _port = value;
-                OnPropertyChanged(nameof(Port));
-            }
+            _port = value;
+            OnPropertyChanged(nameof(Port));
+        }
+    }
+
+    public string IpAddress
+    {
+        get => _ipAddress;
+        set
+        {
+            _ipAddress = value;
+            OnPropertyChanged(nameof(IpAddress));
+        }
+    }
+
+    public string PortValidationMessage
+    {
+        get => _portValidationMessage;
+        set
+        {
+            _portValidationMessage = value;
+            OnPropertyChanged(nameof(PortValidationMessage));
+        }
+    }
+
+    public string IpValidationMessage
+    {
+        get => _ipValidationMessage;
+        set
+        {
+            _ipValidationMessage = value;
+            OnPropertyChanged(nameof(IpValidationMessage));
+        }
+    }
+
+    public ICommand ForwardCommand
+    {
+        get => _forwardCommand;
+        set
+        {
+            _forwardCommand = value;
+            OnPropertyChanged(nameof(ForwardCommand));
+        }
+    }
+
+    public ICommand BackCommand
+    {
+        get => _backCommand;
+        set
+        {
+            _backCommand = value;
+            OnPropertyChanged(nameof(BackCommand));
+        }
+    }
+
+    public void setConfigData()
+    {
+        AppConfig appConfig = _configAppJson.ReadJson();
+        Port = appConfig.Port.ToString();
+        IpAddress = appConfig.IpAddress;
+        AvoidingMechanismIsChecked = appConfig.IsAvoidingMechanismTurnedOn;
+        AlarmMechanismIsChecked = appConfig.IsAlarmMechanismTurnedOn;
+        SelectedSensorType = appConfig.SelectedSensorType;
+        AlarmDistance = appConfig.AlarmDistance;
+        AvoidingDistance = appConfig.AvoidingDistance;
+        SelectedLanguage = appConfig.Language;
+    }
+
+    private void SaveSettings(object parameter)
+    {
+        bool isValid = true;
+
+        if (int.TryParse(Port, out int portNumber) && portNumber > 0 && portNumber <= 65535)
+        {
+            PortValidationMessage = string.Empty;
+        }
+        else
+        {
+            PortValidationMessage = "Port is invalid. It must be a number between 1 and 65535.";
+            isValid = false;
         }
 
-        public string IpAddress
+        if (IPAddress.TryParse(IpAddress, out _))
         {
-            get => _ipAddress;
-            set
-            {
-                _ipAddress = value;
-                OnPropertyChanged(nameof(IpAddress));
-            }
+            IpValidationMessage = string.Empty;
+        }
+        else
+        {
+            IpValidationMessage = "IP address is invalid.";
+            isValid = false;
         }
 
-        public string PortValidationMessage
+        if (isValid)
         {
-            get => _portValidationMessage;
-            set
-            {
-                _portValidationMessage = value;
-                OnPropertyChanged(nameof(PortValidationMessage));
-            }
-        }
-
-        public string IpValidationMessage
-        {
-            get => _ipValidationMessage;
-            set
-            {
-                _ipValidationMessage = value;
-                OnPropertyChanged(nameof(IpValidationMessage));
-            }
-        }
-
-        public ICommand ForwardCommand
-        {
-            get => _forwardCommand;
-            set
-            {
-                _forwardCommand = value;
-                OnPropertyChanged(nameof(ForwardCommand));
-            }
-        }
-
-        public ICommand BackCommand
-        {
-            get => _backCommand;
-            set
-            {
-                _backCommand = value;
-                OnPropertyChanged(nameof(BackCommand));
-            }
-        }
-
-        public void setConfigData()
-        {
-            AppConfig appConfig = _configAppJson.ReadJson();
-            Port = appConfig.Port.ToString();
-            IpAddress = appConfig.IpAddress;
-            AvoidingMechanismIsChecked = appConfig.IsAvoidingMechanismTurnedOn;
-            AlarmMechanismIsChecked = appConfig.IsAlarmMechanismTurnedOn;
-            SelectedSensorType = appConfig.SelectedSensorType;
-            AlarmDistance = appConfig.AlarmDistance;
-            AvoidingDistance = appConfig.AvoidingDistance;
-            SelectedLanguage = appConfig.Language;
-        }
-
-        private void SaveSettings(object parameter)
-        {
-            bool isValid = true;
-
-            if (int.TryParse(Port, out int portNumber) && portNumber > 0 && portNumber <= 65535)
-            {
-                PortValidationMessage = string.Empty;
-            }
-            else
-            {
-                PortValidationMessage = "Port is invalid. It must be a number between 1 and 65535.";
-                isValid = false;
-            }
-
-            if (IPAddress.TryParse(IpAddress, out _))
-            {
-                IpValidationMessage = string.Empty;
-            }
-            else
-            {
-                IpValidationMessage = "IP address is invalid.";
-                isValid = false;
-            }
-
-            if (isValid)
-            {
-                _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage);
-                _configAppJson.ReadJson();
-                _languageService.ChangeLanguage(SelectedLanguage);
-                _navigationService.NavigateToMain();
-            }
-        }
-
-        private void CloseSettings(object parameter)
-        {
+            _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage);
+            _configAppJson.ReadJson();
+            _languageService.ChangeLanguage(SelectedLanguage);
             _navigationService.NavigateToMain();
         }
+    }
+
+    private void CloseSettings(object parameter)
+    {
+        _navigationService.NavigateToMain();
     }
 }
