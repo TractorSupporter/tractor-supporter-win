@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
+using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Threading;
 using TractorSupporter.Model;
-using TractorSupporter.Model.Enums;
-using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
+using TractorSupporter.Services;
+using System.Configuration;
+using TractorSupporter.Model.Enums;
 
 namespace TractorSupporter.ViewModel
 {
-    public class StarterWindowViewModel : BaseViewModel
+    public class StarterPageViewModel: BaseViewModel
     {
         private string _port;
         private string _ipAddress;
@@ -32,7 +30,7 @@ namespace TractorSupporter.ViewModel
         private LanguageService _languageService;
         private SettingsVisibilityService _settingsVisibilityService;
 
-        public StarterWindowViewModel()
+        public StarterPageViewModel()
         {
             //_windowService = new WindowService();
             ForwardCommand = new RelayCommand(Validate);
@@ -41,11 +39,8 @@ namespace TractorSupporter.ViewModel
             _navigationService = NavigationService.Instance;
             _languageService = LanguageService.Instance;
             _settingsVisibilityService = SettingsVisibilityService.Instance;
-            _settingsVisibilityService.PropertyChanged += OnSettingsVisibilityServicePropertyChanged;
-            NavigateToMainPageIfConfigExists();
             SetMyIP();
             Port = "8080";
-            IsSettingsVisible = false;
         }
 
         private void SetMyIP()
@@ -123,25 +118,6 @@ namespace TractorSupporter.ViewModel
             }
         }
 
-        private void NavigateToMainPageIfConfigExists()
-        {
-            var configAppJson = ConfigAppJson.Instance;
-            AppConfig appConfig = configAppJson.ReadJson();
-
-            if (appConfig != null)
-            {
-                _languageService.ChangeLanguage(appConfig.Language);
-                _navigationService.NavigateToMain();
-            }
-        }
-
-        private void OnSettingsVisibilityServicePropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName == nameof(_settingsVisibilityService.IsSettingsVisible))
-            {
-                OnPropertyChanged(nameof(IsSettingsVisible));
-            }
-        }
 
         private void Validate(object parameter)
         {

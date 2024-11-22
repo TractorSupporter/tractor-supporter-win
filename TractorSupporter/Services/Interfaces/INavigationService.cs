@@ -10,5 +10,6 @@ namespace TractorSupporter.Services.Interfaces
     {
         void NavigateToSettings();
         void NavigateToMain();
+        void NavigateToStarter();
     }
 }

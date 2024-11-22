@@ -1,0 +1,18 @@
+﻿<Window x:Class="TractorSupporter.View.TSContainerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TractorSupporter.View"
+        xmlns:controls="clr-namespace:TractorSupporter.View.Controls"
+        mc:Ignorable="d"
+        Title="TSContainerWindow" Height="696" Width="469">
+    <Grid Background="{StaticResource GrayBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <controls:Navbar x:Name="Navbar" Grid.Row="0" Margin="0,0,0,0" IsSettingsVisible="{Binding IsSettingsVisible}"/>
+        <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
+    </Grid>
+</Window>
