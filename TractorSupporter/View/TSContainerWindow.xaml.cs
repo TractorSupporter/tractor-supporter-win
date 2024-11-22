@@ -11,6 +11,7 @@ namespace TractorSupporter.View
             InitializeComponent();
             NavigationService.Initialize(MainFrame);
             DataContext = new TSContainerWindowViewModel();
+            Navbar.OnSettingsClicked = NavigationService.Instance.NavigateToSettings;
         }
 
         private void MainFrame_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
@@ -23,7 +24,7 @@ namespace TractorSupporter.View
                         viewModel.IsSettingsVisible = false;
                         break;
                     case SettingsPage:
-                        viewModel.IsSettingsVisible = true;
+                        viewModel.IsSettingsVisible = false;
                         break;
                     case MainPage:
                         viewModel.IsSettingsVisible = true;
