@@ -8,6 +8,7 @@ namespace TractorSupporter.Services;
 
 public partial class ServerThreadService
 {
+    private bool _useMockData;
     public EventHandler<UdpDataReceivedEventArgs> UdpDataReceived;
     private Thread _serverThread;
     private bool _isConnected;
@@ -35,7 +36,8 @@ public partial class ServerThreadService
 
     public void StopServer()
     {
-        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
+        if (!_useMockData)
+            _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
         _gpsConnectionService.Disconnect();
         _isConnected = false;
         _cancellationTokenSource.Cancel();
@@ -43,6 +45,7 @@ public partial class ServerThreadService
 
     public void StartServer(int port, bool useMockData)
     {
+        _useMockData = useMockData;
         _currentPort = port;
         _cancellationTokenSource = new CancellationTokenSource();
         _serverThread = new Thread(() => ServerThread(_cancellationTokenSource.Token));
@@ -59,9 +62,13 @@ public partial class ServerThreadService
         _avoidingService = AvoidingService.Instance;
         _dataReceiverGPS = DataReceiverGPS.Instance;
         _dataSenderGPS = DataSenderGPS.Instance;
-        _dataSenderUDP = DataSenderUDP.Instance;
+        
+        if (!_useMockData)
+        {
+            _dataSenderUDP = DataSenderUDP.Instance;
+            _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
+        }
 
-        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
         _ = _dataReceiverGPS.StartReceivingAsync(token);
 

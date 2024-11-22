@@ -4,6 +4,7 @@ namespace TractorSupporter.Services;
 
 public partial class StandbyThreadService
 {
+    private bool _useMockData;
     private Thread _standbyThread;
     private bool _shouldRun;
     private IDataReceiverAsync _dataReceiverESP;
@@ -26,6 +27,7 @@ public partial class StandbyThreadService
 
     public void StartStandby(int port, bool useMockData)
     {
+        _useMockData = useMockData;
         _currentPort = port;
         _standbyThread = new Thread(() => StandbyThread(_cancellationTokenSource.Token));
         _shouldRun = true;
@@ -40,7 +42,7 @@ public partial class StandbyThreadService
         {
             _checkDataReceiverStatus.CheckStatus(_dataReceiverESP.ReceiveDataAsync(token));
 
-            if (!DataSenderUDP.IsInitialized && _checkDataReceiverStatus.TryGetResult(out byte[]? x))
+            if (!_useMockData && !DataSenderUDP.IsInitialized && _checkDataReceiverStatus.TryGetResult(out byte[]? x))
                 DataSenderUDP.Initialize(_dataReceiverESP.GetRemoteIpAddress(), _currentPort);
         }
     }
