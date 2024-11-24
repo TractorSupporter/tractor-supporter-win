@@ -47,6 +47,11 @@ namespace TractorSupporter.Services
             _mainFrame = mainFrame;
         }
 
+        public void NavigateToStarter()
+        {
+            _mainFrame.Navigate(new StarterPage());
+        }
+
         public void NavigateToSettings()
         {
             _mainFrame.Navigate(new SettingsPage());
