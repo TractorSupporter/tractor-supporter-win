@@ -43,28 +43,6 @@ public partial class DataSenderGPS
             }
         }
     }
-
-    //private void RetrySendData(string jsonString)
-    //{
-    //    for (int attempt = 1; attempt <= MaxRetryAttempts; attempt++)
-    //    {
-    //        try
-    //        {
-    //            Console.WriteLine($"Attempting to reconnect... (Attempt {attempt})");
-    //            ConnectToPipe();
-    //            _writer.WriteLine(jsonString);
-    //            Console.WriteLine("Reconnected and sent data successfully.");
-    //            return;
-    //        }
-    //        catch (IOException ex)
-    //        {
-    //            Console.WriteLine($"Reconnection attempt {attempt} failed: {ex.Message}");
-    //            Thread.Sleep(RetryDelayMilliseconds);
-    //        }
-    //    }
-
-    //    Console.WriteLine("Failed to reconnect after multiple attempts.");
-    //}
 }
 
 #region Class structure

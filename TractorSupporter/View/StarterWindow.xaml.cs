@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TractorSupporter.Services;
+using TractorSupporter.View.Controls;
 using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.View

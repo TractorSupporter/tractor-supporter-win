@@ -16,8 +16,14 @@
     </Page.Resources>-->
 
     <Grid Background="{StaticResource GrayBrush}">
-        <controls:LogViewer x:Name="LogViewer" Margin="10,40,10,120" />
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="20,0,40,50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <controls:LogViewer Grid.Row="0" x:Name="HistoryViewer" Margin="10,40,10,120" MaxHeight="300"/>
+        
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Margin="20,0,40,50">
             <controls:NavigationButtons BackCommand="{Binding BackCommand}" ForwardCommand="{Binding ForwardCommand}"/>
         </Grid>
     </Grid>

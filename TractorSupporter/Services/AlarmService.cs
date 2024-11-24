@@ -26,13 +26,18 @@ public partial class AlarmService: CommandFieldDecision
 
     public bool MakeAlarmDecision(double distanceMeasured)
     {
-        return MakeDecision(
+        var decision = MakeDecision(
             distanceMeasured,
             _alarmDistanceTimes,
             AlarmDistance,
             _alarmDistanceSignalValidLifetimeMs,
             _minAlarmSignalsCount
         );
+
+        if (decision)
+            LoggingService.Instance.AddLog(Model.Enums.DecisionType.Alarm);
+
+        return decision;
     }
 }
 

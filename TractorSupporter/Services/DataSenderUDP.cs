@@ -1,10 +1,11 @@
-﻿using System.Net.Sockets;
+﻿using System.Configuration;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 
 namespace TractorSupporter.Services;
 
-public partial class DataSenderUDP
+public partial class DataSenderUDP : IDataSenderUDP
 {
     private readonly UdpClient _udpClient;
     private int _port;
@@ -31,9 +32,9 @@ public partial class DataSenderUDP
 {
     public static bool IsInitialized => _lazyInstance != null;
 
-    private static Lazy<DataSenderUDP>? _lazyInstance = null;
+    private static Lazy<IDataSenderUDP>? _lazyInstance = null;
 
-    public static DataSenderUDP Instance
+    public static IDataSenderUDP Instance
     {
         get
         {
@@ -43,14 +44,36 @@ public partial class DataSenderUDP
         }
     }
 
-    public static DataSenderUDP Initialize(string destinationIP, int port)
+    public static IDataSenderUDP Initialize(string destinationIP, int port)
     {
         if (_lazyInstance is null)
         {
-            _lazyInstance = new(() => new DataSenderUDP(destinationIP, port));
+            if (bool.Parse(ConfigurationManager.AppSettings["UseMockData"]!))
+                _lazyInstance = new(() => new MockDataSenderUDP());
+            else
+                _lazyInstance = new(() => new DataSenderUDP(destinationIP, port));
         }
 
         return _lazyInstance.Value;
     }
+
+
+    private class MockDataSenderUDP : IDataSenderUDP
+    {
+        public Task SendDataAsync(object jsonData)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }
 #endregion
+
+public interface IDataSenderUDP
+{
+    public Task SendDataAsync(object jsonData);
+}
+
+
+
+
+
