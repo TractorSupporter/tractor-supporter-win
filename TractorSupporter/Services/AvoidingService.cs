@@ -42,6 +42,9 @@ public partial class AvoidingService: CommandFieldDecision
         if (decision)
             _avoidingDecisionAllowed = false;
 
+        if (decision)
+            LoggingService.Instance.AddLog(Model.Enums.DecisionType.Avoid);
+
         return decision;
     }
 }

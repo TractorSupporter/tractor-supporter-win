@@ -42,7 +42,7 @@ public partial class StandbyThreadService
         {
             _checkDataReceiverStatus.CheckStatus(_dataReceiverESP.ReceiveDataAsync(token));
 
-            if (!_useMockData && !DataSenderUDP.IsInitialized && _checkDataReceiverStatus.TryGetResult(out byte[]? x))
+            if (!DataSenderUDP.IsInitialized && _checkDataReceiverStatus.TryGetResult(out byte[]? x))
                 DataSenderUDP.Initialize(_dataReceiverESP.GetRemoteIpAddress(), _currentPort);
         }
     }

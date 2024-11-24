@@ -156,6 +156,7 @@ public class MainPageViewModel : BaseViewModel
     {
         IsConnected = !IsConnected;
         _settingsVisibilityService.IsSettingsVisible = !IsConnected;
+        HistoryVisibilityService.Instance.IsHistoryVisible = !IsConnected;
         if (IsConnected)
         {
             StandbyThreadService.Instance.StopStandby();

@@ -22,13 +22,13 @@ namespace TractorSupporter.ViewModel
         private string _ipAddress;
         private string _portValidationMessage;
         private string _ipValidationMessage;
-        private bool _isSettingsVisible;
         private ICommand _forwardCommand;
         private ICommand _backCommand;
         private INavigationService _navigationService;
         private IConfigAppJson _configAppJson;
         private LanguageService _languageService;
         private SettingsVisibilityService _settingsVisibilityService;
+        private HistoryVisibilityService _historyVisibilityService;
 
         public StarterPageViewModel()
         {
@@ -38,6 +38,7 @@ namespace TractorSupporter.ViewModel
             _configAppJson = ConfigAppJson.Instance;
             _navigationService = NavigationService.Instance;
             _languageService = LanguageService.Instance;
+            _historyVisibilityService = HistoryVisibilityService.Instance;
             _settingsVisibilityService = SettingsVisibilityService.Instance;
             SetMyIP();
             Port = "8080";
@@ -57,6 +58,11 @@ namespace TractorSupporter.ViewModel
             set => _settingsVisibilityService.IsSettingsVisible = value;
         }
 
+        public bool IsHistoryVisible
+        {
+            get => _historyVisibilityService.IsHistoryVisible;
+            set => _historyVisibilityService.IsHistoryVisible = value;
+        }
 
         public string Port
         {
@@ -158,9 +164,14 @@ namespace TractorSupporter.ViewModel
                 //Close(new object());
             }
         }
-        public void CloseMainWindow()
+        public void SettingsCloseMainWindow()
         {
             _navigationService.NavigateToSettings();
+        }
+
+        public void HistoryCloseMainWindow()
+        {
+            _navigationService.NavigateToHistory();
         }
     }
 }

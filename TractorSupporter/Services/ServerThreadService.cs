@@ -18,7 +18,7 @@ public partial class ServerThreadService
     private AlarmService _alarmService;
     private DataReceiverGPS _dataReceiverGPS;
     private DataSenderGPS _dataSenderGPS;
-    private DataSenderUDP _dataSenderUDP;
+    private IDataSenderUDP _dataSenderUDP;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
@@ -36,7 +36,6 @@ public partial class ServerThreadService
 
     public void StopServer()
     {
-        if (!_useMockData)
             _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
         _gpsConnectionService.Disconnect();
         _isConnected = false;
@@ -62,13 +61,9 @@ public partial class ServerThreadService
         _avoidingService = AvoidingService.Instance;
         _dataReceiverGPS = DataReceiverGPS.Instance;
         _dataSenderGPS = DataSenderGPS.Instance;
-        
-        if (!_useMockData)
-        {
             _dataSenderUDP = DataSenderUDP.Instance;
-            _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
-        }
 
+        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
         _ = _dataReceiverGPS.StartReceivingAsync(token);
 

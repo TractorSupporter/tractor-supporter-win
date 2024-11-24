@@ -3,13 +3,14 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Resources\Icons\confirm-icon.png" />
+    <None Remove="Resources\Icons\history-icon.png" />
     <None Remove="Resources\Icons\return-icon.png" />
     <None Remove="Resources\Icons\settings-icon.png" />
   </ItemGroup>
@@ -27,6 +28,9 @@
     <Resource Include="Dictionary-en-US.xaml" />
     <Resource Include="Dictionary-pl-PL.xaml" />
     <Resource Include="Resources\Icons\confirm-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\history-icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Icons\return-icon.png">

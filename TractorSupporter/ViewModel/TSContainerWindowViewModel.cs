@@ -16,6 +16,7 @@ namespace TractorSupporter.ViewModel
         private INavigationService _navigationService;
         private LanguageService _languageService;
         private SettingsVisibilityService _settingsVisibilityService;
+        private HistoryVisibilityService _historyVisibilityService;
 
         public TSContainerWindowViewModel()
         {  
@@ -23,8 +24,25 @@ namespace TractorSupporter.ViewModel
             _languageService = LanguageService.Instance;
             _settingsVisibilityService = SettingsVisibilityService.Instance;
             _settingsVisibilityService.PropertyChanged += OnSettingsVisibilityServicePropertyChanged;
+            _historyVisibilityService = HistoryVisibilityService.Instance;
+            _historyVisibilityService.PropertyChanged += OnHistoryVisibilityServicePropertyChanged;
             NavigateToMainPageIfConfigExists();
             IsSettingsVisible = false;
+            IsHistoryVisible = true;
+        }
+
+        private void OnHistoryVisibilityServicePropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(_historyVisibilityService.IsHistoryVisible))
+            {
+                OnPropertyChanged(nameof(IsHistoryVisible));
+            }
+        }
+
+        public bool IsHistoryVisible
+        {
+            get => _historyVisibilityService.IsHistoryVisible;
+            set => _historyVisibilityService.IsHistoryVisible = value;
         }
 
         public bool IsSettingsVisible
