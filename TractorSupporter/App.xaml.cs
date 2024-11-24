@@ -1,9 +1,12 @@
-﻿using System.Configuration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 using TractorSupporter.Model;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
+using TractorSupporter.ViewModel;
 
 namespace TractorSupporter
 {
@@ -14,6 +17,16 @@ namespace TractorSupporter
     {
         public static string[] CommandLineArgs { get; private set; }
         public static bool IsInitialized { get; set; } = true;
+
+        public static IServiceProvider ServiceProvider { get; private set; }
+
+        public App()
+        {
+            ServiceCollection servicecollection = new();
+            servicecollection.ConfigureServices();
+
+            ServiceProvider = servicecollection.BuildServiceProvider();
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -26,4 +39,16 @@ namespace TractorSupporter
         }
     }
 
+}
+
+public static class ServiceCollectionExtentions
+{
+    public static void ConfigureServices(
+        this IServiceCollection services)
+    {
+        services.AddSingleton<ILoggingService, LoggingService>();
+        services.AddSingleton<IAvoidingService, AvoidingService>();
+        services.AddSingleton<IAlarmService, AlarmService>();
+        services.AddSingleton<MainPageViewModel>();
+    }
 }

@@ -10,11 +10,17 @@ using TractorSupporter.View.Controls;
 
 namespace TractorSupporter.Services;
 
-public partial class LoggingService
+public interface ILoggingService
+{
+    public ObservableCollection<LogEntry> Logs { get; set; }
+    public void AddLog(DecisionType decisionType);
+}
+
+public partial class LoggingService: ILoggingService
 {
     private ObservableCollection<LogEntry> _allLogs = new ObservableCollection<LogEntry>();
 
-    public ObservableCollection<LogEntry> Logs { get; private set; }
+    public ObservableCollection<LogEntry> Logs { get; set; }
 
     public void AddLog(DecisionType decisionType)
     {
@@ -22,17 +28,7 @@ public partial class LoggingService
         
     }
 
-    private LoggingService()
+    public LoggingService()
     {
-        Logs = new ObservableCollection<LogEntry>();
     }
 }
-
-#region Class structure 
-public partial class LoggingService
-{
-    private static LoggingService _instance = new LoggingService();
-
-    public static LoggingService Instance => _instance;
-}
-#endregion

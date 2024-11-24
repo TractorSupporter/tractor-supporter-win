@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using TractorSupporter.ViewModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.View;
 
@@ -9,7 +10,8 @@ public partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
-        DataContext = new MainPageViewModel();
+        var viewModel = App.ServiceProvider.GetRequiredService<MainPageViewModel>();
+        DataContext = viewModel;
         this.Loaded += MainPage_Loaded;
     }
 

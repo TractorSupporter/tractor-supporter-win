@@ -27,8 +27,8 @@ public class MainPageViewModel : BaseViewModel
     private FlowDocument _receivedMessages;
     
     private INavigationService _navigationService;
-    private AlarmService _alarmService;
-    private AvoidingService _avoidingService;
+    private IAlarmService _alarmService;
+    private IAvoidingService _avoidingService;
     private SettingsVisibilityService _settingsVisibilityService;
     private AppConfig _appConfig;
     private int _port;
@@ -36,11 +36,11 @@ public class MainPageViewModel : BaseViewModel
     private bool _isAvoidingMechanismTurnedOn;
     private bool _isAlarmMechanismTurnedOn;
 
-    public MainPageViewModel()
+    public MainPageViewModel(IAvoidingService avoiding, IAlarmService alarm)
     {
+        _avoidingService = avoiding;
         _navigationService = NavigationService.Instance;
-        _alarmService = AlarmService.Instance;
-        _avoidingService = AvoidingService.Instance;
+        _alarmService = alarm;
         _settingsVisibilityService = SettingsVisibilityService.Instance;
         _receivedMessages = new FlowDocument();
         StartConnectionCommand = new RelayCommand(StartConnection);
