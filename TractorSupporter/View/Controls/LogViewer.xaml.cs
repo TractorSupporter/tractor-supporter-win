@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using TractorSupporter.Model;
 using TractorSupporter.Model.Enums;
@@ -16,7 +17,7 @@ public partial class LogViewer : UserControl
     
     public ObservableCollection<LogEntry> Logs
     {
-        get => LoggingService.Instance.Logs;
+        get => App.ServiceProvider.GetRequiredService<ILoggingService>().Logs;
     }
 
     public LogViewer()

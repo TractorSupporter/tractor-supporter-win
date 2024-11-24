@@ -4,16 +4,25 @@ using TractorSupporter.Services.Abstract;
 
 namespace TractorSupporter.Services;
 
-public partial class AvoidingService: CommandFieldDecision
+public interface IAvoidingService
 {
+    public double AvoidingDistance { get; set; }
+    public bool MakeAvoidingDecision(double distanceMeasured);
+    public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
+}
+
+public partial class AvoidingService: CommandFieldDecision, IAvoidingService
+{
+    private ILoggingService _logging;
     private readonly List<DateTime> _avoidingDistanceTimes;
     public double AvoidingDistance { get; set; }
     private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
 
-    private AvoidingService()
+    public AvoidingService(ILoggingService loggingService)
     {
+        _logging = loggingService;
         DataReceiverGPS.Instance.ReceivedAllowMakingDecision += AllowMakingDecision;
         _avoidingDistanceTimes = new List<DateTime>();
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
@@ -43,17 +52,8 @@ public partial class AvoidingService: CommandFieldDecision
             _avoidingDecisionAllowed = false;
 
         if (decision)
-            LoggingService.Instance.AddLog(Model.Enums.DecisionType.Avoid);
+            _logging.AddLog(Model.Enums.DecisionType.Avoid);
 
         return decision;
     }
 }
-
-#region Class structure 
-public partial class AvoidingService
-{
-    // not lazy, i want to register event hander at the begining of the app execution
-    private static readonly AvoidingService _instance = new AvoidingService();
-    public static AvoidingService Instance => _instance;
-}
-#endregion

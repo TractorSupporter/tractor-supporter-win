@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text;
 using TractorSupporter.Services.Interfaces;
 using TractorSupporter.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.Services;
 
@@ -14,8 +15,8 @@ public partial class ServerThreadService
     private bool _isConnected;
     private GPSConnectionService _gpsConnectionService;
     private IDataReceiverAsync _dataReceiverESP;
-    private AvoidingService _avoidingService;
-    private AlarmService _alarmService;
+    private IAvoidingService _avoidingService;
+    private IAlarmService _alarmService;
     private DataReceiverGPS _dataReceiverGPS;
     private DataSenderGPS _dataSenderGPS;
     private IDataSenderUDP _dataSenderUDP;
@@ -28,15 +29,17 @@ public partial class ServerThreadService
 
     public bool IsConnected => _isConnected;
 
-    private ServerThreadService() 
+    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm) 
     {
+        _alarmService = alarm;
+        _avoidingService = avoiding;
         _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
         _cancellationTokenSource = new CancellationTokenSource(); 
     }
 
     public void StopServer()
     {
-            _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
+        _ = _dataSenderUDP.SendDataAsync(new { shouldRun = false });
         _gpsConnectionService.Disconnect();
         _isConnected = false;
         _cancellationTokenSource.Cancel();
@@ -56,9 +59,8 @@ public partial class ServerThreadService
 
     private void ServerThread(CancellationToken token)
     {
+
         _gpsConnectionService = GPSConnectionService.Instance;
-        _alarmService = AlarmService.Instance;
-        _avoidingService = AvoidingService.Instance;
         _dataReceiverGPS = DataReceiverGPS.Instance;
         _dataSenderGPS = DataSenderGPS.Instance;
             _dataSenderUDP = DataSenderUDP.Instance;
@@ -113,7 +115,7 @@ public partial class ServerThreadService
 #region Class structure
 public partial class ServerThreadService
 {
-    private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService());
+    private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService(App.ServiceProvider.GetRequiredService<IAvoidingService>(), App.ServiceProvider.GetRequiredService<IAlarmService>()));
     public static ServerThreadService Instance => _lazyInstance.Value;
     
 }
