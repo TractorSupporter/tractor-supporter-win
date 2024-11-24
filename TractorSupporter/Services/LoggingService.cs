@@ -30,6 +30,5 @@ public partial class LoggingService: ILoggingService
 
     public LoggingService()
     {
-        Logs = new ObservableCollection<LogEntry>();
     }
 }
