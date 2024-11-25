@@ -18,71 +18,149 @@ namespace TractorSupporter.Tests
             A.CallTo(() => _loggingService.AddLog(A<DecisionType>.Ignored)).DoesNothing();
         }
 
-        [Fact]
-        public void AllowMakingDecision_ShouldUpdateDecisionAllowedFlag()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AllowMakingDecision_ShouldUpdateDecisionAllowedFlag(bool expectedValue)
         {
             // Arrange
             var avoidingService = new AvoidingService(_loggingService);
 
             // Act
-            avoidingService.AllowMakingDecision(null, true);
+            avoidingService.AllowMakingDecision(null, expectedValue);
 
             // Assert
             GetPrivateField<bool>(avoidingService, "_avoidingDecisionAllowed")
-                .Should().BeTrue();
+                .Should().Be(expectedValue);
         }
 
-        [Fact]
-        public void MakeAvoidingDecision_ShouldReturnTrue_WhenConditionsMet()
+        [Theory]
+        [InlineData(true, 1, 1000, 10, 9)]
+        [InlineData(true, 2, 1000, 10, 9)]
+        [InlineData(true, 3, 1000, 10, 9)]
+        public void MakeAvoidingDecision_ShouldReturnTrue_WhenConditionsMet(bool allowedDecision, int minSignalsCount, int signalValidLifetimeMs, double avoidingDist, double measuredDist)
         {
            // Arrange
            var avoidingService = new AvoidingService(_loggingService);
 
             SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
-            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", true);
-            SetPrivateField(avoidingService, "_minAvoidingSignalsCount", 1);
-            SetPrivateField(avoidingService, "_avoidingDistanceSignalValidLifetimeMs", 1000);
+            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
+            SetPrivateField(avoidingService, "_minAvoidingSignalsCount", minSignalsCount);
+            SetPrivateField(avoidingService, "_avoidingDistanceSignalValidLifetimeMs", signalValidLifetimeMs);
 
-            avoidingService.AvoidingDistance = 10.0;
+            avoidingService.AvoidingDistance = avoidingDist;
 
-            var distanceMeasured = 9.0;
+            var distanceMeasured = measuredDist;
 
-
+            bool result = false;
             // Act
-            var result = avoidingService.MakeAvoidingDecision(distanceMeasured);
+            for (int i = 0; i < minSignalsCount; i++)
+            {
+                result = avoidingService.MakeAvoidingDecision(distanceMeasured);
+                Thread.Sleep(signalValidLifetimeMs / minSignalsCount);
+            }
 
             // Assert
             result.Should().BeTrue();
         }
 
-        [Fact]
-        public void MakeAvoidingDecision_ShouldReturnFalse_WhenDecisionNotAllowed()
+        [Theory]
+        [InlineData(false, 1, 1000, 10, 9)]
+        [InlineData(false, 2, 1000, 10, 11)]
+        [InlineData(false, 3, 1000, 10, 9)]
+        public void MakeAvoidingDecision_ShouldReturnFalse_WhenDecisionNotAllowed(bool allowedDecision, int minSignalsCount, int signalValidLifetimeMs, double avoidingDist, double measuredDist)
         {
             // Arrange
             
             var avoidingService = new AvoidingService(_loggingService);
 
-            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", false);
+            SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
+            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
+            SetPrivateField(avoidingService, "_minAvoidingSignalsCount", minSignalsCount);
+            SetPrivateField(avoidingService, "_avoidingDistanceSignalValidLifetimeMs", signalValidLifetimeMs);
+
+            avoidingService.AvoidingDistance = avoidingDist;
+
+            var distanceMeasured = measuredDist;
 
             // Act
-            var result = avoidingService.MakeAvoidingDecision(5.0);
+            bool result = false;
+            // Act
+            for (int i = 0; i < minSignalsCount; i++)
+            {
+                result = avoidingService.MakeAvoidingDecision(distanceMeasured);
+                Thread.Sleep(signalValidLifetimeMs / minSignalsCount);
+            }
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineData(true, 1, 100, 10, 200)]
+        [InlineData(true, 2, 100, 10, 11)]
+        [InlineData(true, 3, 100, 10, 111)]
+        public void MakeAvoidingDecision_ShouldReturnFalse_DistanceTooHigh(bool allowedDecision, int minSignalsCount, int signalValidLifetimeMs, double avoidingDist, double measuredDist)
+        {
+            // Arrange
+
+            var avoidingService = new AvoidingService(_loggingService);
+
+            SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
+            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
+            SetPrivateField(avoidingService, "_minAvoidingSignalsCount", minSignalsCount);
+            SetPrivateField(avoidingService, "_avoidingDistanceSignalValidLifetimeMs", signalValidLifetimeMs);
+
+            avoidingService.AvoidingDistance = avoidingDist;
+
+            var distanceMeasured = measuredDist;
+
+            // Act
+            bool result = false;
+            // Act
+            for (int i = 0; i < minSignalsCount; i++)
+            {
+                result = avoidingService.MakeAvoidingDecision(distanceMeasured);
+                Thread.Sleep(signalValidLifetimeMs / minSignalsCount);
+            }
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineData(true, 2, 100, 10, 1)]
+        [InlineData(true, 3, 100, 10, 1)]
+        [InlineData(true, 4, 100, 10, 1)]
+        public void MakeAvoidingDecision_ShouldReturnFalse_SignalsTimeout(bool allowedDecision, int minSignalsCount, int signalValidLifetimeMs, double avoidingDist, double measuredDist)
+        {
+            // Arrange
+
+            var avoidingService = new AvoidingService(_loggingService);
+
+            SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
+            SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
+            SetPrivateField(avoidingService, "_minAvoidingSignalsCount", minSignalsCount);
+            SetPrivateField(avoidingService, "_avoidingDistanceSignalValidLifetimeMs", signalValidLifetimeMs);
+
+            avoidingService.AvoidingDistance = avoidingDist;
+
+            var distanceMeasured = measuredDist;
+
+            // Act
+            bool result = false;
+            // Act
+            for (int i = 0; i < minSignalsCount; i++)
+            {
+                result = avoidingService.MakeAvoidingDecision(distanceMeasured);
+                Thread.Sleep(signalValidLifetimeMs + minSignalsCount * 2);
+            }
 
             // Assert
             result.Should().BeFalse();
         }
 
         #region Helper Methods
-
-        private void ReplaceLoggingServiceWithFake()
-        {
-            var fakeLoggingService = A.Fake<LoggingService>();
-            var field = typeof(LoggingService)
-                .GetField("_instance", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            if (field == null)
-                throw new InvalidOperationException("The _instance field was not found in LoggingService.");
-
-            field.SetValue(null, fakeLoggingService);
-        }
 
         private T GetPrivateField<T>(object obj, string fieldName)
         {
@@ -96,10 +174,8 @@ namespace TractorSupporter.Tests
 
         private void SetPrivateField<T>(object obj, string fieldName, T value)
         {
-            var field = obj.GetType()
-                .GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (field == null)
-                throw new InvalidOperationException($"Field {fieldName} was not found.");
+            var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (field == null) throw new InvalidOperationException($"Field {fieldName} not found.");
 
             field.SetValue(obj, value);
         }
