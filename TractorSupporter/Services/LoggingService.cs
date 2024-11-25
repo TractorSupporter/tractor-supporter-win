@@ -20,7 +20,7 @@ public partial class LoggingService: ILoggingService
 {
     private ObservableCollection<LogEntry> _allLogs = new ObservableCollection<LogEntry>();
 
-    public ObservableCollection<LogEntry> Logs { get; set; }
+    public ObservableCollection<LogEntry> Logs { get => _allLogs; set => _allLogs = value; }
 
     public void AddLog(DecisionType decisionType)
     {

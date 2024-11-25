@@ -29,6 +29,7 @@ public class MainPageViewModel : BaseViewModel
     private INavigationService _navigationService;
     private IAlarmService _alarmService;
     private IAvoidingService _avoidingService;
+    private readonly IGPSConnectionService _gpsConnectionService;
     private SettingsVisibilityService _settingsVisibilityService;
     private AppConfig _appConfig;
     private int _port;
@@ -36,8 +37,9 @@ public class MainPageViewModel : BaseViewModel
     private bool _isAvoidingMechanismTurnedOn;
     private bool _isAlarmMechanismTurnedOn;
 
-    public MainPageViewModel(IAvoidingService avoiding, IAlarmService alarm)
+    public MainPageViewModel(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection)
     {
+        _gpsConnectionService = gpsConnection;
         _avoidingService = avoiding;
         _navigationService = NavigationService.Instance;
         _alarmService = alarm;
@@ -46,7 +48,7 @@ public class MainPageViewModel : BaseViewModel
         StartConnectionCommand = new RelayCommand(StartConnection);
         InitConfig();
         InitMockConfigWindow();
-        GPSConnectionService.Instance.ConnectedToGPSUpdated += OnUpdateConnectionToGPS; 
+        _gpsConnectionService.ConnectedToGPSUpdated += OnUpdateConnectionToGPS; 
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
         CheckAsyncDataReceiverStatus<byte[]>.Instance.UpdateUdpConnectionStatus += OnUpdateUdpConnectionStatus;
 
