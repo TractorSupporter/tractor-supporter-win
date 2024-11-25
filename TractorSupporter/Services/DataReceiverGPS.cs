@@ -1,15 +1,16 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace TractorSupporter.Services;
     
 public partial class DataReceiverGPS 
 {
     public event EventHandler<bool> ReceivedAllowMakingDecision;
-    private readonly GPSConnectionService _gpsConnectionService;
+    private readonly IGPSConnectionService _gpsConnectionService;
 
-    private DataReceiverGPS() 
+    private DataReceiverGPS(IGPSConnectionService gpsConnectionService) 
     {
-        _gpsConnectionService = GPSConnectionService.Instance;
+        _gpsConnectionService = gpsConnectionService;
     }
 
     public async Task StartReceivingAsync(CancellationToken token)
@@ -49,7 +50,7 @@ public partial class DataReceiverGPS
 #region Class structure
 public partial class DataReceiverGPS
 {
-    private static readonly Lazy<DataReceiverGPS> _lazyInstance = new(() => new DataReceiverGPS());
+    private static readonly Lazy<DataReceiverGPS> _lazyInstance = new(() => new DataReceiverGPS(App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
     public static DataReceiverGPS Instance => _lazyInstance.Value;
 }
 #endregion

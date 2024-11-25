@@ -13,7 +13,7 @@ public partial class ServerThreadService
     public EventHandler<UdpDataReceivedEventArgs> UdpDataReceived;
     private Thread _serverThread;
     private bool _isConnected;
-    private GPSConnectionService _gpsConnectionService;
+    private IGPSConnectionService _gpsConnectionService;
     private IDataReceiverAsync _dataReceiverESP;
     private IAvoidingService _avoidingService;
     private IAlarmService _alarmService;
@@ -29,8 +29,9 @@ public partial class ServerThreadService
 
     public bool IsConnected => _isConnected;
 
-    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm) 
+    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection) 
     {
+        _gpsConnectionService = gpsConnection;
         _alarmService = alarm;
         _avoidingService = avoiding;
         _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
@@ -59,11 +60,9 @@ public partial class ServerThreadService
 
     private void ServerThread(CancellationToken token)
     {
-
-        _gpsConnectionService = GPSConnectionService.Instance;
         _dataReceiverGPS = DataReceiverGPS.Instance;
         _dataSenderGPS = DataSenderGPS.Instance;
-            _dataSenderUDP = DataSenderUDP.Instance;
+        _dataSenderUDP = DataSenderUDP.Instance;
 
         _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
@@ -115,7 +114,10 @@ public partial class ServerThreadService
 #region Class structure
 public partial class ServerThreadService
 {
-    private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService(App.ServiceProvider.GetRequiredService<IAvoidingService>(), App.ServiceProvider.GetRequiredService<IAlarmService>()));
+    private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService(
+        App.ServiceProvider.GetRequiredService<IAvoidingService>(), 
+        App.ServiceProvider.GetRequiredService<IAlarmService>(), 
+        App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
     public static ServerThreadService Instance => _lazyInstance.Value;
     
 }

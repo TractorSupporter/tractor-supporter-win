@@ -1,16 +1,17 @@
 ﻿using System.IO.Pipes;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.Services;
 
 public partial class DataSenderGPS
 {
-    private readonly GPSConnectionService _gpsConnectionService;
+    private readonly IGPSConnectionService _gpsConnectionService;
 
-    private DataSenderGPS()
+    private DataSenderGPS(IGPSConnectionService gpsConnection)
     {
-        _gpsConnectionService = GPSConnectionService.Instance;
+        _gpsConnectionService = gpsConnection;
     }
 
     public async Task SendData(object jsonData)
@@ -48,7 +49,7 @@ public partial class DataSenderGPS
 #region Class structure
 public partial class DataSenderGPS
 {
-    private static readonly Lazy<DataSenderGPS> _lazyInstance = new(() => new DataSenderGPS());
+    private static readonly Lazy<DataSenderGPS> _lazyInstance = new(() => new DataSenderGPS(App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
     public static DataSenderGPS Instance => _lazyInstance.Value;
 }
 #endregion

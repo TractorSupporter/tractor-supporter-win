@@ -50,5 +50,6 @@ public static class ServiceCollectionExtentions
         services.AddSingleton<IAvoidingService, AvoidingService>();
         services.AddSingleton<IAlarmService, AlarmService>();
         services.AddSingleton<MainPageViewModel>();
+        services.AddSingleton<IGPSConnectionService, GPSConnectionService>();
     }
 }

@@ -3,7 +3,19 @@ using System.IO;
 
 namespace TractorSupporter.Services;
 
-public partial class GPSConnectionService
+public interface IGPSConnectionService
+{
+    public event EventHandler<bool> ConnectedToGPSUpdated;
+    public bool ConnectingToGPSAllowed { get; set; }
+    public bool IsConnectedToGPS { get; }
+    public bool IsConnecting { get; set; }
+    public Task Connect();
+    public void Disconnect();
+    public void WriteToPipe(string data);
+    public Task<string> ReadFromPipe(CancellationToken token);
+}
+
+public partial class GPSConnectionService : IGPSConnectionService
 {
     private readonly string _pipeName;
     private NamedPipeClientStream _pipeClient;
@@ -19,8 +31,8 @@ public partial class GPSConnectionService
     //private StreamWriter _outputWriter;
     private readonly SemaphoreSlim _connectToGPSSemaphore;
     private CancellationTokenSource _cancellationTokenSource;
-    public bool IsConnecting { get; private set; }
-    public bool ConnectingToGPSAllowed { get; private set; }
+    public bool IsConnecting { get; set; }
+    public bool ConnectingToGPSAllowed { get; set; }
     //public bool IsConnectedToGPS => _outputPipeClient.IsConnected && _inputPipeServer.IsConnected;
     public bool IsConnectedToGPS => _pipeClient.IsConnected;
 
@@ -53,7 +65,7 @@ public partial class GPSConnectionService
         });
     }
 
-    private GPSConnectionService()
+    public GPSConnectionService()
     {
         _pipeName = "ts_gps_pipe";
         _pipeClient = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -113,10 +125,7 @@ public partial class GPSConnectionService
 
             //_outputWriter = new StreamWriter(_outputPipeClient) { AutoFlush = true };
 
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                ConnectedToGPSUpdated.Invoke(this, IsConnectedToGPS);
-            });
+            
         }
         catch (Exception e) 
         {
@@ -136,6 +145,11 @@ public partial class GPSConnectionService
         {
             IsConnecting = false;
             _connectToGPSSemaphore.Release();
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                ConnectedToGPSUpdated.Invoke(this, IsConnectedToGPS);
+            });
         }
     }
 
@@ -149,11 +163,3 @@ public partial class GPSConnectionService
         return await _reader.ReadLineAsync(token) ?? "";
     }
 }
-
-#region Class structure
-public partial class GPSConnectionService
-{
-    private static readonly Lazy<GPSConnectionService> _lazyInstance = new(() => new GPSConnectionService());
-    public static GPSConnectionService Instance => _lazyInstance.Value;
-}
-#endregion
