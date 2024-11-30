@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using TractorSupporter.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 
 namespace TractorSupporter.View;
 
@@ -15,7 +16,7 @@ public partial class MainPage : Page
         this.Loaded += MainPage_Loaded;
     }
 
-    private void MainPage_Loaded(object sender, RoutedEventArgs e)
+    private async void MainPage_Loaded(object sender, RoutedEventArgs e)
     {
         if (App.IsInitialized && App.CommandLineArgs != null && App.CommandLineArgs.Length > 0 && App.CommandLineArgs[0] == "click_connect_button")
         {
@@ -23,6 +24,7 @@ public partial class MainPage : Page
             {
                 if (viewModel.StartConnectionCommand.CanExecute(null))
                 {
+                    await Task.Delay(500);
                     viewModel.StartConnectionCommand.Execute(null);
                 }
             }

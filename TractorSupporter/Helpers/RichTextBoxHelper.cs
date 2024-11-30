@@ -27,7 +27,17 @@ namespace TractorSupporter.Helpers
         {
             if (d is RichTextBox richTextBox)
             {
-                richTextBox.Document = (FlowDocument)e.NewValue;
+                var newDocument = e.NewValue as FlowDocument;
+                if (newDocument != null)
+                {
+                    var previousParent = LogicalTreeHelper.GetParent(newDocument) as RichTextBox;
+                    if (previousParent != null)
+                    {
+                        previousParent.Document = new FlowDocument();
+                    }
+                }
+
+                richTextBox.Document = newDocument ?? new FlowDocument();
             }
         }
     }
