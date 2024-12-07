@@ -55,7 +55,6 @@ public interface IInnerMockDataReceiver
 public class InnerMockUltraSoundReceiver : IInnerMockDataReceiver
 {
     public static string ExtraMessage { get; set; } = "extra message";
-    public static double DistanceMeasured { get; set; } = 1000; // cm
 
     public async Task<byte[]> ReceiveDataAsync(double distance, CancellationToken token = default)
     {
@@ -64,7 +63,7 @@ public class InnerMockUltraSoundReceiver : IInnerMockDataReceiver
         var mockData = new
         {
             extraMessage = ExtraMessage,
-            distanceMeasured = DistanceMeasured
+            distanceMeasured = distance
         };
 
         string jsonString = JsonSerializer.Serialize(mockData);
@@ -90,6 +89,11 @@ public class InnerMockLidarReceiver : IInnerMockDataReceiver
             measurementsSB.Append(";");
             measurementsSB.Append(distance.ToString()); // mm
             measurementsSB.Append(";");
+        }
+
+        if (measurementsSB.Length > 0)
+        {
+            measurementsSB.Remove(measurementsSB.Length - 1, 1);
         }
 
         await Task.Delay(152, token);

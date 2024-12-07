@@ -33,13 +33,17 @@ class SettingsPageViewModel : BaseViewModel
     private ICommand _backCommand;
     private NavigationService _navigationService;
     private LanguageService _languageService;
+    private MockDataReceiver _mockDataReceiver;
+    private IReceivedDataFormatter _receivedDataFormatter;
     private IConfigAppJson _configAppJson;
 
-    public SettingsPageViewModel()
+    public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
         _navigationService = NavigationService.Instance;
         _configAppJson = ConfigAppJson.Instance;
         _languageService = LanguageService.Instance;
+        _mockDataReceiver = MockDataReceiver.Instance;
+        _receivedDataFormatter = receivedDataFormatter;
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
@@ -226,6 +230,8 @@ class SettingsPageViewModel : BaseViewModel
             _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage);
             _configAppJson.ReadJson();
             _languageService.ChangeLanguage(SelectedLanguage);
+            _mockDataReceiver.ChangeInnerMock(SelectedSensorType == TypeSensor.Laser);
+            _receivedDataFormatter.ChangeMode(SelectedSensorType == TypeSensor.Laser);
             _navigationService.NavigateToMain();
         }
     }
