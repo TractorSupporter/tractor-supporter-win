@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text;
 using TractorSupporter.Services.Interfaces;
-using TractorSupporter.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.Services;
@@ -20,6 +18,7 @@ public partial class ServerThreadService
     private DataReceiverGPS _dataReceiverGPS;
     private DataSenderGPS _dataSenderGPS;
     private IDataSenderUDP _dataSenderUDP;
+    private IReceivedDataFormatter _receivedDataFormatter;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
@@ -29,8 +28,9 @@ public partial class ServerThreadService
 
     public bool IsConnected => _isConnected;
 
-    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection) 
+    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection, IReceivedDataFormatter receivedDataFormatter) 
     {
+        _receivedDataFormatter = receivedDataFormatter;
         _gpsConnectionService = gpsConnection;
         _alarmService = alarm;
         _avoidingService = avoiding;
@@ -77,8 +77,6 @@ public partial class ServerThreadService
 
             ProcessReceivedData(result!);
         }
-
-       
     }
     
     private void ProcessReceivedData(byte[] receivedBytes)
@@ -86,9 +84,7 @@ public partial class ServerThreadService
         string serializedData = Encoding.ASCII.GetString(receivedBytes);
         using (JsonDocument data = JsonDocument.Parse(serializedData))
         {
-            var dataRoot = data.RootElement;
-            var extraMessage = dataRoot.GetProperty("extraMessage").GetString() ?? "";
-            var distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
+            (string extraMessage, double distanceMeasured) = _receivedDataFormatter.Format(data);
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
             bool shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
@@ -115,9 +111,11 @@ public partial class ServerThreadService
 public partial class ServerThreadService
 {
     private static readonly Lazy<ServerThreadService> _lazyInstance = new(() => new ServerThreadService(
-        App.ServiceProvider.GetRequiredService<IAvoidingService>(), 
-        App.ServiceProvider.GetRequiredService<IAlarmService>(), 
-        App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
+        App.ServiceProvider.GetRequiredService<IAvoidingService>(),
+        App.ServiceProvider.GetRequiredService<IAlarmService>(),
+        App.ServiceProvider.GetRequiredService<IGPSConnectionService>(),
+        App.ServiceProvider.GetRequiredService<IReceivedDataFormatter>()));
+        
     public static ServerThreadService Instance => _lazyInstance.Value;
     
 }

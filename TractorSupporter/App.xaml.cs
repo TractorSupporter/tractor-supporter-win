@@ -51,5 +51,6 @@ public static class ServiceCollectionExtentions
         services.AddSingleton<IAlarmService, AlarmService>();
         services.AddSingleton<MainPageViewModel>();
         services.AddSingleton<IGPSConnectionService, GPSConnectionService>();
+        services.AddSingleton<IReceivedDataFormatter,  ReceivedDataFormatter>();
     }
 }
