@@ -1,6 +1,7 @@
 ﻿using TractorSupporter.Services;
 using TractorSupporter.ViewModel;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.View
 {
@@ -10,7 +11,7 @@ namespace TractorSupporter.View
         {
             InitializeComponent();
             NavigationService.Initialize(MainFrame);
-            DataContext = new TSContainerWindowViewModel();
+            DataContext = new TSContainerWindowViewModel(App.ServiceProvider.GetRequiredService<IReceivedDataFormatter>());
             Navbar.OnSettingsClicked = NavigationService.Instance.NavigateToSettings;
             Navbar.OnHistoryClicked = NavigationService.Instance.NavigateToHistory;
         }

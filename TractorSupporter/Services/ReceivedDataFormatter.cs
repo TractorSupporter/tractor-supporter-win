@@ -45,7 +45,49 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
     public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
     {
         string message = "";
+        double leastDistance = double.MaxValue;
 
-        return (message, 0); // todo: calculate
+        if (data.RootElement.TryGetProperty("measurements", out JsonElement measurements))
+        {
+            string[] measurementArray = measurements.GetString().Split(';');
+
+            for (int i = 0; i < measurementArray.Length; i += 2)
+            {
+                (bool isValid, int angle, double distance) = ValidateMeasurement(measurementArray, i);
+
+                if (!isValid)
+                {
+                    continue;
+                }
+
+                double distanceInFront = distance * Math.Cos(angle * Math.PI / 180);
+
+                if (distanceInFront < leastDistance)
+                {
+                    leastDistance = distanceInFront;
+                }
+            }
+        }
+
+        double leastDistanceInCm = (double)(leastDistance / 10);
+        return (message, leastDistanceInCm);
+    }
+
+    private (bool, int, double) ValidateMeasurement(string[] measurementArray, int i)
+    {
+        if (i + 1 >= measurementArray.Length)
+        {
+            return (false, 0, 0);
+        }
+        if (!int.TryParse(measurementArray[i], out int angle))
+        {
+            return (false, 0, 0);
+        }
+        if (!double.TryParse(measurementArray[i + 1], out double distance))
+        {
+            return (false, 0, 0);
+        }
+
+        return (true, angle, distance);
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Input;
 using TractorSupporter.Model;
 using TractorSupporter.Services.Interfaces;
 using TractorSupporter.Services;
+using TractorSupporter.Model.Enums;
 
 namespace TractorSupporter.ViewModel
 {
@@ -17,8 +18,10 @@ namespace TractorSupporter.ViewModel
         private LanguageService _languageService;
         private SettingsVisibilityService _settingsVisibilityService;
         private HistoryVisibilityService _historyVisibilityService;
+        private MockDataReceiver _mockDataReceiver;
+        private IReceivedDataFormatter _receivedDataFormatter;
 
-        public TSContainerWindowViewModel()
+        public TSContainerWindowViewModel(IReceivedDataFormatter receivedDataFormatter)
         {  
             _navigationService = NavigationService.Instance;
             _languageService = LanguageService.Instance;
@@ -26,6 +29,8 @@ namespace TractorSupporter.ViewModel
             _settingsVisibilityService.PropertyChanged += OnSettingsVisibilityServicePropertyChanged;
             _historyVisibilityService = HistoryVisibilityService.Instance;
             _historyVisibilityService.PropertyChanged += OnHistoryVisibilityServicePropertyChanged;
+            _mockDataReceiver = MockDataReceiver.Instance;
+            _receivedDataFormatter = receivedDataFormatter;
             NavigateToMainPageIfConfigExists();
             IsSettingsVisible = false;
             IsHistoryVisible = true;
@@ -59,6 +64,8 @@ namespace TractorSupporter.ViewModel
             if (appConfig != null)
             {
                 _languageService.ChangeLanguage(appConfig.Language);
+                _mockDataReceiver.ChangeInnerMock(appConfig.SelectedSensorType == TypeSensor.Laser);
+                _receivedDataFormatter.ChangeMode(appConfig.SelectedSensorType == TypeSensor.Laser);
                 _navigationService.NavigateToMain();
             } else
             {
