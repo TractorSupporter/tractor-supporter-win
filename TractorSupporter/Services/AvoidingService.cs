@@ -9,6 +9,7 @@ public interface IAvoidingService
     public double AvoidingDistance { get; set; }
     public bool MakeAvoidingDecision(double distanceMeasured);
     public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
+    public void ChangeConfig(bool isLidar);
 }
 
 public partial class AvoidingService: CommandFieldDecision, IAvoidingService
@@ -31,6 +32,14 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
         _avoidingDecisionAllowed = false;
+    }
+
+    public void ChangeConfig(bool isLidar)
+    {
+        if (isLidar)
+            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCountLidar"]!);
+        else
+            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
     }
 
     public async void OnConnectionToGPSChanged(object? sender, bool isConnected)

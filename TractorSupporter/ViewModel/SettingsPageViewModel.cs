@@ -37,14 +37,18 @@ class SettingsPageViewModel : BaseViewModel
     private IMockDataReceiver _mockDataReceiver;
     private IReceivedDataFormatter _receivedDataFormatter;
     private IConfigAppJson _configAppJson;
+    private IAvoidingService _avoidingService;
+    private IAlarmService _alarmService;
 
     public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
+        _alarmService = App.ServiceProvider.GetRequiredService<IAlarmService>();
         _navigationService = NavigationService.Instance;
         _configAppJson = ConfigAppJson.Instance;
         _languageService = LanguageService.Instance;
         _mockDataReceiver = App.ServiceProvider.GetRequiredService<IMockDataReceiver>();
         _receivedDataFormatter = receivedDataFormatter;
+        _avoidingService = App.ServiceProvider.GetRequiredService<IAvoidingService>();
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
@@ -233,6 +237,9 @@ class SettingsPageViewModel : BaseViewModel
             _languageService.ChangeLanguage(SelectedLanguage);
             _mockDataReceiver.ChangeInnerMock(SelectedSensorType == TypeSensor.Laser);
             _receivedDataFormatter.ChangeMode(SelectedSensorType == TypeSensor.Laser);
+            _avoidingService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
+            _alarmService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
+
             _navigationService.NavigateToMain();
         }
     }

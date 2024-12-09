@@ -13,6 +13,7 @@ public interface IAlarmService
 {
     public double AlarmDistance { get; set; }
     public bool MakeAlarmDecision(double distanceMeasured);
+    public void ChangeConfig(bool isLidar);
 }
 
 public partial class AlarmService: CommandFieldDecision, IAlarmService
@@ -30,6 +31,14 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
         _alarmDistanceTimes = new List<DateTime>();
         _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+    }
+
+    public void ChangeConfig(bool isLidar)
+    {
+        if (isLidar)
+            _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCountLidar"]!);
+        else
+            _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
     }
 
     public bool MakeAlarmDecision(double distanceMeasured)
