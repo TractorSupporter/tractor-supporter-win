@@ -155,7 +155,12 @@ public partial class GPSConnectionService : IGPSConnectionService
 
     public void WriteToPipe(string data)
     {
-        _writer.WriteLineAsync(data);
+        try
+        {
+            _writer.WriteLineAsync(data);
+        }
+        catch
+        { }
     }
 
     public async Task<string> ReadFromPipe(CancellationToken token)

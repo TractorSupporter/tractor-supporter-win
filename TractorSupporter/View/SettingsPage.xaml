@@ -45,7 +45,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80"/>
                         <RowDefinition Height="80"/>
-                        <RowDefinition Height="120"/>
+                        <RowDefinition Height="90"/>
+                        <RowDefinition Height="80"/>
                         <RowDefinition Height="80"/>
                     </Grid.RowDefinitions>
 
@@ -61,7 +62,26 @@
                         <controls:SettingsOption Label="{DynamicResource SettingsAlarmingMechanismLabel}" Description="{DynamicResource SettingsAlarmingMechanismDescription}" IsChecked="{Binding AlarmMechanismIsChecked, Mode=TwoWay}" Loaded="SettingsOption_Loaded"/>
                     </Grid>
 
-                    <controls:DistanceControl Grid.Row="2" Margin="0,40,0,0" 
+                    <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="300">
+                            <TextBlock Text="{DynamicResource SettingsSelectTurnDirection}" FontSize="20" Margin="0,0,0,10" />
+
+                            <RadioButton Content="{DynamicResource SettingsLeft}" 
+                             GroupName="TurnDirection"
+                             Margin="0,0,0,10"
+                             FontSize="16"
+                             VerticalContentAlignment="Center"
+                             IsChecked="{Binding SelectedTurnDirection, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:TypeTurn.Left}}" />
+                             
+                            <RadioButton Content="{DynamicResource SettingsRight}" 
+                             GroupName="TurnDirection"
+                             FontSize="16"
+                             VerticalContentAlignment="Center"
+                             IsChecked="{Binding SelectedTurnDirection, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:TypeTurn.Right}}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <controls:DistanceControl Grid.Row="3" Margin="0,40,0,0" 
                                Title="{DynamicResource SettingsAvoidingDistanceTitle}" 
                                Description="{DynamicResource SettingsAvoidingDistanceDescription}"
                                Minimum="50" 
@@ -69,7 +89,7 @@
                                Visibility="{Binding AvoidingMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Value="{Binding AvoidingDistance, Mode=TwoWay}" Grid.ColumnSpan="2" />
 
-                    <controls:DistanceControl Grid.Row="3" 
+                    <controls:DistanceControl Grid.Row="4" 
                                Title="{DynamicResource SettingsAlarmDistanceTitle}" 
                                Description="{DynamicResource SettingsAlarmDistanceDescription}"
                                Minimum="100" 

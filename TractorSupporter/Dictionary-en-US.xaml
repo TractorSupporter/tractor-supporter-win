@@ -10,6 +10,9 @@
     <sys:String x:Key="MainPageStopConnection">Stop Connection</sys:String>
     <sys:String x:Key="MainPageStartConnection">Start Connection</sys:String>
 
+    <sys:String x:Key="SettingsSelectTurnDirection">Select Turn Direction</sys:String>
+    <sys:String x:Key="SettingsLeft">Left Turn</sys:String>
+    <sys:String x:Key="SettingsRight">Right Turn</sys:String>
     <sys:String x:Key="Port">Port</sys:String>
     <sys:String x:Key="YourIP">Your IP</sys:String>
     <sys:String x:Key="SettingsSelectLanguage">Select Language:</sys:String>

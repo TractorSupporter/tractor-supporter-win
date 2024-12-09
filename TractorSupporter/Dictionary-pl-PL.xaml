@@ -12,6 +12,9 @@
     <sys:String x:Key="MainPageStopConnection">Zastopuj połączenie</sys:String>
     <sys:String x:Key="MainPageStartConnection">Rozpocznij połączenie</sys:String>
 
+    <sys:String x:Key="SettingsSelectTurnDirection">Wybierz kierunek skrętu</sys:String>
+    <sys:String x:Key="SettingsLeft">Skręt w lewo</sys:String>
+    <sys:String x:Key="SettingsRight">Skręt w prawo</sys:String>
     <sys:String x:Key="Port">Port</sys:String>
     <sys:String x:Key="YourIP">Twoje IP</sys:String>
     <sys:String x:Key="SettingsSelectLanguage">Wybierz język:</sys:String>

@@ -27,6 +27,7 @@ class SettingsPageViewModel : BaseViewModel
     private bool _avoidingMechanismIsChecked;
     private bool _alarmMechanismIsChecked;
     private TypeSensor _selectedSensorType;
+    private TypeTurn _selectedTurnDirection;
     private int _alarmDistance;
     private int _avoidingDistance;
     private Language _selectedLanguage;
@@ -90,6 +91,19 @@ class SettingsPageViewModel : BaseViewModel
             {
                 _avoidingDistance = value;
                 OnPropertyChanged(nameof(AvoidingDistance));
+            }
+        }
+    }
+
+    public TypeTurn SelectedTurnDirection
+    {
+        get => _selectedTurnDirection;
+        set
+        {
+            if (_selectedTurnDirection != value)
+            {
+                _selectedTurnDirection = value;
+                OnPropertyChanged(nameof(SelectedTurnDirection));
             }
         }
     }
@@ -204,6 +218,7 @@ class SettingsPageViewModel : BaseViewModel
         AlarmDistance = appConfig.AlarmDistance;
         AvoidingDistance = appConfig.AvoidingDistance;
         SelectedLanguage = appConfig.Language;
+        SelectedTurnDirection = appConfig.SelectedTurnDirection;
     }
 
     private void SaveSettings(object parameter)
@@ -232,7 +247,7 @@ class SettingsPageViewModel : BaseViewModel
 
         if (isValid)
         {
-            _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage);
+            _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage, SelectedTurnDirection);
             _configAppJson.ReadJson();
             _languageService.ChangeLanguage(SelectedLanguage);
             _mockDataReceiver.ChangeInnerMock(SelectedSensorType == TypeSensor.Laser);

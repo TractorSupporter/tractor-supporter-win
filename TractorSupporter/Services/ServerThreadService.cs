@@ -95,6 +95,7 @@ public partial class ServerThreadService
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new
                 {
+                    turnDirection = ConfigAppJson.Instance.GetConfig().SelectedTurnDirection,
                     shouldAvoid,
                     shouldAlarm,
                     distanceMeasured
