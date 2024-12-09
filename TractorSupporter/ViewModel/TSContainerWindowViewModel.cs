@@ -9,6 +9,7 @@ using TractorSupporter.Model;
 using TractorSupporter.Services.Interfaces;
 using TractorSupporter.Services;
 using TractorSupporter.Model.Enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.ViewModel
 {
@@ -18,7 +19,7 @@ namespace TractorSupporter.ViewModel
         private LanguageService _languageService;
         private SettingsVisibilityService _settingsVisibilityService;
         private HistoryVisibilityService _historyVisibilityService;
-        private MockDataReceiver _mockDataReceiver;
+        private IMockDataReceiver _mockDataReceiver;
         private IReceivedDataFormatter _receivedDataFormatter;
 
         public TSContainerWindowViewModel(IReceivedDataFormatter receivedDataFormatter)
@@ -29,7 +30,7 @@ namespace TractorSupporter.ViewModel
             _settingsVisibilityService.PropertyChanged += OnSettingsVisibilityServicePropertyChanged;
             _historyVisibilityService = HistoryVisibilityService.Instance;
             _historyVisibilityService.PropertyChanged += OnHistoryVisibilityServicePropertyChanged;
-            _mockDataReceiver = MockDataReceiver.Instance;
+            _mockDataReceiver = App.ServiceProvider.GetRequiredService<IMockDataReceiver>();
             _receivedDataFormatter = receivedDataFormatter;
             NavigateToMainPageIfConfigExists();
             IsSettingsVisible = false;

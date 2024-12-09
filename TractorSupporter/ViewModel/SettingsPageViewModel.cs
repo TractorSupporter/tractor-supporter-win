@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -33,7 +34,7 @@ class SettingsPageViewModel : BaseViewModel
     private ICommand _backCommand;
     private NavigationService _navigationService;
     private LanguageService _languageService;
-    private MockDataReceiver _mockDataReceiver;
+    private IMockDataReceiver _mockDataReceiver;
     private IReceivedDataFormatter _receivedDataFormatter;
     private IConfigAppJson _configAppJson;
 
@@ -42,7 +43,7 @@ class SettingsPageViewModel : BaseViewModel
         _navigationService = NavigationService.Instance;
         _configAppJson = ConfigAppJson.Instance;
         _languageService = LanguageService.Instance;
-        _mockDataReceiver = MockDataReceiver.Instance;
+        _mockDataReceiver = App.ServiceProvider.GetRequiredService<IMockDataReceiver>();
         _receivedDataFormatter = receivedDataFormatter;
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);

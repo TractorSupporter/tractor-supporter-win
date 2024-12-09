@@ -4,84 +4,91 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using TractorSupporter.Model.Enums;
 using TractorSupporter.Services;
-using TractorSupporter.ViewModel;
 
-namespace TractorSupporter.ViewModel
+namespace TractorSupporter.ViewModel;
+
+public interface IMockDataConfigWindowViewModel
 {
-    public class MockDataConfigWindowViewModel : BaseViewModel
+    public string ExtraMessage { get; set; }
+    public double DistanceMeasured { get; set; }
+    public TractorState TractorState { get; set; }
+    public double Speed { get; set; }
+    public Visibility SpeedVisibility { get; }
+}
+
+public class MockDataConfigWindowViewModel : BaseViewModel, IMockDataConfigWindowViewModel
+{
+    private double _speed;
+    private DispatcherTimer _timer;
+    private readonly int _timerInterval = 500;
+    private TractorState _tractorState;
+
+    public MockDataConfigWindowViewModel()
     {
-        private double _speed;
-        private DispatcherTimer _timer;
-        private readonly int _timerInterval = 500;
-        private TractorState _tractorState;
+        InitializeTimer();
+    }
 
-        public MockDataConfigWindowViewModel()
-        {
-            InitializeTimer();
-        }
+    public string ExtraMessage
+    {
+        get => MockDataReceiver.ExtraMessage;
+        set { MockDataReceiver.ExtraMessage = value; OnPropertyChanged(nameof(ExtraMessage)); }
+    }
 
-        public string ExtraMessage
-        {
-            get => MockDataReceiver.ExtraMessage;
-            set { MockDataReceiver.ExtraMessage = value; OnPropertyChanged(nameof(ExtraMessage)); }
-        }
+    public double DistanceMeasured
+    {
+        get => MockDataReceiver.DistanceMeasured;
+        set { MockDataReceiver.DistanceMeasured = value; OnPropertyChanged(nameof(DistanceMeasured)); }
+    }
 
-        public double DistanceMeasured
+    public TractorState TractorState
+    {
+        get => _tractorState;
+        set
         {
-            get => MockDataReceiver.DistanceMeasured;
-            set { MockDataReceiver.DistanceMeasured = value; OnPropertyChanged(nameof(DistanceMeasured)); }
-        }
-
-        public TractorState TractorState
-        {
-            get => _tractorState;
-            set
+            _tractorState = value;
+            OnPropertyChanged(nameof(TractorState));
+            OnPropertyChanged(nameof(SpeedVisibility));
+            if (_tractorState == TractorState.Stationary)
             {
-                _tractorState = value;
-                OnPropertyChanged(nameof(TractorState));
-                OnPropertyChanged(nameof(SpeedVisibility));
-                if (_tractorState == TractorState.Stationary)
-                {
-                    Speed = 0;
-                }
+                Speed = 0;
             }
         }
+    }
 
-        public double Speed
+    public double Speed
+    {
+        get => _speed;
+        set
         {
-            get => _speed;
-            set
+            _speed = value;
+            OnPropertyChanged(nameof(Speed));
+            if (_speed > 0)
             {
-                _speed = value;
-                OnPropertyChanged(nameof(Speed));
-                if (_speed > 0)
-                {
-                    _timer.Start();
-                } else
-                {
-                    _timer.Stop();
-                }
+                _timer.Start();
+            } else
+            {
+                _timer.Stop();
             }
         }
+    }
 
-        public Visibility SpeedVisibility => _tractorState.Equals(TractorState.Moving) ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility SpeedVisibility => _tractorState.Equals(TractorState.Moving) ? Visibility.Visible : Visibility.Collapsed;
 
-        private void InitializeTimer()
+    private void InitializeTimer()
+    {
+        _timer = new DispatcherTimer();
+        _timer.Interval = TimeSpan.FromMilliseconds(_timerInterval);
+        _timer.Tick += Timer_Tick;
+    }
+
+    private void Timer_Tick(object sender, EventArgs e)
+    {
+        if (MockDataReceiver.DistanceMeasured > 0 && Speed > 0)
         {
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(_timerInterval);
-            _timer.Tick += Timer_Tick;
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            if (MockDataReceiver.DistanceMeasured > 0 && Speed > 0)
-            {
-                double speedInMetersPerSecond = Speed * 1000 / 3600;
-                double distanceChange = speedInMetersPerSecond * (_timerInterval / 10.0);
-                MockDataReceiver.DistanceMeasured -= distanceChange;
-                OnPropertyChanged(nameof(DistanceMeasured));
-            }
+            double speedInMetersPerSecond = Speed * 1000 / 3600;
+            double distanceChange = speedInMetersPerSecond * (_timerInterval / 10.0);
+            MockDataReceiver.DistanceMeasured -= distanceChange;
+            OnPropertyChanged(nameof(DistanceMeasured));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using TractorSupporter.Services.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TractorSupporter.Services.Interfaces;
 
 namespace TractorSupporter.Services;
 
@@ -11,9 +12,11 @@ public partial class StandbyThreadService
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
+    private IMockDataReceiver _mockDataReceiver;
 
-    private StandbyThreadService()
+    private StandbyThreadService(IMockDataReceiver mockDataReceiver)
     {
+        _mockDataReceiver = mockDataReceiver;
         _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -32,7 +35,7 @@ public partial class StandbyThreadService
         _standbyThread = new Thread(() => StandbyThread(_cancellationTokenSource.Token));
         _shouldRun = true;
         _standbyThread.IsBackground = true;
-        _dataReceiverESP = useMockData ? MockDataReceiver.Instance : DataReceiverUDP.Initialize(port);
+        _dataReceiverESP = useMockData ? _mockDataReceiver : DataReceiverUDP.Initialize(port);
         _standbyThread.Start();
     }
 
@@ -51,7 +54,7 @@ public partial class StandbyThreadService
 #region Class structure
 public partial class StandbyThreadService
 {
-    private static readonly Lazy<StandbyThreadService> _lazyInstance = new(() => new StandbyThreadService());
+    private static readonly Lazy<StandbyThreadService> _lazyInstance = new(() => new StandbyThreadService(App.ServiceProvider.GetRequiredService<IMockDataReceiver>()));
     public static StandbyThreadService Instance => _lazyInstance.Value;
 }
 #endregion

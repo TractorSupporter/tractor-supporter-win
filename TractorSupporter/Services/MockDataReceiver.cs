@@ -1,31 +1,45 @@
 ﻿using System.Text;
 using System.Text.Json;
-using System.Windows.Media.Media3D;
 using TractorSupporter.Services.Interfaces;
+using TractorSupporter.ViewModel;
 
 namespace TractorSupporter.Services;
 
-public partial class MockDataReceiver
+public interface IMockDataReceiver : IDataReceiverAsync
 {
+    public static string ExtraMessage { get; set; }
+    public static double DistanceMeasured { get; set; }
+    public void ChangeInnerMock(bool isLidar);
+}
+
+public partial class MockDataReceiver : IDataReceiverAsync, IMockDataReceiver
+{
+    private IMockDataConfigWindowViewModel _mockDataConfigWindowViewModel;
+
+    public MockDataReceiver(IMockDataConfigWindowViewModel mockDataConfigWindowViewModel)
+    {
+        _mockDataConfigWindowViewModel = mockDataConfigWindowViewModel; 
+    }
+
     public static string ExtraMessage { get; set; } = "extra message";
     public static double DistanceMeasured { get; set; } = 1000;
     private IInnerMockDataReceiver innerMockDataReceiver = new InnerMockLidarReceiver();
-
 
     public void ChangeInnerMock(bool isLidar)
     {
         if (isLidar)
         {
-            DistanceMeasured = 1000;
+            _mockDataConfigWindowViewModel.DistanceMeasured = 10000;
+            DistanceMeasured = 10000;
             innerMockDataReceiver = new InnerMockLidarReceiver();
         }
         else
         {
-            DistanceMeasured = 10000;
+            _mockDataConfigWindowViewModel.DistanceMeasured = 1000;
+            DistanceMeasured = 1000;
             innerMockDataReceiver = new InnerMockUltraSoundReceiver();
         }
     }
-
 
     public async Task<byte[]> ReceiveDataAsync(CancellationToken token = default)
     {
@@ -37,15 +51,6 @@ public partial class MockDataReceiver
         return "0.0.0.0";
     }
 }
-
-#region Class structure
-public partial class MockDataReceiver : IDataReceiverAsync
-{
-    private static readonly Lazy<MockDataReceiver> _lazyInstance = new(() => new MockDataReceiver());
-    public static MockDataReceiver Instance => _lazyInstance.Value;
-    private MockDataReceiver() {}
-}
-#endregion
 
 public interface IInnerMockDataReceiver
 {

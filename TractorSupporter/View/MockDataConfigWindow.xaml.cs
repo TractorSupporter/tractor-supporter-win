@@ -1,14 +1,15 @@
 ﻿using System.Windows;
 using TractorSupporter.ViewModel;
 
-namespace TractorSupporter
+namespace TractorSupporter;
+
+public partial class MockDataConfigWindow : Window
 {
-    public partial class MockDataConfigWindow : Window
+    private IMockDataConfigWindowViewModel mockDataConfigWindowViewModel;
+    public MockDataConfigWindow(IMockDataConfigWindowViewModel mockdataconfigwvm)
     {
-        public MockDataConfigWindow()
-        {
-            InitializeComponent();
-            DataContext = new MockDataConfigWindowViewModel();
-        }
+        InitializeComponent();
+        mockDataConfigWindowViewModel = mockdataconfigwvm;
+        DataContext = mockDataConfigWindowViewModel;
     }
 }

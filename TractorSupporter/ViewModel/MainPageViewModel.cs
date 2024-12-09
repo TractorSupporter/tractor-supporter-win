@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
@@ -124,7 +125,7 @@ public class MainPageViewModel : BaseViewModel
         _useMockData = bool.Parse(ConfigurationManager.AppSettings["UseMockData"]!);
         if (_useMockData && (_mockDataConfigWindow == null || !_mockDataConfigWindow.IsVisible))
         {
-            _mockDataConfigWindow = new MockDataConfigWindow();
+            _mockDataConfigWindow = new MockDataConfigWindow(App.ServiceProvider.GetRequiredService<IMockDataConfigWindowViewModel>());
             _mockDataConfigWindow.Show();
         }
     }
