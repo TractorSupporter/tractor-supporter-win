@@ -16,8 +16,8 @@ public partial class ServerThreadService
     private IMockDataReceiver _mockDataReceiver;
     private IAvoidingService _avoidingService;
     private IAlarmService _alarmService;
-    private DataReceiverGPS _dataReceiverGPS;
-    private DataSenderGPS _dataSenderGPS;
+    private IDataReceiverGPS _dataReceiverGPS;
+    private IDataSenderGPS _dataSenderGPS;
     private IDataSenderUDP _dataSenderUDP;
     private IReceivedDataFormatter _receivedDataFormatter;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
@@ -62,8 +62,8 @@ public partial class ServerThreadService
 
     private void ServerThread(CancellationToken token)
     {
-        _dataReceiverGPS = DataReceiverGPS.Instance;
-        _dataSenderGPS = DataSenderGPS.Instance;
+        _dataReceiverGPS = App.ServiceProvider.GetRequiredService<IDataReceiverGPS>();
+        _dataSenderGPS = App.ServiceProvider.GetRequiredService<IDataSenderGPS>(); ;
         _dataSenderUDP = DataSenderUDP.Instance;
 
         _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });

@@ -54,5 +54,7 @@ public static class ServiceCollectionExtentions
         services.AddSingleton<IReceivedDataFormatter,  ReceivedDataFormatter>();
         services.AddSingleton<IMockDataConfigWindowViewModel, MockDataConfigWindowViewModel>();
         services.AddSingleton<IMockDataReceiver, MockDataReceiver>();
+        services.AddSingleton<IDataReceiverGPS, DataReceiverGPS>();
+        services.AddSingleton<IDataSenderGPS, DataSenderGPS>();
     }
 }

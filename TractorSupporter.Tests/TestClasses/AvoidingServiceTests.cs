@@ -11,10 +11,16 @@ namespace TractorSupporter.Tests
     public class AvoidingServiceTests
     {
         ILoggingService _loggingService;
+        IGPSConnectionService _gpsConnectionService;
+        IDataReceiverGPS _dataReceiverGPS;
+        IDataSenderGPS _dataSenderGPS;
 
         public AvoidingServiceTests()
         {
+            _gpsConnectionService = A.Fake<GPSConnectionService>();
             _loggingService = A.Fake<ILoggingService>();
+            _dataReceiverGPS = A.Fake<IDataReceiverGPS>();
+            _dataSenderGPS = A.Fake<IDataSenderGPS>();
             A.CallTo(() => _loggingService.AddLog(A<DecisionType>.Ignored)).DoesNothing();
         }
 
@@ -24,7 +30,7 @@ namespace TractorSupporter.Tests
         public void AllowMakingDecision_ShouldUpdateDecisionAllowedFlag(bool expectedValue)
         {
             // Arrange
-            var avoidingService = new AvoidingService(_loggingService);
+            var avoidingService = new AvoidingService(_loggingService, _gpsConnectionService, _dataReceiverGPS, _dataSenderGPS);
 
             // Act
             avoidingService.AllowMakingDecision(null, expectedValue);
@@ -41,7 +47,7 @@ namespace TractorSupporter.Tests
         public void MakeAvoidingDecision_ShouldReturnTrue_WhenConditionsMet(bool allowedDecision, int minSignalsCount, int signalValidLifetimeMs, double avoidingDist, double measuredDist)
         {
            // Arrange
-           var avoidingService = new AvoidingService(_loggingService);
+           var avoidingService = new AvoidingService(_loggingService, _gpsConnectionService, _dataReceiverGPS, _dataSenderGPS);
 
             SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
             SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
@@ -72,7 +78,7 @@ namespace TractorSupporter.Tests
         {
             // Arrange
             
-            var avoidingService = new AvoidingService(_loggingService);
+            var avoidingService = new AvoidingService(_loggingService, _gpsConnectionService, _dataReceiverGPS, _dataSenderGPS);
 
             SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
             SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
@@ -104,7 +110,7 @@ namespace TractorSupporter.Tests
         {
             // Arrange
 
-            var avoidingService = new AvoidingService(_loggingService);
+            var avoidingService = new AvoidingService(_loggingService, _gpsConnectionService, _dataReceiverGPS, _dataSenderGPS);
 
             SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
             SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);
@@ -136,7 +142,7 @@ namespace TractorSupporter.Tests
         {
             // Arrange
 
-            var avoidingService = new AvoidingService(_loggingService);
+            var avoidingService = new AvoidingService(_loggingService, _gpsConnectionService, _dataReceiverGPS, _dataSenderGPS);
 
             SetPrivateField(avoidingService, "_avoidingDistanceTimes", new List<DateTime>());
             SetPrivateField(avoidingService, "_avoidingDecisionAllowed", allowedDecision);

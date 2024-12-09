@@ -5,11 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TractorSupporter.Services;
 
-public partial class DataSenderGPS
+public interface IDataSenderGPS
+{
+    public Task SendData(object jsonData);
+}
+
+public class DataSenderGPS : IDataSenderGPS
 {
     private readonly IGPSConnectionService _gpsConnectionService;
 
-    private DataSenderGPS(IGPSConnectionService gpsConnection)
+    public DataSenderGPS(IGPSConnectionService gpsConnection)
     {
         _gpsConnectionService = gpsConnection;
     }
@@ -45,11 +50,3 @@ public partial class DataSenderGPS
         }
     }
 }
-
-#region Class structure
-public partial class DataSenderGPS
-{
-    private static readonly Lazy<DataSenderGPS> _lazyInstance = new(() => new DataSenderGPS(App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
-    public static DataSenderGPS Instance => _lazyInstance.Value;
-}
-#endregion

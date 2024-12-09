@@ -3,12 +3,18 @@ using System.Text.Json;
 
 namespace TractorSupporter.Services;
     
-public partial class DataReceiverGPS 
+public interface IDataReceiverGPS
+{
+    public Task StartReceivingAsync(CancellationToken token);
+    public event EventHandler<bool> ReceivedAllowMakingDecision;
+}
+
+public class DataReceiverGPS : IDataReceiverGPS
 {
     public event EventHandler<bool> ReceivedAllowMakingDecision;
     private readonly IGPSConnectionService _gpsConnectionService;
 
-    private DataReceiverGPS(IGPSConnectionService gpsConnectionService) 
+    public DataReceiverGPS(IGPSConnectionService gpsConnectionService) 
     {
         _gpsConnectionService = gpsConnectionService;
     }
@@ -47,12 +53,5 @@ public partial class DataReceiverGPS
     }
 }
 
-#region Class structure
-public partial class DataReceiverGPS
-{
-    private static readonly Lazy<DataReceiverGPS> _lazyInstance = new(() => new DataReceiverGPS(App.ServiceProvider.GetRequiredService<IGPSConnectionService>()));
-    public static DataReceiverGPS Instance => _lazyInstance.Value;
-}
-#endregion
 
 

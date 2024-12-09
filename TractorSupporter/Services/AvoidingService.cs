@@ -20,26 +20,28 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
     private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
     private bool _avoidingDecisionAllowed;
-    private DataSenderGPS _senderGPS;
+    private IDataSenderGPS _senderGPS;
+    private IDataReceiverGPS _receiverGPS;
 
-    public AvoidingService(ILoggingService loggingService, IGPSConnectionService gpsConnection)
+    public AvoidingService(ILoggingService loggingService, IGPSConnectionService gpsConnection, IDataReceiverGPS dataReceiverGPS, IDataSenderGPS dataSenderGPS)
     {
-        _senderGPS = DataSenderGPS.Instance;
+        _receiverGPS = dataReceiverGPS;
+        _senderGPS = dataSenderGPS;
         _logging = loggingService;
         gpsConnection.ConnectedToGPSUpdated += OnConnectionToGPSChanged;
-        DataReceiverGPS.Instance.ReceivedAllowMakingDecision += AllowMakingDecision;
+        _receiverGPS.ReceivedAllowMakingDecision += AllowMakingDecision;
         _avoidingDistanceTimes = new List<DateTime>();
-        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
-        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+        _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"] ?? "0");
+        _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"] ?? "0");
         _avoidingDecisionAllowed = false;
     }
 
     public void ChangeConfig(bool isLidar)
     {
         if (isLidar)
-            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCountLidar"]!);
+            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCountLidar"] ?? "0");
         else
-            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
+            _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"] ?? "0");
     }
 
     public async void OnConnectionToGPSChanged(object? sender, bool isConnected)
