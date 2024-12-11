@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Configuration;
+using System.Text.Json;
 
 namespace TractorSupporter.Services;
 
@@ -42,6 +43,8 @@ public class UltrasoundReceivedDataFormatter : IInnerReceivedDataFormatter
 
 public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 {
+    private readonly int _minDistanceCm = int.Parse(ConfigurationManager.AppSettings["MinDistance"] ?? "0");
+
     public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
     {
         string message = "";
@@ -53,7 +56,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 
             for (int i = 0; i < measurementArray.Length; i += 2)
             {
-                (bool isValid, int angle, double distance) = ValidateMeasurement(measurementArray, i);
+                (bool isValid, double angle, double distance) = ValidateMeasurement(measurementArray, i);
 
                 if (!isValid)
                 {
@@ -62,7 +65,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 
                 double distanceInFront = distance * Math.Cos(angle * Math.PI / 180);
 
-                if (distanceInFront < leastDistance)
+                if (distanceInFront < leastDistance && distanceInFront / 10 >= _minDistanceCm)
                 {
                     leastDistance = distanceInFront;
                 }
@@ -73,13 +76,15 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
         return (message, leastDistanceInCm);
     }
 
-    private (bool, int, double) ValidateMeasurement(string[] measurementArray, int i)
+    private (bool, double, double) ValidateMeasurement(string[] measurementArray, int i)
     {
+
+
         if (i + 1 >= measurementArray.Length)
         {
             return (false, 0, 0);
         }
-        if (!int.TryParse(measurementArray[i], out int angle))
+        if (!double.TryParse(measurementArray[i], out double angle))
         {
             return (false, 0, 0);
         }
@@ -87,6 +92,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
         {
             return (false, 0, 0);
         }
+        
 
         return (true, angle, distance);
     }
