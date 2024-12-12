@@ -84,8 +84,8 @@
                     <controls:DistanceControl Grid.Row="3" Margin="0,40,0,0" 
                                Title="{DynamicResource SettingsAvoidingDistanceTitle}" 
                                Description="{DynamicResource SettingsAvoidingDistanceDescription}"
-                               Minimum="50" 
-                               Maximum="500" 
+                               Minimum="100" 
+                               Maximum="1200" 
                                Visibility="{Binding AvoidingMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Value="{Binding AvoidingDistance, Mode=TwoWay}" Grid.ColumnSpan="2" />
 
@@ -93,7 +93,7 @@
                                Title="{DynamicResource SettingsAlarmDistanceTitle}" 
                                Description="{DynamicResource SettingsAlarmDistanceDescription}"
                                Minimum="100" 
-                               Maximum="800" 
+                               Maximum="1500" 
                                Visibility="{Binding AlarmMechanismIsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Value="{Binding AlarmDistance, Mode=TwoWay}" Grid.ColumnSpan="2" />
                 </Grid>
