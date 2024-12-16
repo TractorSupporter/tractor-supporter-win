@@ -53,6 +53,7 @@
                 Width="250" 
                 Height="50" 
                 x:Name="ConnectButton"
+                AutomationProperties.AutomationId="ConnectButton"
                 Command="{Binding StartConnectionCommand}"
                 />
         </Grid>

@@ -51,7 +51,7 @@
                 Visibility="{Binding IsSettingsVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
                 ToolTip="Settings"
                 Click="SettingsButton_Click">
-            <Image Source="pack://application:,,,/TractorSupporter;component/Resources/Icons/settings-icon.png"/>
+            <Image Source="pack://application:,,,/TractorSupporter;component/Resources/Icons/settings-icon.png" AutomationProperties.AutomationId="SettingsIcon"/>
         </Button>
 
     </Grid>

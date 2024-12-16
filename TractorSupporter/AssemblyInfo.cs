@@ -12,3 +12,4 @@ using System.Windows;
 
 [assembly: InternalsVisibleTo("TractorSupporter.Tests")]
 
+
