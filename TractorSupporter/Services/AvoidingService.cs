@@ -15,7 +15,7 @@ public interface IAvoidingService
 public partial class AvoidingService: CommandFieldDecision, IAvoidingService
 {
     private ILoggingService _logging;
-    private readonly List<DateTime> _avoidingDistanceTimes;
+    private readonly List<(DateTime, double)> _avoidingDistanceTimes;
     public double AvoidingDistance { get; set; }
     private int _minAvoidingSignalsCount;
     private int _avoidingDistanceSignalValidLifetimeMs;
@@ -30,7 +30,7 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         _logging = loggingService;
         gpsConnection.ConnectedToGPSUpdated += OnConnectionToGPSChanged;
         _receiverGPS.ReceivedAllowMakingDecision += AllowMakingDecision;
-        _avoidingDistanceTimes = new List<DateTime>();
+        _avoidingDistanceTimes = new List<(DateTime, double)>();
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"] ?? "0");
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"] ?? "0");
         _avoidingDecisionAllowed = false;

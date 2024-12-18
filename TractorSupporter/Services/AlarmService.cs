@@ -18,7 +18,7 @@ public interface IAlarmService
 
 public partial class AlarmService: CommandFieldDecision, IAlarmService
 {
-    private readonly List<DateTime> _alarmDistanceTimes;
+    private readonly List<(DateTime, double)> _alarmDistanceTimes;
     public double AlarmDistance { get; set; }
     private int _minAlarmSignalsCount;
     private int _alarmDistanceSignalValidLifetimeMs;
@@ -28,7 +28,7 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
     public AlarmService(ILoggingService logging)
     {
         _loggingService = logging;
-        _alarmDistanceTimes = new List<DateTime>();
+        _alarmDistanceTimes = new List<(DateTime, double)>();
         _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
     }
