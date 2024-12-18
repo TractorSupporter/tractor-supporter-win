@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace TractorSupporter.Services;
 
@@ -43,8 +42,7 @@ public class UltrasoundReceivedDataFormatter : IInnerReceivedDataFormatter
 
 public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 {
-    private readonly int _minDistanceCm = int.Parse(ConfigurationManager.AppSettings["MinDistance"] ?? "0");
-
+    private const double distanceThreshold = 1000;
     public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
     {
         string message = "";
@@ -65,7 +63,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 
                 double distanceInFront = distance * Math.Cos(angle * Math.PI / 180);
 
-                if (distanceInFront < leastDistance && distanceInFront / 10 >= _minDistanceCm)
+                if (distanceInFront < leastDistance)
                 {
                     leastDistance = distanceInFront;
                 }
@@ -78,21 +76,22 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 
     private (bool, double, double) ValidateMeasurement(string[] measurementArray, int i)
     {
-
-
         if (i + 1 >= measurementArray.Length)
         {
             return (false, 0, 0);
         }
-        if (!double.TryParse(measurementArray[i], out double angle))
+        if (!double.TryParse(measurementArray[i].Replace('.', ','), out double angle))
         {
             return (false, 0, 0);
         }
-        if (!double.TryParse(measurementArray[i + 1], out double distance))
+        if (!double.TryParse(measurementArray[i + 1].Replace('.', ','), out double distance))
         {
             return (false, 0, 0);
         }
-        
+        if(distance< distanceThreshold)
+        {
+            return (false, 0, 0);
+        }
 
         return (true, angle, distance);
     }

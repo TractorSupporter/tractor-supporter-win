@@ -14,6 +14,7 @@
         <Button 
             Grid.Column="0" 
             HorizontalAlignment="Center" 
+            AutomationProperties.AutomationId="Back"
             Background="Transparent" 
             Width="50" 
             Height="50"
@@ -24,6 +25,7 @@
         <Button 
             Grid.Column="1" 
             HorizontalAlignment="Center" 
+            AutomationProperties.AutomationId="Accept"
             Background="Transparent" 
             Width="50" 
             Height="50" 
