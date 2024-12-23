@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using TractorSupporter.Model;
 
 namespace TractorSupporter.Services;
 
@@ -42,9 +43,14 @@ public class UltrasoundReceivedDataFormatter : IInnerReceivedDataFormatter
 
 public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 {
+    private ConfigAppJson configGetter = ConfigAppJson.Instance;
+    private AppConfig appConfig = null;
+
     private const double distanceThreshold = 1000;
     public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
     {
+        appConfig = configGetter.GetConfig();
+
         string message = "";
         double leastDistance = double.MaxValue;
 
@@ -93,6 +99,18 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
             return (false, 0, 0);
         }
 
+
+        var max_dist = appConfig.VehicleWidth * 1000 / 2 / Math.Sin(Math.Abs(angle) * Math.PI / 180);
+        if (distance > max_dist)
+        {
+            return (false, 0, 0);
+        }
+        else
+        {
+            int xd = 3;
+        }
+
         return (true, angle, distance);
     }
+
 }
