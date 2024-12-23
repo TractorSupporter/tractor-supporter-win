@@ -7,7 +7,7 @@ namespace TractorSupporter.Services;
 
 public partial class DataSenderUDP : IDataSenderUDP
 {
-    private readonly UdpClient _udpClient;
+    private UdpClient _udpClient;
     private int _port;
     private string _destinationIP;
     private DataSenderUDP(string destinationIP, int port)
@@ -15,6 +15,14 @@ public partial class DataSenderUDP : IDataSenderUDP
         _udpClient = new UdpClient();
         _port = port;
         _destinationIP = destinationIP;
+        _udpClient.Connect(_destinationIP, _port);
+    }
+
+    public void ChangeConfig(int port)
+    {
+        _port = port;
+        _udpClient.Dispose();
+        _udpClient = new UdpClient();
         _udpClient.Connect(_destinationIP, _port);
     }
 
@@ -60,6 +68,11 @@ public partial class DataSenderUDP
 
     private class MockDataSenderUDP : IDataSenderUDP
     {
+        public void ChangeConfig(int port)
+        {
+            return;
+        }
+
         public Task SendDataAsync(object jsonData)
         {
             return Task.CompletedTask;
@@ -70,6 +83,7 @@ public partial class DataSenderUDP
 
 public interface IDataSenderUDP
 {
+    public void ChangeConfig(int port);
     public Task SendDataAsync(object jsonData);
 }
 

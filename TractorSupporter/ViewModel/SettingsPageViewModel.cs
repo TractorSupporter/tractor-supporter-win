@@ -40,9 +40,11 @@ class SettingsPageViewModel : BaseViewModel
     private IConfigAppJson _configAppJson;
     private IAvoidingService _avoidingService;
     private IAlarmService _alarmService;
+    private IDataSenderUDP _dataSenderUDP;
 
     public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
+        _dataSenderUDP = DataSenderUDP.Instance;
         _alarmService = App.ServiceProvider.GetRequiredService<IAlarmService>();
         _navigationService = NavigationService.Instance;
         _configAppJson = ConfigAppJson.Instance;
@@ -219,6 +221,7 @@ class SettingsPageViewModel : BaseViewModel
         AvoidingDistance = appConfig.AvoidingDistance;
         SelectedLanguage = appConfig.Language;
         SelectedTurnDirection = appConfig.SelectedTurnDirection;
+        
     }
 
     private void SaveSettings(object parameter)
@@ -254,6 +257,7 @@ class SettingsPageViewModel : BaseViewModel
             _receivedDataFormatter.ChangeMode(SelectedSensorType == TypeSensor.Laser);
             _avoidingService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
             _alarmService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
+            _dataSenderUDP.ChangeConfig(portNumber);
 
             _navigationService.NavigateToMain();
         }
