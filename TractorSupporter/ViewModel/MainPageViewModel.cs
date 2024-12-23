@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Xml.Serialization;
 using TractorSupporter.Model;
 using TractorSupporter.Services;
 using TractorSupporter.Services.Interfaces;
@@ -52,7 +49,7 @@ public class MainPageViewModel : BaseViewModel
         _gpsConnectionService.ConnectedToGPSUpdated += OnUpdateConnectionToGPS; 
         ServerThreadService.Instance.UdpDataReceived += OnUdpDataReceived;
         CheckAsyncDataReceiverStatus<byte[]>.Instance.UpdateUdpConnectionStatus += OnUpdateUdpConnectionStatus;
-
+        
         StandbyThreadService.Instance.StartStandby(_port, _useMockData);
     }
 
@@ -160,6 +157,10 @@ public class MainPageViewModel : BaseViewModel
         IsConnected = !IsConnected;
         _settingsVisibilityService.IsSettingsVisible = !IsConnected;
         HistoryVisibilityService.Instance.IsHistoryVisible = !IsConnected;
+
+        _appConfig = ConfigAppJson.Instance.GetConfig();
+        _port = _appConfig.Port;
+
         if (IsConnected)
         {
             StandbyThreadService.Instance.StopStandby();
