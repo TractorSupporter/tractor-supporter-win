@@ -12,7 +12,10 @@ public partial class ConfigAppJson
     readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
     readonly string fileName = "config.json";
 
-    public void CreateJson(string port, string ipAddress, bool isAvoidingMechanismTurnedOn, bool isAlarmMechanismTurnedOn, TypeSensor selectedTypeSensor, int avoidingDistance, int alarmDistance, Language language, TypeTurn selectedTurnDirection)
+    public void CreateJson(string port, string ipAddress, 
+        bool isAvoidingMechanismTurnedOn, bool isAlarmMechanismTurnedOn, 
+        TypeSensor selectedTypeSensor, int avoidingDistance, 
+        int alarmDistance, Language language, TypeTurn selectedTurnDirection, double vehicleWidth = 3.01)
     {
         var config = new AppConfig
         {
@@ -25,7 +28,7 @@ public partial class ConfigAppJson
             AvoidingDistance = avoidingDistance,
             Language = language,
             SelectedTurnDirection = selectedTurnDirection,
-            VehicleWidth = 3.01
+            VehicleWidth = vehicleWidth
         };
 
         string jsonString = JsonSerializer.Serialize(config);

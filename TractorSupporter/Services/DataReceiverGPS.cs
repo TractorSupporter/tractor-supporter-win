@@ -1,17 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
+using TractorSupporter.Model;
 
 namespace TractorSupporter.Services;
     
 public interface IDataReceiverGPS
 {
     public Task StartReceivingAsync(CancellationToken token);
-    public event EventHandler<bool> ReceivedAllowMakingDecision;
+    public event EventHandler<bool> ReceivedAvoidingDecisionState;
 }
 
 public class DataReceiverGPS : IDataReceiverGPS
 {
-    public event EventHandler<bool> ReceivedAllowMakingDecision;
+    public event EventHandler<bool> ReceivedAvoidingDecisionState;
+    public event EventHandler<double> ReceivedVehicleWidth;
     private readonly IGPSConnectionService _gpsConnectionService;
 
     public DataReceiverGPS(IGPSConnectionService gpsConnectionService) 
@@ -33,9 +35,16 @@ public class DataReceiverGPS : IDataReceiverGPS
                         JsonElement dataRoot = data.RootElement;
                         // change this to event! and avoiding service shall subcribe to it (name it: ReceivedAllowMakingDecision)
                         if (dataRoot.TryGetProperty("allowAvoidingDecision", out JsonElement blockAvoidingDecisionElement))
-                            ReceivedAllowMakingDecision.Invoke(this, blockAvoidingDecisionElement.GetBoolean());
-                        else
-                            Console.WriteLine("Failed to recogize the input elements.");
+                        {
+                            ReceivedAvoidingDecisionState.Invoke(this, blockAvoidingDecisionElement.GetBoolean());
+                        }
+                        if (dataRoot.TryGetProperty("vehicleWidth", out JsonElement vehicleWidthElement))
+                        {
+                            AppConfig appConfig = ConfigAppJson.Instance.GetConfig();
+                            ConfigAppJson.Instance.CreateJson(appConfig.Port.ToString(), appConfig.IpAddress, appConfig.IsAvoidingMechanismTurnedOn,
+                                appConfig.IsAlarmMechanismTurnedOn, appConfig.SelectedSensorType, appConfig.AvoidingDistance, appConfig.AlarmDistance,
+                                appConfig.Language, appConfig.SelectedTurnDirection, vehicleWidthElement.GetDouble());
+                        }
                     }
                 }
                 catch (Exception e) 
