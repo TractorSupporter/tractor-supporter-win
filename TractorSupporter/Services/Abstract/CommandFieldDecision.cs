@@ -20,6 +20,7 @@ public abstract class CommandFieldDecision
         var decision = distanceTimes.Count >= minSignalsCount;
         if (decision)
         {
+            
             var max = distanceTimes.Select(x => x.dist).Max();
             var min = distanceTimes.Select(x => x.dist).Min();
 

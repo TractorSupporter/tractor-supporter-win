@@ -29,7 +29,7 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         _senderGPS = dataSenderGPS;
         _logging = loggingService;
         gpsConnection.ConnectedToGPSUpdated += OnConnectionToGPSChanged;
-        _receiverGPS.ReceivedAllowMakingDecision += AllowMakingDecision;
+        _receiverGPS.ReceivedAvoidingDecisionState += AllowMakingDecision;
         _avoidingDistanceTimes = new List<(DateTime, double)>();
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"] ?? "0");
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"] ?? "0");
@@ -47,7 +47,8 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
     public async void OnConnectionToGPSChanged(object? sender, bool isConnected)
     {
         if (isConnected)
-            await _senderGPS.SendData(new { askIfAvoidingAllowed = true });
+            await _senderGPS.SendData(new { askForApplicationState = true });
+
 
     }
 
