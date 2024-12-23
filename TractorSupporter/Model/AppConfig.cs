@@ -13,4 +13,5 @@ public class AppConfig
     public int AvoidingDistance { get; set; }
     public int AlarmDistance { get; set; }
     public Language Language { get; set; }
+    public double VehicleWidth { get; set; } = 3.01; // meters
 }

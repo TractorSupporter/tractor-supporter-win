@@ -24,7 +24,8 @@ public partial class ConfigAppJson
             AlarmDistance = alarmDistance,
             AvoidingDistance = avoidingDistance,
             Language = language,
-            SelectedTurnDirection = selectedTurnDirection
+            SelectedTurnDirection = selectedTurnDirection,
+            VehicleWidth = 3.01
         };
 
         string jsonString = JsonSerializer.Serialize(config);
