@@ -8,6 +8,7 @@ public interface IAvoidingService
 {
     public double AvoidingDistance { get; set; }
     public bool MakeAvoidingDecision(double distanceMeasured);
+    public bool MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed);
     public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
     public void ChangeConfig(bool isLidar);
 }
@@ -25,6 +26,7 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
 
     public AvoidingService(ILoggingService loggingService, IGPSConnectionService gpsConnection, IDataReceiverGPS dataReceiverGPS, IDataSenderGPS dataSenderGPS)
     {
+        InitMeasurements();
         _receiverGPS = dataReceiverGPS;
         _senderGPS = dataSenderGPS;
         _logging = loggingService;
@@ -67,6 +69,29 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
             _minAvoidingSignalsCount
         );
 
+        decision = processDecision(decision);
+
+        return decision;
+    }
+
+    public bool MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed)
+    {
+        bool decision = MakeDecision(
+            distanceMeasured,
+            speed,
+            _avoidingDistanceTimes,
+            AvoidingDistance,
+            _avoidingDistanceSignalValidLifetimeMs,
+            _minAvoidingSignalsCount
+        );
+
+        decision = processDecision(decision);
+
+        return decision;
+    }
+
+    private bool processDecision(bool decision)
+    {
         if (!_avoidingDecisionAllowed)
             return false;
 

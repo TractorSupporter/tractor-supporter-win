@@ -8,12 +8,14 @@ public interface IDataReceiverGPS
 {
     public Task StartReceivingAsync(CancellationToken token);
     public event EventHandler<bool> ReceivedAvoidingDecisionState;
+    public event EventHandler<double> ReceivedVehicleSpeed;
 }
 
 public class DataReceiverGPS : IDataReceiverGPS
 {
     public event EventHandler<bool> ReceivedAvoidingDecisionState;
     public event EventHandler<double> ReceivedVehicleWidth;
+    public event EventHandler<double> ReceivedVehicleSpeed;
     private readonly IGPSConnectionService _gpsConnectionService;
 
     public DataReceiverGPS(IGPSConnectionService gpsConnectionService) 
@@ -44,6 +46,10 @@ public class DataReceiverGPS : IDataReceiverGPS
                             ConfigAppJson.Instance.CreateJson(appConfig.Port.ToString(), appConfig.IpAddress, appConfig.IsAvoidingMechanismTurnedOn,
                                 appConfig.IsAlarmMechanismTurnedOn, appConfig.SelectedSensorType, appConfig.AvoidingDistance, appConfig.AlarmDistance,
                                 appConfig.Language, appConfig.SelectedTurnDirection, vehicleWidthElement.GetDouble());
+                        }
+                        if (dataRoot.TryGetProperty("speed", out JsonElement speedElement))
+                        {
+                            ReceivedVehicleSpeed.Invoke(this, speedElement.GetDouble());
                         }
                     }
                 }

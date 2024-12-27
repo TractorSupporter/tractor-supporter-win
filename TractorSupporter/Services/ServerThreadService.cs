@@ -23,6 +23,7 @@ public partial class ServerThreadService
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
+    private double speed;
 
     public bool IsAvoidingMechanismTurnedOn { get; set; }
     public bool IsAlarmMechanismTurnedOn { get; set; }
@@ -69,6 +70,7 @@ public partial class ServerThreadService
         _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
         _ = _dataReceiverGPS.StartReceivingAsync(token);
+        _dataReceiverGPS.ReceivedVehicleSpeed += ProcessVehicleSpeed;
 
         while (_isConnected && !token.IsCancellationRequested)
         {   
@@ -80,17 +82,36 @@ public partial class ServerThreadService
             ProcessReceivedData(result!);
         }
     }
-    
+
+    private void ProcessVehicleSpeed(object? sender, double speed)
+    {
+        this.speed = speed;
+    }
+
     private void ProcessReceivedData(byte[] receivedBytes)
     {
         string serializedData = Encoding.ASCII.GetString(receivedBytes);
         using (JsonDocument data = JsonDocument.Parse(serializedData))
         {
-            (string extraMessage, double distanceMeasured) = _receivedDataFormatter.Format(data);
+            bool shouldAvoid = false;
+            bool shouldAlarm = false;
+            double distanceMeasured = 0;
+            string extraMessage = "";
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
-            bool shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
-            bool shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
+            if (_receivedDataFormatter.Format(data) is UltrasoundResult ultrasound)
+            {
+                distanceMeasured = ultrasound.DistanceMeasured;
+                extraMessage = ultrasound.ExtraMessage;
+                shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
+                shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
+            }
+            else if (_receivedDataFormatter.Format(data) is LidarResult lidar)
+            {
+                extraMessage = lidar.ExtraMessage;
+                shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(lidar.Measurements, speed) : false;
+                shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(lidar.Measurements, speed) : false;
+            }
 
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new

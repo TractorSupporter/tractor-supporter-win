@@ -3,6 +3,21 @@ using TractorSupporter.Model;
 
 namespace TractorSupporter.Services;
 
+public abstract class FormatterResult
+{
+    public string ExtraMessage { get; set; }
+}
+
+public class UltrasoundResult : FormatterResult
+{
+    public double DistanceMeasured { get; set; }
+}
+
+public class LidarResult : FormatterResult
+{
+    public Dictionary<int, double> Measurements { get; set; }
+}
+
 public interface IReceivedDataFormatter : IInnerReceivedDataFormatter
 {
     public void ChangeMode(bool isLidar);
@@ -10,7 +25,7 @@ public interface IReceivedDataFormatter : IInnerReceivedDataFormatter
 
 public interface IInnerReceivedDataFormatter
 {
-    public (string extraMessage, double distanceMeasured) Format(JsonDocument data);
+    public FormatterResult Format(JsonDocument data);
 }
 
 public class ReceivedDataFormatter : IReceivedDataFormatter
@@ -23,7 +38,7 @@ public class ReceivedDataFormatter : IReceivedDataFormatter
         else innerFormatter = new UltrasoundReceivedDataFormatter();
     }
 
-    public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
+    public FormatterResult Format(JsonDocument data)
     {
         return innerFormatter.Format(data);
     }
@@ -31,13 +46,17 @@ public class ReceivedDataFormatter : IReceivedDataFormatter
 
 public class UltrasoundReceivedDataFormatter : IInnerReceivedDataFormatter
 {
-    public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
+    public FormatterResult Format(JsonDocument data)
     {
         var dataRoot = data.RootElement;
         var extraMessage = dataRoot.GetProperty("extraMessage").GetString() ?? "";
         var distanceMeasured = dataRoot.GetProperty("distanceMeasured").GetDouble();
 
-        return (extraMessage, distanceMeasured);
+        return new UltrasoundResult
+        {
+            ExtraMessage = extraMessage,
+            DistanceMeasured = distanceMeasured
+        };
     }
 }
 
@@ -45,14 +64,14 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 {
     private ConfigAppJson configGetter = ConfigAppJson.Instance;
     private AppConfig appConfig = null;
+    private Dictionary<int, double> measurements;
 
     private const double distanceThreshold = 1000;
-    public (string extraMessage, double distanceMeasured) Format(JsonDocument data)
+    public FormatterResult Format(JsonDocument data)
     {
         appConfig = configGetter.GetConfig();
-
+        this.measurements = new Dictionary<int, double>();
         string message = "";
-        double leastDistance = double.MaxValue;
 
         if (data.RootElement.TryGetProperty("measurements", out JsonElement measurements))
         {
@@ -67,17 +86,15 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
                     continue;
                 }
 
-                double distanceInFront = distance * Math.Cos(angle * Math.PI / 180);
-
-                if (distanceInFront < leastDistance)
-                {
-                    leastDistance = distanceInFront;
-                }
+                this.measurements.Add((int)angle, distance);
             }
         }
 
-        double leastDistanceInCm = (double)(leastDistance / 10);
-        return (message, leastDistanceInCm);
+        return new LidarResult
+        {
+            ExtraMessage = message,
+            Measurements = this.measurements
+        };
     }
 
     private (bool, double, double) ValidateMeasurement(string[] measurementArray, int i)

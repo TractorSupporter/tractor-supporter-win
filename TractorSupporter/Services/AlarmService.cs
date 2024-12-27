@@ -13,6 +13,7 @@ public interface IAlarmService
 {
     public double AlarmDistance { get; set; }
     public bool MakeAlarmDecision(double distanceMeasured);
+    public bool MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed);
     public void ChangeConfig(bool isLidar);
 }
 
@@ -27,6 +28,7 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
 
     public AlarmService(ILoggingService logging)
     {
+        InitMeasurements();
         _loggingService = logging;
         _alarmDistanceTimes = new List<(DateTime, double)>();
         _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
@@ -45,6 +47,23 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
     {
         var decision = MakeDecision(
             distanceMeasured,
+            _alarmDistanceTimes,
+            AlarmDistance,
+            _alarmDistanceSignalValidLifetimeMs,
+            _minAlarmSignalsCount
+        );
+
+        if (decision)
+            _loggingService.AddLog(Model.Enums.DecisionType.Alarm);
+
+        return decision;
+    }
+
+    public bool MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed)
+    {
+        var decision = MakeDecision(
+            distanceMeasured,
+            speed,
             _alarmDistanceTimes,
             AlarmDistance,
             _alarmDistanceSignalValidLifetimeMs,
