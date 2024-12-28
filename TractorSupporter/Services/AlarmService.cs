@@ -25,12 +25,21 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
     private bool _alarmDecisionAllowed;
     private ILoggingService _loggingService;
 
-    public AlarmService(ILoggingService logging)
+    public AlarmService(ILoggingService logging, IDataReceiverGPS _receiverGPS)
     {
+        _receiverGPS.ReceivedAlarmDecisionState += AllowAlarmDecision;
+
         _loggingService = logging;
         _alarmDistanceTimes = new List<(DateTime, double)>();
         _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+
+        _alarmDecisionAllowed = false;
+    }
+
+    public void AllowAlarmDecision(bool decision)
+    {
+        _alarmDecisionAllowed = decision;
     }
 
     public void ChangeConfig(bool isLidar)
@@ -43,6 +52,8 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
 
     public bool MakeAlarmDecision(double distanceMeasured)
     {
+        if (!_alarmDecisionAllowed) return false;
+
         var decision = MakeDecision(
             distanceMeasured,
             _alarmDistanceTimes,
@@ -52,8 +63,10 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
         );
 
         if (decision)
+        {
             _loggingService.AddLog(Model.Enums.DecisionType.Alarm);
-
+            _alarmDecisionAllowed = false;
+        }
         return decision;
     }
 }
