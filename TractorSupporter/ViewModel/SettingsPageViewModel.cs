@@ -258,6 +258,8 @@ class SettingsPageViewModel : BaseViewModel
             _avoidingService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
             _alarmService.ChangeConfig(SelectedSensorType == TypeSensor.Laser);
             _dataSenderUDP.ChangeConfig(portNumber);
+            _alarmService.AlarmDistance = AlarmDistance;
+            _avoidingService.AvoidingDistance = AvoidingDistance;
 
             _navigationService.NavigateToMain();
         }

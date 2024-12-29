@@ -52,8 +52,6 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
 
     public bool MakeAlarmDecision(double distanceMeasured)
     {
-        if (!_alarmDecisionAllowed) return false;
-
         var decision = MakeDecision(
             distanceMeasured,
             _alarmDistanceTimes,
@@ -61,6 +59,8 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
             _alarmDistanceSignalValidLifetimeMs,
             _minAlarmSignalsCount
         );
+
+        if (!_alarmDecisionAllowed) return false;
 
         if (decision)
         {
