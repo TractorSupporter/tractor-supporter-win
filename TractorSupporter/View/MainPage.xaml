@@ -38,24 +38,32 @@
         <Grid Grid.Row="2" Margin="20,50,20,0">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{DynamicResource MainPageConnectionStatusAgOpenGPS}" FontSize="18"/>
-                <TextBlock Text="{Binding IsConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
+                <TextBlock Text="{Binding IsGPSConnected, Converter={StaticResource ConnectionStatusToTextConverter}}" 
                            FontSize="18" Margin="20,0,0,0" 
                            Foreground="{Binding IsGPSConnected, Converter={StaticResource ConnectionStatusToForegroundConverter}}" 
                            FontWeight="Bold"/>
             </StackPanel>
-            <Button 
-                Content="{Binding IsConnected, Converter={StaticResource ConnectionStatusToContentConverter}}" 
-                FontSize="24" Foreground="White" 
-                Margin="0,20,0,0" 
-                Background="{Binding IsConnected, Converter={StaticResource ConnectionStatusToBackgroundConverter}}" 
-                Grid.Column="0" 
-                HorizontalAlignment="Center" 
-                Width="250" 
-                Height="50" 
-                x:Name="ConnectButton"
-                AutomationProperties.AutomationId="ConnectButton"
-                Command="{Binding StartConnectionCommand}"
+            <StackPanel Orientation="Vertical" Margin="0,25,0,0" >
+                <Button 
+                    Content="{Binding IsConnected, Converter={StaticResource ConnectionStatusToContentConverter}}" 
+                    FontSize="24" Foreground="White" 
+                    
+                    Background="{Binding IsConnected, Converter={StaticResource ConnectionStatusToBackgroundConverter}}" 
+                    Grid.Column="0" 
+                    HorizontalAlignment="Center" 
+                    Width="250" 
+                    Height="50" 
+                    x:Name="ConnectButton"
+                    AutomationProperties.AutomationId="ConnectButton"
+                    Command="{Binding StartConnectionCommand}"
                 />
+                <TextBlock 
+                    Text="{Binding InvalidConnectionErrorMessage}" 
+                    Foreground="Red" 
+                    FontSize="16" 
+                    TextAlignment="Center"
+                />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="3" Margin="40,40,40,80">

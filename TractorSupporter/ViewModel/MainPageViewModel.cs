@@ -94,7 +94,15 @@ public class MainPageViewModel : BaseViewModel
         get => _isGPSConnected;
         set { _isGPSConnected = value; OnPropertyChanged(nameof(IsGPSConnected)); }
     }
-    
+
+    private string _invalidConnectionErrorMessage;
+    public string InvalidConnectionErrorMessage
+    {
+        get => _invalidConnectionErrorMessage;
+        set { _invalidConnectionErrorMessage = value; 
+            OnPropertyChanged(nameof(InvalidConnectionErrorMessage)); }
+    }
+
     public ICommand StartConnectionCommand
     {
         get => _startConnectionCommand;
@@ -104,6 +112,8 @@ public class MainPageViewModel : BaseViewModel
             OnPropertyChanged(nameof(StartConnectionCommand));
         }
     }
+
+
 
     private void InitConfig()
     {
@@ -152,8 +162,23 @@ public class MainPageViewModel : BaseViewModel
         udpClient.Send(dataToSend, dataToSend.Length);
     }
 
+    private bool ValidateStartConnection()
+    {
+        return IsUdpConnected;
+    }
+
     private void StartConnection(object parameter)
     {
+        if (!ValidateStartConnection() && !IsConnected)
+        {
+            InvalidConnectionErrorMessage = "Connect to ESP32 first!";
+            return;
+        }
+        else
+        {
+            InvalidConnectionErrorMessage = string.Empty;
+        }
+
         IsConnected = !IsConnected;
         _settingsVisibilityService.IsSettingsVisible = !IsConnected;
         HistoryVisibilityService.Instance.IsHistoryVisible = !IsConnected;
