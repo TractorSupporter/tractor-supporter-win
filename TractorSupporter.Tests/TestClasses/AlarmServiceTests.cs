@@ -16,6 +16,8 @@ namespace TractorSupporter.Tests
         {
             _loggingService = A.Fake<ILoggingService>();
             A.CallTo(() => _loggingService.AddLog(A<DecisionType>.Ignored)).DoesNothing();
+            _loggingService = A.Fake<ILoggingService>();
+            A.CallTo(() => _loggingService.AddLog(A<DecisionType>.Ignored)).DoesNothing();
         }
 
         [Theory]

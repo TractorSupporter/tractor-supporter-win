@@ -8,9 +8,14 @@ public interface IAvoidingService
 {
     public double AvoidingDistance { get; set; }
     public bool MakeAvoidingDecision(double distanceMeasured);
-    public bool MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed);
+    public (bool, double) MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed);
     public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
     public void ChangeConfig(bool isLidar);
+    // do usuniecia
+    public void SetMaxAcceptableError(int error);
+
+    // do usuniecia
+    public void SetLidarMinConfirmationCount(int error);
 }
 
 public partial class AvoidingService: CommandFieldDecision, IAvoidingService
@@ -26,7 +31,7 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
 
     public AvoidingService(ILoggingService loggingService, IGPSConnectionService gpsConnection, IDataReceiverGPS dataReceiverGPS, IDataSenderGPS dataSenderGPS)
     {
-        InitMeasurements();
+        obstacles = new List<Obstacle2D>();
         _receiverGPS = dataReceiverGPS;
         _senderGPS = dataSenderGPS;
         _logging = loggingService;
@@ -37,6 +42,19 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"] ?? "0");
         _avoidingDecisionAllowed = false;
     }
+
+    // do usuniecia
+    public void SetMaxAcceptableError(int error)
+    {
+        _lidarMaxAcceptableError = error;
+    }
+
+    // do usuniecia
+    public void SetLidarMinConfirmationCount(int error)
+    {
+        _lidarMinConfirmationCount = error;
+    }
+
 
     public void ChangeConfig(bool isLidar)
     {
@@ -74,9 +92,9 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         return decision;
     }
 
-    public bool MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed)
+    public (bool, double) MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed)
     {
-        bool decision = MakeDecision(
+        (bool decision, double distance) = MakeDecision(
             distanceMeasured,
             speed,
             _avoidingDistanceTimes,
@@ -87,7 +105,7 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
 
         decision = processDecision(decision);
 
-        return decision;
+        return (decision, distance);
     }
 
     private bool processDecision(bool decision)

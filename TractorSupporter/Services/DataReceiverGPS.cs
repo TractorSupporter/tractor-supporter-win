@@ -8,6 +8,7 @@ public interface IDataReceiverGPS
 {
     public Task StartReceivingAsync(CancellationToken token);
     public event EventHandler<bool> ReceivedAvoidingDecisionState;
+    public event Action<bool> ReceivedAlarmDecisionState;
     public event EventHandler<double> ReceivedVehicleSpeed;
 }
 
@@ -15,6 +16,7 @@ public class DataReceiverGPS : IDataReceiverGPS
 {
     public event EventHandler<bool> ReceivedAvoidingDecisionState;
     public event EventHandler<double> ReceivedVehicleWidth;
+    public event Action<bool> ReceivedAlarmDecisionState;
     public event EventHandler<double> ReceivedVehicleSpeed;
     private readonly IGPSConnectionService _gpsConnectionService;
 
@@ -39,6 +41,10 @@ public class DataReceiverGPS : IDataReceiverGPS
                         if (dataRoot.TryGetProperty("allowAvoidingDecision", out JsonElement blockAvoidingDecisionElement))
                         {
                             ReceivedAvoidingDecisionState.Invoke(this, blockAvoidingDecisionElement.GetBoolean());
+                        }
+                        if (dataRoot.TryGetProperty("allowAlarmDecision", out JsonElement blockAlarmDecisionElement))
+                        {
+                            ReceivedAlarmDecisionState.Invoke(blockAlarmDecisionElement.GetBoolean());
                         }
                         if (dataRoot.TryGetProperty("vehicleWidth", out JsonElement vehicleWidthElement))
                         {

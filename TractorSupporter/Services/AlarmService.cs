@@ -13,26 +13,54 @@ public interface IAlarmService
 {
     public double AlarmDistance { get; set; }
     public bool MakeAlarmDecision(double distanceMeasured);
-    public bool MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed);
+    public (bool, double) MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed);
     public void ChangeConfig(bool isLidar);
+
+    // do usuniecia
+    public void SetMaxAcceptableError(int error);
+
+    // do usuniecia
+    public void SetLidarMinConfirmationCount(int error);
+
 }
 
 public partial class AlarmService: CommandFieldDecision, IAlarmService
 {
     private readonly List<(DateTime, double)> _alarmDistanceTimes;
+
     public double AlarmDistance { get; set; }
     private int _minAlarmSignalsCount;
     private int _alarmDistanceSignalValidLifetimeMs;
     private bool _alarmDecisionAllowed;
     private ILoggingService _loggingService;
 
-    public AlarmService(ILoggingService logging)
+    public AlarmService(ILoggingService logging, IDataReceiverGPS _receiverGPS)
     {
-        InitMeasurements();
+        _receiverGPS.ReceivedAlarmDecisionState += AllowAlarmDecision;
+        obstacles = new List<Obstacle2D>();
         _loggingService = logging;
         _alarmDistanceTimes = new List<(DateTime, double)>();
         _minAlarmSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"]!);
         _alarmDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"]!);
+
+        _alarmDecisionAllowed = false;
+    }
+
+    public void AllowAlarmDecision(bool decision)
+    {
+        _alarmDecisionAllowed = decision;
+    }
+
+    // do usuniecia
+    public void SetMaxAcceptableError(int error)
+    {
+        _lidarMinConfirmationCount = error;
+    }
+
+    // do usuniecia
+    public void SetLidarMinConfirmationCount(int error)
+    {
+        _lidarMaxAcceptableError = error;
     }
 
     public void ChangeConfig(bool isLidar)
@@ -53,15 +81,14 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
             _minAlarmSignalsCount
         );
 
-        if (decision)
-            _loggingService.AddLog(Model.Enums.DecisionType.Alarm);
+        decision = processDecision(decision);
 
         return decision;
     }
 
-    public bool MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed)
+    public (bool, double) MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed)
     {
-        var decision = MakeDecision(
+        (bool decision, double distance) = MakeDecision(
             distanceMeasured,
             speed,
             _alarmDistanceTimes,
@@ -70,8 +97,20 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
             _minAlarmSignalsCount
         );
 
+        decision = processDecision(decision);
+
+        return (decision, distance);
+    }
+
+    private bool processDecision(bool decision)
+    {
+        if (!_alarmDecisionAllowed) return false;
+
         if (decision)
+        {
             _loggingService.AddLog(Model.Enums.DecisionType.Alarm);
+            _alarmDecisionAllowed = false;
+        }
 
         return decision;
     }

@@ -2,6 +2,7 @@
 using System.Text;
 using TractorSupporter.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace TractorSupporter.Services;
 
@@ -80,12 +81,56 @@ public partial class ServerThreadService
             }
 
             ProcessReceivedData(result!);
+            Thread.Sleep(166);
         }
     }
 
     private void ProcessVehicleSpeed(object? sender, double speed)
     {
-        this.speed = speed;
+        // m/s to mm/s
+        this.speed = speed * 1000;
+    }
+
+    private void FormatReceivedData(JsonDocument data, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        if (_receivedDataFormatter.Format(data) is UltrasoundResult ultrasound)
+        {
+            FormatUltrasoundData(ultrasound, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+        }
+        else if (_receivedDataFormatter.Format(data) is LidarResult lidar)
+        {
+            FormatLidarData(lidar, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+        }
+    }
+
+    private void FormatUltrasoundData(UltrasoundResult ultrasound, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        distanceMeasured = ultrasound.DistanceMeasured;
+        extraMessage = ultrasound.ExtraMessage;
+        shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
+        shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
+    }
+
+    private void FormatLidarData(LidarResult lidar, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        extraMessage = lidar.ExtraMessage;
+        if (IsAvoidingMechanismTurnedOn)
+        {
+            (shouldAvoid, distanceMeasured) = _avoidingService.MakeAvoidingDecision(lidar.Measurements, speed);
+        }
+        else
+        {
+            shouldAvoid = false;
+        }
+
+        if (IsAlarmMechanismTurnedOn)
+        {
+            (shouldAvoid, distanceMeasured) = _alarmService.MakeAlarmDecision(lidar.Measurements, speed);
+        }
+        else
+        {
+            shouldAlarm = false;
+        }
     }
 
     private void ProcessReceivedData(byte[] receivedBytes)
@@ -99,19 +144,7 @@ public partial class ServerThreadService
             string extraMessage = "";
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
-            if (_receivedDataFormatter.Format(data) is UltrasoundResult ultrasound)
-            {
-                distanceMeasured = ultrasound.DistanceMeasured;
-                extraMessage = ultrasound.ExtraMessage;
-                shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
-                shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
-            }
-            else if (_receivedDataFormatter.Format(data) is LidarResult lidar)
-            {
-                extraMessage = lidar.ExtraMessage;
-                shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(lidar.Measurements, speed) : false;
-                shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(lidar.Measurements, speed) : false;
-            }
+            FormatReceivedData(data, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
 
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new
