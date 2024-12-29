@@ -2,6 +2,7 @@
 using System.Text;
 using TractorSupporter.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace TractorSupporter.Services;
 
@@ -23,6 +24,7 @@ public partial class ServerThreadService
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
+    private double speed;
 
     public bool IsAvoidingMechanismTurnedOn { get; set; }
     public bool IsAlarmMechanismTurnedOn { get; set; }
@@ -69,6 +71,7 @@ public partial class ServerThreadService
         _ = _dataSenderUDP.SendDataAsync(new { shouldRun = true, config = ConfigAppJson.Instance.GetConfig().SelectedSensorType });
         _ = _gpsConnectionService.Connect();
         _ = _dataReceiverGPS.StartReceivingAsync(token);
+        _dataReceiverGPS.ReceivedVehicleSpeed += ProcessVehicleSpeed;
 
         while (_isConnected && !token.IsCancellationRequested)
         {   
@@ -78,19 +81,70 @@ public partial class ServerThreadService
             }
 
             ProcessReceivedData(result!);
+            Thread.Sleep(166);
         }
     }
-    
+
+    private void ProcessVehicleSpeed(object? sender, double speed)
+    {
+        // m/s to mm/s
+        this.speed = speed * 1000;
+    }
+
+    private void FormatReceivedData(JsonDocument data, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        if (_receivedDataFormatter.Format(data) is UltrasoundResult ultrasound)
+        {
+            FormatUltrasoundData(ultrasound, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+        }
+        else if (_receivedDataFormatter.Format(data) is LidarResult lidar)
+        {
+            FormatLidarData(lidar, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+        }
+    }
+
+    private void FormatUltrasoundData(UltrasoundResult ultrasound, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        distanceMeasured = ultrasound.DistanceMeasured;
+        extraMessage = ultrasound.ExtraMessage;
+        shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
+        shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
+    }
+
+    private void FormatLidarData(LidarResult lidar, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    {
+        extraMessage = lidar.ExtraMessage;
+        if (IsAvoidingMechanismTurnedOn)
+        {
+            (shouldAvoid, distanceMeasured) = _avoidingService.MakeAvoidingDecision(lidar.Measurements, speed);
+        }
+        else
+        {
+            shouldAvoid = false;
+        }
+
+        if (IsAlarmMechanismTurnedOn)
+        {
+            (shouldAvoid, distanceMeasured) = _alarmService.MakeAlarmDecision(lidar.Measurements, speed);
+        }
+        else
+        {
+            shouldAlarm = false;
+        }
+    }
+
     private void ProcessReceivedData(byte[] receivedBytes)
     {
         string serializedData = Encoding.ASCII.GetString(receivedBytes);
         using (JsonDocument data = JsonDocument.Parse(serializedData))
         {
-            (string extraMessage, double distanceMeasured) = _receivedDataFormatter.Format(data);
+            bool shouldAvoid = false;
+            bool shouldAlarm = false;
+            double distanceMeasured = 0;
+            string extraMessage = "";
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
 
-            bool shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeAvoidingDecision(distanceMeasured) : false;
-            bool shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
+            FormatReceivedData(data, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
 
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new

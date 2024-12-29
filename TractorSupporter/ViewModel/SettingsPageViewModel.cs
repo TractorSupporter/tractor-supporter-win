@@ -42,6 +42,10 @@ class SettingsPageViewModel : BaseViewModel
     private IAlarmService _alarmService;
     private IDataSenderUDP _dataSenderUDP;
 
+    // do usuniecia
+    private int _lidarMaxAcceptableError;
+    private int _lidarMinConfirmationCount;
+
     public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
         _dataSenderUDP = DataSenderUDP.Instance;
@@ -55,6 +59,30 @@ class SettingsPageViewModel : BaseViewModel
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
+    }
+
+    // do usuniecia
+    public int LidarMaxAcceptableError
+    {
+        get => _lidarMaxAcceptableError;
+        set
+        {
+            _lidarMaxAcceptableError = value;
+            _alarmService.SetMaxAcceptableError(value);
+            _avoidingService.SetMaxAcceptableError(value);
+        }
+    }
+
+    // do usuniecia
+    public int LidarMinConfirmationCount
+    {
+        get => _lidarMinConfirmationCount;
+        set
+        {
+            _lidarMinConfirmationCount = value;
+            _alarmService.SetLidarMinConfirmationCount(value);
+            _avoidingService.SetLidarMinConfirmationCount(value);
+        }
     }
 
     public Language SelectedLanguage
