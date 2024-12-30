@@ -20,7 +20,7 @@ public class LidarDistanceService: ILidarDistanceService
 {
     //private readonly int _lidarMaxAcceptableError = int.Parse(ConfigurationManager.AppSettings["LidarMaxAcceptableError"] ?? "0");
     //private readonly int _lidarMinConfirmationCount = int.Parse(ConfigurationManager.AppSettings["LidarMinConfirmationCount"] ?? "0");
-    //private readonly int _lidarTimeOfMeasurementLife = int.Parse(ConfigurationManager.AppSettings["LidarMinConfirmationCount"] ?? "0");
+    //private readonly int _lidarTimeOfMeasurementLife = int.Parse(ConfigurationManager.AppSettings["LidarTimeOfMeasurementLife"] ?? "0");
     public int _lidarMaxAcceptableError;
     public int _lidarMinConfirmationCount;
     public int _lidarTimeOfMeasurementLife;
