@@ -13,7 +13,7 @@ public interface IAlarmService
 {
     public double AlarmDistance { get; set; }
     public bool MakeAlarmDecision(double distanceMeasured);
-    public (bool, double) MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed);
+    public bool MakeLidarAlarmDecision(double distanceMeasured);
     public void ChangeConfig(bool isLidar);
 
     // do usuniecia
@@ -86,20 +86,16 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
         return decision;
     }
 
-    public (bool, double) MakeAlarmDecision(Dictionary<int, double> distanceMeasured, double speed)
+    public bool MakeLidarAlarmDecision(double distanceMeasured)
     {
-        (bool decision, double distance) = MakeDecision(
+        bool decision = MakeDecision(
             distanceMeasured,
-            speed,
-            _alarmDistanceTimes,
-            AlarmDistance,
-            _alarmDistanceSignalValidLifetimeMs,
-            _minAlarmSignalsCount
+            AlarmDistance
         );
 
         decision = processDecision(decision);
 
-        return (decision, distance);
+        return decision;
     }
 
     private bool processDecision(bool decision)

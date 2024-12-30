@@ -8,7 +8,7 @@ public interface IAvoidingService
 {
     public double AvoidingDistance { get; set; }
     public bool MakeAvoidingDecision(double distanceMeasured);
-    public (bool, double) MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed);
+    public bool MakeLidarAvoidingDecision(double distanceMeasured);
     public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
     public void ChangeConfig(bool isLidar);
     // do usuniecia
@@ -92,20 +92,16 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         return decision;
     }
 
-    public (bool, double) MakeAvoidingDecision(Dictionary<int, double> distanceMeasured, double speed)
+    public bool MakeLidarAvoidingDecision(double distanceMeasured)
     {
-        (bool decision, double distance) = MakeDecision(
+        bool decision = MakeDecision(
             distanceMeasured,
-            speed,
-            _avoidingDistanceTimes,
-            AvoidingDistance,
-            _avoidingDistanceSignalValidLifetimeMs,
-            _minAvoidingSignalsCount
+            AvoidingDistance
         );
 
         decision = processDecision(decision);
 
-        return (decision, distance);
+        return decision;
     }
 
     private bool processDecision(bool decision)

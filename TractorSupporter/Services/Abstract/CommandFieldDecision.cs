@@ -8,6 +8,7 @@ public abstract class CommandFieldDecision
     private readonly int _minDistance = int.Parse(ConfigurationManager.AppSettings["MinDistance"] ?? "0");
     //private readonly int _lidarMaxAcceptableError = int.Parse(ConfigurationManager.AppSettings["LidarMaxAcceptableError"] ?? "0");
     //private readonly int _lidarMinConfirmationCount = int.Parse(ConfigurationManager.AppSettings["LidarMinConfirmationCount"] ?? "0");
+    //private readonly int _lidarTimeOfMeasurementLife = int.Parse(ConfigurationManager.AppSettings["LidarMinConfirmationCount"] ?? "0");
     public int _lidarMaxAcceptableError;
     public int _lidarMinConfirmationCount;
 
@@ -38,83 +39,11 @@ public abstract class CommandFieldDecision
         else return false;
     }
 
-    public (bool, double) MakeDecision(Dictionary<int, double> newMeasurements, double speed, List<(DateTime time, double dist)> distanceTimes, double distance, int validLifetimeMs, int minSignalsCount)
+    public bool MakeDecision(double distanceMeasured, double distance)
     {
-        var currentTime = DateTime.Now;
+        if (distanceMeasured <= distance && distance >= _minDistance)
+            return true;
 
-        foreach (var obs in obstacles)
-        {
-            double dt = (currentTime - obs.LastUpdateTime).TotalSeconds;
-            obs.Y -= speed * dt;
-        }
-
-        List<Obstacle2D> newObstacles = new List<Obstacle2D>();
-
-        foreach (var (angle, measurement) in newMeasurements)
-        {
-            if (measurement <= 0)
-            {
-                continue;
-            }
-
-            double angleRad = angle * (Math.PI / 180);
-            double x = Math.Sin(angleRad) * measurement;
-            double y = Math.Cos(angleRad) * measurement;
-
-            Obstacle2D bestObstacle = null;
-            double bestDistance = double.MaxValue;
-
-            foreach (Obstacle2D obstacle in obstacles)
-            {
-                double dx = x - obstacle.X;
-                double dy = y - obstacle.Y;
-                double dist = Math.Sqrt(dx * dx + dy * dy);
-
-                if (dist < bestDistance)
-                {
-                    bestDistance = dist;
-                    bestObstacle = obstacle;
-                }
-            }
-
-            if (bestDistance < _lidarMaxAcceptableError && bestObstacle != null)
-            {
-                bestObstacle.X = x;
-                bestObstacle.Y = y;
-                bestObstacle.ConfirmCount++;
-            }
-            else
-            {
-                newObstacles.Add(new Obstacle2D(x, y, currentTime));
-            }
-        }
-
-        obstacles.AddRange(newObstacles);
-
-        obstacles.RemoveAll(o => (currentTime - o.LastUpdateTime).TotalSeconds > 1);
-        obstacles.RemoveAll(o => o.Y < 0);
-
-        double closestObstacleDistance = double.MaxValue;
-        Obstacle2D closestObstacle = null;
-
-        foreach (var obs in obstacles)
-        {
-            if (obs.ConfirmCount >= _lidarMinConfirmationCount)
-            {
-                double distanceToObstacle = Math.Sqrt(obs.X * obs.X + obs.Y * obs.Y); 
-                if (distanceToObstacle < closestObstacleDistance)
-                {
-                    closestObstacle = obs;
-                    closestObstacleDistance = distanceToObstacle;
-                }
-            }
-        }
-
-        if (closestObstacle != null)
-        {
-            return (true, closestObstacleDistance / 10);
-        }
-
-        return (false, 0);
+        return false;
     }
 }

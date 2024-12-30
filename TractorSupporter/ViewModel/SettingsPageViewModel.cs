@@ -41,10 +41,13 @@ class SettingsPageViewModel : BaseViewModel
     private IAvoidingService _avoidingService;
     private IAlarmService _alarmService;
     private IDataSenderUDP _dataSenderUDP;
+    // do usuniecia
+    private ILidarDistanceService _lidarDistanceService;
 
     // do usuniecia
     private int _lidarMaxAcceptableError;
     private int _lidarMinConfirmationCount;
+    private int _lidarMinTime;
 
     public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
@@ -56,6 +59,7 @@ class SettingsPageViewModel : BaseViewModel
         _mockDataReceiver = App.ServiceProvider.GetRequiredService<IMockDataReceiver>();
         _receivedDataFormatter = receivedDataFormatter;
         _avoidingService = App.ServiceProvider.GetRequiredService<IAvoidingService>();
+        _lidarDistanceService = App.ServiceProvider.GetRequiredService<ILidarDistanceService>();
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
@@ -70,6 +74,7 @@ class SettingsPageViewModel : BaseViewModel
             _lidarMaxAcceptableError = value;
             _alarmService.SetMaxAcceptableError(value);
             _avoidingService.SetMaxAcceptableError(value);
+            _lidarDistanceService.setLidarMax(value);
         }
     }
 
@@ -82,6 +87,19 @@ class SettingsPageViewModel : BaseViewModel
             _lidarMinConfirmationCount = value;
             _alarmService.SetLidarMinConfirmationCount(value);
             _avoidingService.SetLidarMinConfirmationCount(value);
+            _lidarDistanceService.setLidarMin(value);
+
+        }
+    }
+
+    public int LidarMinTime
+    {
+        get => _lidarMinTime;
+        set
+        {
+            _lidarMinTime = value;
+            _lidarDistanceService.setLidarTime(value);
+
         }
     }
 
