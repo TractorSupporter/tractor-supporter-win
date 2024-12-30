@@ -13,7 +13,7 @@ public interface ILidarDistanceService
     public void setLidarMin(int value);
     public void setLidarTime(int value);
 
-    public double FindClosestDistance(Dictionary<double, double> newMeasurements, double speed);
+    public double FindClosestDistance(Dictionary<double, double> newMeasurements, double speed, ref double closestAngle);
 }
 
 public class LidarDistanceService: ILidarDistanceService
@@ -41,7 +41,7 @@ public class LidarDistanceService: ILidarDistanceService
         _lidarTimeOfMeasurementLife = value;
     }
 
-    public double FindClosestDistance(Dictionary<double, double> newMeasurements, double speed)
+    public double FindClosestDistance(Dictionary<double, double> newMeasurements, double speed, ref double closestAngle)
     {
         var currentTime = DateTime.Now;
 
@@ -78,6 +78,7 @@ public class LidarDistanceService: ILidarDistanceService
                 {
                     bestDistance = dist;
                     bestObstacle = obstacle;
+                    closestAngle = angle;
                 }
             }
 

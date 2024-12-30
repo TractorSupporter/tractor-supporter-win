@@ -3,5 +3,6 @@
 public enum TypeTurn
 {
     Left,
-    Right
+    Right,
+    Auto
 }

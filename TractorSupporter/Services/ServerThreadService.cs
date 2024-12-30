@@ -3,6 +3,7 @@ using System.Text;
 using TractorSupporter.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using TractorSupporter.Model.Enums;
 
 namespace TractorSupporter.Services;
 
@@ -93,7 +94,7 @@ public partial class ServerThreadService
         this.speed = speed * 1000;
     }
 
-    private void FormatReceivedData(JsonDocument data, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    private void FormatReceivedData(JsonDocument data, ref double angle, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
     {
         if (_receivedDataFormatter.Format(data) is UltrasoundResult ultrasound)
         {
@@ -101,7 +102,7 @@ public partial class ServerThreadService
         }
         else if (_receivedDataFormatter.Format(data) is LidarResult lidar)
         {
-            FormatLidarData(lidar, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+            FormatLidarData(lidar, ref angle, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
         }
     }
 
@@ -113,10 +114,10 @@ public partial class ServerThreadService
         shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeAlarmDecision(distanceMeasured) : false;
     }
 
-    private void FormatLidarData(LidarResult lidar, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
+    private void FormatLidarData(LidarResult lidar, ref double angle, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
     {
         extraMessage = lidar.ExtraMessage;
-        distanceMeasured = _lidarDistanceService.FindClosestDistance(lidar.Measurements, speed);
+        distanceMeasured = _lidarDistanceService.FindClosestDistance(lidar.Measurements, speed, ref angle);
         shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeLidarAvoidingDecision(distanceMeasured) : false;
         shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeLidarAlarmDecision(distanceMeasured) : false;
     }
@@ -131,13 +132,17 @@ public partial class ServerThreadService
             double distanceMeasured = 0;
             string extraMessage = "";
             string ipSender = _dataReceiverESP.GetRemoteIpAddress();
-
-            FormatReceivedData(data, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+            
+            double angle = 0;
+            FormatReceivedData(data, ref angle, ref distanceMeasured, ref extraMessage, ref shouldAvoid, ref shouldAlarm);
+            TypeTurn turnDirection = GetTurnDirection(angle > 0);
+            
 
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _ = _dataSenderGPS.SendData(new
                 {
-                    turnDirection = ConfigAppJson.Instance.GetConfig().SelectedTurnDirection,
+                    angle,
+                    turnDirection,
                     shouldAvoid,
                     shouldAlarm,
                     distanceMeasured
@@ -149,6 +154,14 @@ public partial class ServerThreadService
                 UdpDataReceived?.Invoke(this, new UdpDataReceivedEventArgs(ipSender, extraMessage, distanceMeasured));
             });
         }
+    }
+
+    private TypeTurn GetTurnDirection(bool isTurnLeft)
+    {
+        if (ConfigAppJson.Instance.GetConfig().SelectedTurnDirection == TypeTurn.Auto)
+            return isTurnLeft ? TypeTurn.Left : TypeTurn.Right;
+        else
+            return ConfigAppJson.Instance.GetConfig().SelectedTurnDirection;
     }
 }
 
