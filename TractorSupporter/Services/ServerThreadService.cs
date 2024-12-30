@@ -21,6 +21,7 @@ public partial class ServerThreadService
     private IDataSenderGPS _dataSenderGPS;
     private IDataSenderUDP _dataSenderUDP;
     private IReceivedDataFormatter _receivedDataFormatter;
+    private ILidarDistanceService _lidarDistanceService;
     private CheckAsyncDataReceiverStatus<byte[]> _checkDataReceiverStatus;
     private CancellationTokenSource _cancellationTokenSource;
     private int _currentPort;
@@ -31,11 +32,12 @@ public partial class ServerThreadService
 
     public bool IsConnected => _isConnected;
 
-    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection, IReceivedDataFormatter receivedDataFormatter, IMockDataReceiver mockDataReceiver) 
+    public ServerThreadService(IAvoidingService avoiding, IAlarmService alarm, IGPSConnectionService gpsConnection, IReceivedDataFormatter receivedDataFormatter, IMockDataReceiver mockDataReceiver, ILidarDistanceService lidarDistanceService) 
     {
         _mockDataReceiver = mockDataReceiver;
         _receivedDataFormatter = receivedDataFormatter;
         _gpsConnectionService = gpsConnection;
+        _lidarDistanceService = lidarDistanceService;
         _alarmService = alarm;
         _avoidingService = avoiding;
         _checkDataReceiverStatus = CheckAsyncDataReceiverStatus<byte[]>.Instance;
@@ -114,23 +116,9 @@ public partial class ServerThreadService
     private void FormatLidarData(LidarResult lidar, ref double distanceMeasured, ref string extraMessage, ref bool shouldAvoid, ref bool shouldAlarm)
     {
         extraMessage = lidar.ExtraMessage;
-        if (IsAvoidingMechanismTurnedOn)
-        {
-            (shouldAvoid, distanceMeasured) = _avoidingService.MakeAvoidingDecision(lidar.Measurements, speed);
-        }
-        else
-        {
-            shouldAvoid = false;
-        }
-
-        if (IsAlarmMechanismTurnedOn)
-        {
-            (shouldAvoid, distanceMeasured) = _alarmService.MakeAlarmDecision(lidar.Measurements, speed);
-        }
-        else
-        {
-            shouldAlarm = false;
-        }
+        distanceMeasured = _lidarDistanceService.FindClosestDistance(lidar.Measurements, speed);
+        shouldAvoid = IsAvoidingMechanismTurnedOn ? _avoidingService.MakeLidarAvoidingDecision(distanceMeasured) : false;
+        shouldAlarm = IsAlarmMechanismTurnedOn ? _alarmService.MakeLidarAlarmDecision(distanceMeasured) : false;
     }
 
     private void ProcessReceivedData(byte[] receivedBytes)
@@ -171,8 +159,10 @@ public partial class ServerThreadService
         App.ServiceProvider.GetRequiredService<IAvoidingService>(),
         App.ServiceProvider.GetRequiredService<IAlarmService>(),
         App.ServiceProvider.GetRequiredService<IGPSConnectionService>(),
-        App.ServiceProvider.GetRequiredService<IReceivedDataFormatter>(), 
-        App.ServiceProvider.GetRequiredService<IMockDataReceiver>()));
+        App.ServiceProvider.GetRequiredService<IReceivedDataFormatter>(),
+        App.ServiceProvider.GetRequiredService<IMockDataReceiver>(),
+        App.ServiceProvider.GetRequiredService<ILidarDistanceService>()
+        ));
         
     public static ServerThreadService Instance => _lazyInstance.Value;
     

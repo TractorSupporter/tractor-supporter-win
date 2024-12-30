@@ -15,7 +15,7 @@ public class UltrasoundResult : FormatterResult
 
 public class LidarResult : FormatterResult
 {
-    public Dictionary<int, double> Measurements { get; set; }
+    public Dictionary<double, double> Measurements { get; set; }
 }
 
 public interface IReceivedDataFormatter : IInnerReceivedDataFormatter
@@ -64,13 +64,13 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
 {
     private ConfigAppJson configGetter = ConfigAppJson.Instance;
     private AppConfig appConfig = null;
-    private Dictionary<int, double> measurements;
+    private Dictionary<double, double> measurements;
 
     private const double distanceThreshold = 1000;
     public FormatterResult Format(JsonDocument data)
     {
         appConfig = configGetter.GetConfig();
-        this.measurements = new Dictionary<int, double>();
+        this.measurements = new Dictionary<double, double>();
         string message = "";
 
         if (data.RootElement.TryGetProperty("measurements", out JsonElement measurements))
@@ -86,7 +86,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
                     continue;
                 }
 
-                this.measurements.Add((int)angle, distance);
+                this.measurements.Add(angle, distance);
             }
         }
 
