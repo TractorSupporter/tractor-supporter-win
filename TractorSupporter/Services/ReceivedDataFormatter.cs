@@ -86,6 +86,7 @@ public class LidarReceivedDataFormatter : IInnerReceivedDataFormatter
                     continue;
                 }
 
+                if(!this.measurements.ContainsKey(angle))
                 this.measurements.Add(angle, distance);
             }
         }
