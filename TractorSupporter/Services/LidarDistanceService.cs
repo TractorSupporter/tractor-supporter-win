@@ -9,6 +9,9 @@ namespace TractorSupporter.Services;
 
 public interface ILidarDistanceService
 {
+    public int _lidarMaxAcceptableError { get; set; }
+    public int _lidarMinConfirmationCount { get; set; }
+    public int _lidarTimeOfMeasurementLife { get; set; }
     public void setLidarMax(int value);
     public void setLidarMin(int value);
     public void setLidarTime(int value);
@@ -21,9 +24,9 @@ public class LidarDistanceService: ILidarDistanceService
     //private readonly int _lidarMaxAcceptableError = int.Parse(ConfigurationManager.AppSettings["LidarMaxAcceptableError"] ?? "0");
     //private readonly int _lidarMinConfirmationCount = int.Parse(ConfigurationManager.AppSettings["LidarMinConfirmationCount"] ?? "0");
     //private readonly int _lidarTimeOfMeasurementLife = int.Parse(ConfigurationManager.AppSettings["LidarTimeOfMeasurementLife"] ?? "0");
-    public int _lidarMaxAcceptableError;
-    public int _lidarMinConfirmationCount;
-    public int _lidarTimeOfMeasurementLife;
+    public int _lidarMaxAcceptableError { get; set; }
+    public int _lidarMinConfirmationCount { get; set; }
+    public int _lidarTimeOfMeasurementLife { get; set; }
     public List<Obstacle2D> obstacles = new List<Obstacle2D>();
 
     public void setLidarMax(int value)
