@@ -19,7 +19,6 @@ namespace TractorSupporter.ViewModel
     public class StarterPageViewModel: BaseViewModel
     {
         private string _port;
-        private string _ipAddress;
         private string _portValidationMessage;
         private string _ipValidationMessage;
         private ICommand _forwardCommand;
@@ -49,7 +48,6 @@ namespace TractorSupporter.ViewModel
             string hostName = Dns.GetHostName();
             string myIP = Dns.GetHostEntry(hostName)
                 .AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
-            IpAddress = myIP;
         }
 
         public bool IsSettingsVisible
@@ -71,16 +69,6 @@ namespace TractorSupporter.ViewModel
             {
                 _port = value;
                 OnPropertyChanged(nameof(Port));
-            }
-        }
-
-        public string IpAddress
-        {
-            get => _ipAddress;
-            set
-            {
-                _ipAddress = value;
-                OnPropertyChanged(nameof(IpAddress));
             }
         }
 
@@ -139,20 +127,9 @@ namespace TractorSupporter.ViewModel
                 isValid = false;
             }
 
-            if (IPAddress.TryParse(IpAddress, out _))
-            {
-                IpValidationMessage = string.Empty;
-            }
-            else
-            {
-                IpValidationMessage = "IP address is invalid.";
-                isValid = false;
-            }
-
             if (isValid)
             {
                 _configAppJson.CreateJson(Port,
-                    IpAddress,
                     true,
                     true,
                     TypeSensor.Ultrasonic,

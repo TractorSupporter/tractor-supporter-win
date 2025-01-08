@@ -16,12 +16,6 @@ public interface IAlarmService
     public bool MakeLidarAlarmDecision(double distanceMeasured);
     public void ChangeConfig(bool isLidar);
 
-    // do usuniecia
-    public void SetMaxAcceptableError(int error);
-
-    // do usuniecia
-    public void SetLidarMinConfirmationCount(int error);
-
 }
 
 public partial class AlarmService: CommandFieldDecision, IAlarmService
@@ -49,18 +43,6 @@ public partial class AlarmService: CommandFieldDecision, IAlarmService
     public void AllowAlarmDecision(bool decision)
     {
         _alarmDecisionAllowed = decision;
-    }
-
-    // do usuniecia
-    public void SetMaxAcceptableError(int error)
-    {
-        _lidarMinConfirmationCount = error;
-    }
-
-    // do usuniecia
-    public void SetLidarMinConfirmationCount(int error)
-    {
-        _lidarMaxAcceptableError = error;
     }
 
     public void ChangeConfig(bool isLidar)

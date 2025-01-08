@@ -11,8 +11,5 @@
         <TextBlock Text="{DynamicResource Port}" HorizontalAlignment="Center" FontSize="16" Margin="0,20,0,5"/>
         <TextBox Name="PortTextBox" Background="White" Width="300" Height="25" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.AutomationId="PortTextBox"/>
         <TextBlock Text="{Binding PortValidationMessage}" Foreground="Red" HorizontalAlignment="Left" Margin="0,5,0,0" AutomationProperties.AutomationId="PortTextBoxError"/>
-        <TextBlock Text="{DynamicResource YourIP}" HorizontalAlignment="Center" FontSize="16" Margin="0,20,0,5"/>
-        <TextBox Name="IpTextBox" Background="White" Width="300" Height="25" Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.AutomationId="IpTextBox"/>
-        <TextBlock Text="{Binding IpValidationMessage}" Foreground="Red" HorizontalAlignment="Left" Margin="0,5,0,0" AutomationProperties.AutomationId="IpTextBoxError"/>
     </StackPanel>
 </UserControl>

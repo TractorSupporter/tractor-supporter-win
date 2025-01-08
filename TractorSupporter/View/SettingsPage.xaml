@@ -26,11 +26,6 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="75"/>
                         <RowDefinition Height="30"/>
-                        <RowDefinition Height="100"/>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="100"/>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="100"/>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,50,0,0" Grid.ColumnSpan="2">
@@ -44,16 +39,6 @@
                             <ComboBoxItem Content="{DynamicResource SettingsPolish}" Tag="{x:Static enums:Language.Polish}"/>
                         </ComboBox>
                     </Grid>
-
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Lidar Max Acceptable Error"/>
-                    <TextBox Grid.Row="2" Background="White" Width="300" Height="25" Text="{Binding LidarMaxAcceptableError, UpdateSourceTrigger=PropertyChanged}"/>
-
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Lidar Min Confirmation Count"/>
-                    <TextBox Grid.Row="4" Background="White" Width="300" Height="25" Text="{Binding LidarMinConfirmationCount, UpdateSourceTrigger=PropertyChanged}"/>
-
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="Time Life of Measurement"/>
-                    <TextBox Grid.Row="6" Background="White" Width="300" Height="25" Text="{Binding LidarMinTime, UpdateSourceTrigger=PropertyChanged}"/>
-
                 </Grid>
             </TabItem>
             <TabItem Header="{DynamicResource SettingsBehaviourTabSetting}">
