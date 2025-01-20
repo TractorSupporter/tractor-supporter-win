@@ -84,7 +84,6 @@ public partial class ServerThreadService
             }
 
             ProcessReceivedData(result!);
-            Thread.Sleep(166);
         }
     }
 

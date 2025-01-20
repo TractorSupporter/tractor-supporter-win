@@ -133,7 +133,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="300">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="300" Visibility="Hidden">
                             <TextBlock Text="{DynamicResource SettingsSelectSensorType}" FontSize="20" Margin="0,0,0,10" />
 
                             <RadioButton Content="{DynamicResource SettingsUltrasonic}" 
