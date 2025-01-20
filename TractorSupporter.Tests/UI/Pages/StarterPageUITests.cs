@@ -36,9 +36,7 @@ public class StarterPageUITests : IDisposable
         // Arrange
         connectButton = UITestHelpers.FindElementByIdAndAssert(mainWindow, "Accept").AsButton();
         portTextBox = UITestHelpers.FindElementByIdAndAssert(mainWindow, "PortTextBox").AsTextBox();
-        ipTextBox = UITestHelpers.FindElementByIdAndAssert(mainWindow, "IpTextBox").AsTextBox();
         portTextBoxError = UITestHelpers.FindElementByIdAndAssert(mainWindow, "PortTextBoxError").AsTextBox();
-        ipTextBoxError = UITestHelpers.FindElementByIdAndAssert(mainWindow, "IpTextBoxError").AsTextBox();
     }
 
     public void Dispose()
@@ -52,14 +50,12 @@ public class StarterPageUITests : IDisposable
 
 
     [Theory]
-    [InlineData("", "", UITestHelpers.PORT_EXPECTED_ERROR, UITestHelpers.IP_EXPECTED_ERROR)]
-    [InlineData("80", "", "", UITestHelpers.IP_EXPECTED_ERROR)]
-    [InlineData("", "0.0.0.0", UITestHelpers.PORT_EXPECTED_ERROR, "")]
-    public void MoveNext_ChangesButtonState(string portInput, string ipInput, string portExpectedError, string ipExpectedError)
+    [InlineData("", UITestHelpers.PORT_EXPECTED_ERROR)]
+    [InlineData("80", "")]
+    public void MoveNext_ChangesButtonState(string portInput, string portExpectedError)
     {
         Thread.Sleep(1000);
         portTextBox.Enter(portInput);
-        ipTextBox.Enter(ipInput);
 
         // Act
         Thread.Sleep(1000);
@@ -69,7 +65,6 @@ public class StarterPageUITests : IDisposable
         // Assert
         Thread.Sleep(1000);
         Assert.Equal(portExpectedError, portTextBoxError.Properties.Name.Value);
-        Assert.Equal(ipExpectedError, ipTextBoxError.Properties.Name.Value);
         Dispose();
     }
 }
