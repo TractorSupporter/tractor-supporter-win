@@ -31,7 +31,6 @@ public class MainPageViewModel : BaseViewModel
     private SettingsVisibilityService _settingsVisibilityService;
     private AppConfig _appConfig;
     private int _port;
-    private string _ipAddress;
     private bool _isAvoidingMechanismTurnedOn;
     private bool _isAlarmMechanismTurnedOn;
 

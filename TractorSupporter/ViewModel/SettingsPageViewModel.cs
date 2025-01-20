@@ -21,7 +21,6 @@ namespace TractorSupporter.ViewModel;
 class SettingsPageViewModel : BaseViewModel
 {
     private string _port;
-    private string _ipAddress;
     private string _portValidationMessage;
     private string _ipValidationMessage;
     private bool _avoidingMechanismIsChecked;
@@ -41,13 +40,7 @@ class SettingsPageViewModel : BaseViewModel
     private IAvoidingService _avoidingService;
     private IAlarmService _alarmService;
     private IDataSenderUDP _dataSenderUDP;
-    // do usuniecia
-    private ILidarDistanceService _lidarDistanceService;
 
-    // do usuniecia
-    private int _lidarMaxAcceptableError;
-    private int _lidarMinConfirmationCount;
-    private int _lidarMinTime;
 
     public SettingsPageViewModel(IReceivedDataFormatter receivedDataFormatter)
     {
@@ -59,52 +52,9 @@ class SettingsPageViewModel : BaseViewModel
         _mockDataReceiver = App.ServiceProvider.GetRequiredService<IMockDataReceiver>();
         _receivedDataFormatter = receivedDataFormatter;
         _avoidingService = App.ServiceProvider.GetRequiredService<IAvoidingService>();
-        _lidarDistanceService = App.ServiceProvider.GetRequiredService<ILidarDistanceService>();
-
-        LidarMaxAcceptableError = _lidarDistanceService._lidarMaxAcceptableError;
-        LidarMinConfirmationCount = _lidarDistanceService._lidarMinConfirmationCount;
-        LidarMinTime = _lidarDistanceService._lidarTimeOfMeasurementLife;
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
-    }
-
-    // do usuniecia
-    public int LidarMaxAcceptableError
-    {
-        get => _lidarMaxAcceptableError;
-        set
-        {
-            _lidarMaxAcceptableError = value;
-            _alarmService.SetMaxAcceptableError(value);
-            _avoidingService.SetMaxAcceptableError(value);
-            _lidarDistanceService.setLidarMax(value);
-        }
-    }
-
-    // do usuniecia
-    public int LidarMinConfirmationCount
-    {
-        get => _lidarMinConfirmationCount;
-        set
-        {
-            _lidarMinConfirmationCount = value;
-            _alarmService.SetLidarMinConfirmationCount(value);
-            _avoidingService.SetLidarMinConfirmationCount(value);
-            _lidarDistanceService.setLidarMin(value);
-
-        }
-    }
-
-    public int LidarMinTime
-    {
-        get => _lidarMinTime;
-        set
-        {
-            _lidarMinTime = value;
-            _lidarDistanceService.setLidarTime(value);
-
-        }
     }
 
     public Language SelectedLanguage
@@ -209,16 +159,6 @@ class SettingsPageViewModel : BaseViewModel
         }
     }
 
-    public string IpAddress
-    {
-        get => _ipAddress;
-        set
-        {
-            _ipAddress = value;
-            OnPropertyChanged(nameof(IpAddress));
-        }
-    }
-
     public string PortValidationMessage
     {
         get => _portValidationMessage;
@@ -263,7 +203,6 @@ class SettingsPageViewModel : BaseViewModel
     {
         AppConfig appConfig = _configAppJson.ReadJson();
         Port = appConfig.Port.ToString();
-        IpAddress = appConfig.IpAddress;
         AvoidingMechanismIsChecked = appConfig.IsAvoidingMechanismTurnedOn;
         AlarmMechanismIsChecked = appConfig.IsAlarmMechanismTurnedOn;
         SelectedSensorType = appConfig.SelectedSensorType;
@@ -288,19 +227,9 @@ class SettingsPageViewModel : BaseViewModel
             isValid = false;
         }
 
-        if (IPAddress.TryParse(IpAddress, out _))
-        {
-            IpValidationMessage = string.Empty;
-        }
-        else
-        {
-            IpValidationMessage = "IP address is invalid.";
-            isValid = false;
-        }
-
         if (isValid)
         {
-            _configAppJson.CreateJson(Port, IpAddress, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage, SelectedTurnDirection);
+            _configAppJson.CreateJson(Port, AvoidingMechanismIsChecked, AlarmMechanismIsChecked, SelectedSensorType, AvoidingDistance, AlarmDistance, SelectedLanguage, SelectedTurnDirection);
             _configAppJson.ReadJson();
             _languageService.ChangeLanguage(SelectedLanguage);
             _mockDataReceiver.ChangeInnerMock(SelectedSensorType == TypeSensor.Laser);

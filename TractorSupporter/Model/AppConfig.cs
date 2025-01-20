@@ -5,7 +5,6 @@ namespace TractorSupporter.Model;
 public class AppConfig
 {
     public int Port { get; set; }
-    public string IpAddress { get; set; }
     public bool IsAvoidingMechanismTurnedOn { get; set; }
     public bool IsAlarmMechanismTurnedOn { get; set; }
     public TypeSensor SelectedSensorType { get; set; }

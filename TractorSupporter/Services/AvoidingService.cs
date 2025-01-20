@@ -11,11 +11,6 @@ public interface IAvoidingService
     public bool MakeLidarAvoidingDecision(double distanceMeasured);
     public void AllowMakingDecision(object? sender, bool shouldAllowMakingDecision);
     public void ChangeConfig(bool isLidar);
-    // do usuniecia
-    public void SetMaxAcceptableError(int error);
-
-    // do usuniecia
-    public void SetLidarMinConfirmationCount(int error);
 }
 
 public partial class AvoidingService: CommandFieldDecision, IAvoidingService
@@ -41,18 +36,6 @@ public partial class AvoidingService: CommandFieldDecision, IAvoidingService
         _minAvoidingSignalsCount = int.Parse(ConfigurationManager.AppSettings["MinSignalsCount"] ?? "0");
         _avoidingDistanceSignalValidLifetimeMs = int.Parse(ConfigurationManager.AppSettings["SignalValidLifetimeMs"] ?? "0");
         _avoidingDecisionAllowed = false;
-    }
-
-    // do usuniecia
-    public void SetMaxAcceptableError(int error)
-    {
-        _lidarMaxAcceptableError = error;
-    }
-
-    // do usuniecia
-    public void SetLidarMinConfirmationCount(int error)
-    {
-        _lidarMinConfirmationCount = error;
     }
 
 

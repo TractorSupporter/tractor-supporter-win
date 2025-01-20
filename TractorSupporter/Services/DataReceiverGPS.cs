@@ -49,7 +49,7 @@ public class DataReceiverGPS : IDataReceiverGPS
                         if (dataRoot.TryGetProperty("vehicleWidth", out JsonElement vehicleWidthElement))
                         {
                             AppConfig appConfig = ConfigAppJson.Instance.GetConfig();
-                            ConfigAppJson.Instance.CreateJson(appConfig.Port.ToString(), appConfig.IpAddress, appConfig.IsAvoidingMechanismTurnedOn,
+                            ConfigAppJson.Instance.CreateJson(appConfig.Port.ToString(), appConfig.IsAvoidingMechanismTurnedOn,
                                 appConfig.IsAlarmMechanismTurnedOn, appConfig.SelectedSensorType, appConfig.AvoidingDistance, appConfig.AlarmDistance,
                                 appConfig.Language, appConfig.SelectedTurnDirection, vehicleWidthElement.GetDouble());
                         }
