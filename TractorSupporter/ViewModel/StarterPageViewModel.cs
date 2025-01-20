@@ -155,7 +155,7 @@ namespace TractorSupporter.ViewModel
                     IpAddress,
                     true,
                     true,
-                    TypeSensor.Ultrasonic,
+                    TypeSensor.Laser,
                     int.Parse(ConfigurationManager.AppSettings["AvoidingDistance"]),
                     int.Parse(ConfigurationManager.AppSettings["AlarmDistance"]),
                     Language.English, TypeTurn.Auto);
