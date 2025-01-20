@@ -41,7 +41,7 @@ public abstract class CommandFieldDecision
 
     public bool MakeDecision(double distanceMeasured, double distance)
     {
-        if (distanceMeasured <= distance && distance >= _minDistance)
+        if (distanceMeasured <= distance && distanceMeasured >= _minDistance)
             return true;
 
         return false;

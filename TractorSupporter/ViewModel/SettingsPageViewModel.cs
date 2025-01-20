@@ -60,6 +60,10 @@ class SettingsPageViewModel : BaseViewModel
         _receivedDataFormatter = receivedDataFormatter;
         _avoidingService = App.ServiceProvider.GetRequiredService<IAvoidingService>();
         _lidarDistanceService = App.ServiceProvider.GetRequiredService<ILidarDistanceService>();
+
+        LidarMaxAcceptableError = _lidarDistanceService._lidarMaxAcceptableError;
+        LidarMinConfirmationCount = _lidarDistanceService._lidarMinConfirmationCount;
+        LidarMinTime = _lidarDistanceService._lidarTimeOfMeasurementLife;
         ForwardCommand = new RelayCommand(SaveSettings);
         BackCommand = new RelayCommand(CloseSettings);
         setConfigData();
